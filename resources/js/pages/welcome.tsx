@@ -75,13 +75,14 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
 
                     <form onSubmit={search} className="flex max-w-2xl flex-col gap-2 rounded-xl bg-white p-2 shadow-xl sm:flex-row">
                         <div className="relative flex-1">
-                            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
+                            <Search className="pointer-events-none absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                            {/* The search card is white in both themes, so the field's colors are fixed too. */}
                             <Input
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder="Search by title, organization or skill"
                                 aria-label="Search opportunities"
-                                className="h-12 border-0 pl-10 text-base text-slate-900 shadow-none focus-visible:ring-0"
+                                className="h-12 border-0 bg-white pl-10 text-base text-slate-900 caret-slate-900 [color-scheme:light] shadow-none placeholder:text-slate-500 focus-visible:ring-0"
                             />
                         </div>
                         <Button type="submit" size="lg" className="h-12 px-6">
