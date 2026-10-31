@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AccountType;
+use App\Enums\ApplicationStatus;
 use App\Enums\ConsentType;
 use App\Enums\OpportunityCategory;
+use App\Models\Application;
 use App\Models\Opportunity;
+use App\Models\User;
 use App\Services\Profiles\ProfileCompletion;
 use App\Services\Recommendation\MatchRefresher;
 use App\Services\Recommendation\MatchScorer;
@@ -78,6 +81,7 @@ class DashboardController extends Controller
             ->get();
 
         return Inertia::render('dashboard', [
+            'applications' => $this->applicationSummary($user),
             'recommended' => $recommended,
             'latest' => $latest,
             'saved' => $saved->map(fn (Opportunity $o) => $card($o)),
@@ -107,5 +111,35 @@ class DashboardController extends Controller
                 ->map(fn ($preference) => $preference->topic->label())
                 ->values(),
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function applicationSummary(User $user): array
+    {
+        $counts = $user->applications()->toBase()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        return [
+            'total' => (int) $counts->sum(),
+            'active' => (int) collect(ApplicationStatus::active())->sum(fn (ApplicationStatus $s) => $counts[$s->value] ?? 0),
+            'approved' => (int) ($counts[ApplicationStatus::Approved->value] ?? 0),
+            'recent' => $user->applications()
+                ->with(['opportunity' => fn ($q) => $q->withTrashed()->with(['organization' => fn ($o) => $o->withTrashed()])])
+                ->latest('updated_at')
+                ->limit(4)
+                ->get()
+                ->map(fn (Application $application) => [
+                    'id' => $application->id,
+                    'title' => $application->opportunity->title,
+                    'organization' => $application->opportunity->organization->name,
+                    'status' => $application->status->value,
+                    'status_label' => $application->status->label(),
+                    'updated_at' => $application->updated_at?->toIso8601String(),
+                ]),
+        ];
     }
 }

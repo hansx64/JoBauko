@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Files\ApplicationDocumentController;
 use App\Http\Controllers\Files\OrganizationDocumentController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\OpportunityController;
@@ -26,6 +27,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('organization-documents/{document}', [OrganizationDocumentController::class, 'show'])
     ->middleware(['auth', 'verified'])
     ->name('organization-documents.show');
+
+Route::get('application-documents/{document}', [ApplicationDocumentController::class, 'show'])
+    ->middleware(['auth', 'verified'])
+    ->name('application-documents.show');
 
 require __DIR__.'/seeker.php';
 require __DIR__.'/organization.php';

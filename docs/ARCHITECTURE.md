@@ -587,6 +587,65 @@ Rules:
 4. Preview/download go through `ResumeController` behind `ResumePolicy` (owner, or
    members of an organization the seeker applied to).
 
+## 5a. Application workflow
+
+`App\Services\Applications\ApplicationWorkflow` owns every change to an application;
+allowed moves are defined on `App\Enums\ApplicationStatus::nextStatuses()`.
+
+```mermaid
+stateDiagram-v2
+    [*] --> submitted
+    submitted --> under_review
+    submitted --> shortlisted
+    submitted --> for_further_requirements
+    submitted --> rejected
+    under_review --> shortlisted
+    under_review --> for_interview
+    under_review --> for_further_requirements
+    under_review --> approved
+    under_review --> rejected
+    shortlisted --> for_interview
+    shortlisted --> for_further_requirements
+    shortlisted --> approved
+    shortlisted --> rejected
+    for_interview --> shortlisted
+    for_interview --> for_further_requirements
+    for_interview --> approved
+    for_interview --> rejected
+    for_further_requirements --> under_review
+    for_further_requirements --> shortlisted
+    for_further_requirements --> for_interview
+    for_further_requirements --> approved
+    for_further_requirements --> rejected
+    submitted --> withdrawn : applicant
+    under_review --> withdrawn : applicant
+    shortlisted --> withdrawn : applicant
+    for_interview --> withdrawn : applicant
+    for_further_requirements --> withdrawn : applicant
+```
+
+- **Submitting** requires a visible opportunity inside its application period, the
+  applicant's consent to share their data with that organization (stored as
+  `data_sharing_consented_at`), every required document (type and 5 MB limit per the
+  requirement), and a resume for jobs. One application per seeker per opportunity;
+  a withdrawn application cannot be resubmitted.
+- **Files** are stored at `storage/app/private/applications/{id}/{uuid}.{ext}` and
+  served by `ApplicationDocumentController` after `ApplicationPolicy::view` (the
+  applicant, or active personnel of the receiving organization with
+  `view_applications`). Everyone else gets 404. Document labels are copied at
+  submission so later edits of the opportunity don't change them. The resume used is
+  kept even if the seeker later replaces it.
+- **Status changes** by the organization: reviewers may move applications along;
+  `approved` / `rejected` need `decide_applications`. `for_further_requirements`
+  requires remarks for the applicant, and while in that status the applicant can upload
+  additional documents. `first_reviewed_at` and `decided_at` are set automatically.
+- Every step writes `application_status_histories` (remarks there are visible to the
+  applicant), an `audit_logs` row, and an in-app notification to the other side
+  (`ApplicationStatusUpdated` to the applicant, `ApplicationActivity` to personnel).
+  Email/SMS delivery by preference is added with the notification pipeline (Phase 9).
+- `application_remarks` are internal notes of the organization and are never sent to
+  the applicant.
+
 ## 6. Notifications and SMS
 
 - Channels: in-app (Laravel `database` notifications), email, SMS.

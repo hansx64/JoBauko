@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Seeker\ApplicationController;
+use App\Http\Controllers\Seeker\ApplicationDocumentController;
 use App\Http\Controllers\Seeker\CertificationController;
 use App\Http\Controllers\Seeker\EducationController;
 use App\Http\Controllers\Seeker\ExperienceController;
@@ -26,6 +28,17 @@ Route::middleware(['auth', 'verified', 'account:seeker', 'matches.invalidate'])
             Route::put('skills', [SkillController::class, 'update'])->name('skills.update');
             Route::put('interests', [InterestController::class, 'update'])->name('interests.update');
         });
+
+        Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
+        Route::get('applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
+        Route::post('applications/{application}/withdraw', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
+        Route::post('applications/{application}/documents', [ApplicationDocumentController::class, 'store'])
+            ->middleware('throttle:20,60')
+            ->name('applications.documents.store');
+        Route::get('opportunities/{opportunity:slug}/apply', [ApplicationController::class, 'create'])->name('applications.create');
+        Route::post('opportunities/{opportunity:slug}/apply', [ApplicationController::class, 'store'])
+            ->middleware('throttle:10,60')
+            ->name('applications.store');
 
         Route::get('saved', [SavedOpportunityController::class, 'index'])->name('saved.index');
         Route::post('opportunities/{opportunity}/save', [SavedOpportunityController::class, 'store'])->name('saved.store');

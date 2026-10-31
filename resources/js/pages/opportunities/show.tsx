@@ -1,15 +1,17 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowLeft,
     Building2,
     CalendarClock,
     CircleCheck,
     CircleDashed,
+    ClipboardList,
     FileText,
     GraduationCap,
     Mail,
     MapPin,
     Phone,
+    Send,
     Sparkles,
     Users,
     Wallet,
@@ -25,6 +27,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import PublicLayout from '@/layouts/public-layout';
 import { cn } from '@/lib/utils';
+import { type SharedData } from '@/types';
+import { type ApplicationSummary } from '@/types/application';
 import { type OpportunityCardData } from '@/types/opportunity';
 import { formatDate } from '@/types/organization';
 
@@ -57,7 +61,16 @@ interface OpportunityDetails extends OpportunityCardData {
     organization_details: { type: string; description: string | null; official_email: string; contact_number: string; office_address: string };
 }
 
-export default function ShowOpportunity({ opportunity, isSeeker }: { opportunity: OpportunityDetails; isSeeker: boolean }) {
+export default function ShowOpportunity({
+    opportunity,
+    isSeeker,
+    application,
+}: {
+    opportunity: OpportunityDetails;
+    isSeeker: boolean;
+    application: Pick<ApplicationSummary, 'id' | 'status' | 'status_label' | 'submitted_at'> | null;
+}) {
+    const { auth } = usePage<SharedData>().props;
     const Icon = categoryIcons[opportunity.category];
     const match = opportunity.match;
 
@@ -265,12 +278,46 @@ export default function ShowOpportunity({ opportunity, isSeeker }: { opportunity
                                 <CardDescription>{deadlineText(opportunity)}</CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-3">
+                                {application ? (
+                                    <div className="grid gap-3">
+                                        <div className="flex flex-wrap items-center gap-2 text-sm">
+                                            You applied on {formatDate(application.submitted_at)}
+                                            <StatusBadge status={application.status} label={application.status_label} />
+                                        </div>
+                                        <Button asChild>
+                                            <Link href={route('seeker.applications.show', application.id)}>
+                                                <ClipboardList className="h-4 w-4" /> View my application
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    opportunity.accepting &&
+                                    (isSeeker ? (
+                                        <Button asChild>
+                                            <Link href={route('seeker.applications.create', opportunity.slug)}>
+                                                <Send className="h-4 w-4" /> Apply now
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        !auth.user && (
+                                            <Button asChild>
+                                                <Link href={route('login')}>Log in to apply</Link>
+                                            </Button>
+                                        )
+                                    ))
+                                )}
                                 {isSeeker ? (
                                     <SaveButton opportunityId={opportunity.id} saved={opportunity.saved} size="default" />
                                 ) : (
-                                    <Button asChild variant="outline">
-                                        <Link href={route('login')}>Log in to save and see your match</Link>
-                                    </Button>
+                                    !auth.user && (
+                                        <p className="text-muted-foreground text-sm">
+                                            New to JoBauko?{' '}
+                                            <Link href={route('register')} className="text-primary font-medium hover:underline">
+                                                Create a free account
+                                            </Link>{' '}
+                                            to apply, save opportunities and see how well you match.
+                                        </p>
+                                    )
                                 )}
                                 {(opportunity.contact_email || opportunity.contact_number) && (
                                     <div className="text-muted-foreground grid gap-1 text-sm">

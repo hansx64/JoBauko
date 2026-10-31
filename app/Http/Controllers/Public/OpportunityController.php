@@ -110,6 +110,7 @@ class OpportunityController extends Controller
 
         $user = $request->user();
         $isSeeker = $user?->isSeeker() ?? false;
+        $application = $isSeeker ? $user->applications()->withTrashed()->where('opportunity_id', $opportunity->id)->first() : null;
 
         return Inertia::render('opportunities/show', [
             'opportunity' => [
@@ -157,6 +158,12 @@ class OpportunityController extends Controller
                 ],
             ],
             'isSeeker' => $isSeeker,
+            'application' => $application ? [
+                'id' => $application->id,
+                'status' => $application->status->value,
+                'status_label' => $application->status->label(),
+                'submitted_at' => $application->submitted_at->toIso8601String(),
+            ] : null,
         ]);
     }
 

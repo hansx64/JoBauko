@@ -1,5 +1,6 @@
 import { OpportunityCard } from '@/components/opportunities/opportunity-card';
 import { CompletionMeter } from '@/components/profile/completion-card';
+import { StatusBadge } from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +11,7 @@ import { type OpportunityCardData } from '@/types/opportunity';
 import { formatDate } from '@/types/organization';
 import { type Completion } from '@/types/profile';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BellRing, Bookmark, CalendarClock, Info, MapPin, Smartphone, Sparkles, UserRound } from 'lucide-react';
+import { ArrowRight, BellRing, Bookmark, CalendarClock, ClipboardList, Info, MapPin, Smartphone, Sparkles, UserRound } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,6 +22,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface DashboardProps {
+    applications: {
+        total: number;
+        active: number;
+        approved: number;
+        recent: { id: number; title: string; organization: string; status: string; status_label: string; updated_at: string | null }[];
+    };
     recommended: OpportunityCardData[];
     latest: Record<'job' | 'scholarship' | 'livelihood', OpportunityCardData[]>;
     saved: OpportunityCardData[];
@@ -41,6 +48,7 @@ const latestTabs = [
 ] as const;
 
 export default function Dashboard({
+    applications,
     recommended,
     latest,
     saved,
@@ -197,6 +205,44 @@ export default function Dashboard({
                     </div>
 
                     <aside className="grid gap-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-base">
+                                    <ClipboardList className="h-4 w-4" /> My applications
+                                </CardTitle>
+                                <CardDescription>
+                                    {applications.total === 0
+                                        ? 'You have not applied to anything yet.'
+                                        : `${applications.active} in progress · ${applications.approved} approved · ${applications.total} total`}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-3">
+                                {applications.recent.length > 0 && (
+                                    <ul className="grid gap-3 text-sm">
+                                        {applications.recent.map((item) => (
+                                            <li key={item.id} className="flex items-start justify-between gap-2">
+                                                <div className="min-w-0">
+                                                    <Link
+                                                        href={route('seeker.applications.show', item.id)}
+                                                        className="line-clamp-1 font-medium hover:underline"
+                                                    >
+                                                        {item.title}
+                                                    </Link>
+                                                    <p className="text-muted-foreground truncate text-xs">{item.organization}</p>
+                                                </div>
+                                                <StatusBadge status={item.status} label={item.status_label} />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                <Button asChild size="sm" variant="outline">
+                                    <Link href={applications.total === 0 ? route('opportunities.index') : route('seeker.applications.index')}>
+                                        {applications.total === 0 ? 'Find something to apply to' : 'View all applications'}
+                                    </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-baseline justify-between text-base">
