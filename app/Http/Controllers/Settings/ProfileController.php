@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\Barangay;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class ProfileController extends Controller
         return Inertia::render('settings/profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'barangays' => Barangay::orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -33,6 +35,10 @@ class ProfileController extends Controller
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
+        }
+
+        if ($request->user()->isDirty('mobile_number')) {
+            $request->user()->mobile_verified_at = null;
         }
 
         $request->user()->save();
@@ -53,7 +59,10 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        // Self-service deletion permanently erases the account and its
+        // personal data (Data Privacy Act right to erasure). Soft deletes are
+        // reserved for administrative removal.
+        $user->forceDelete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

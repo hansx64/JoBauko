@@ -28,13 +28,29 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export type AccountType = 'seeker' | 'organization' | 'admin';
+
 export interface User {
     id: number;
     name: string;
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    mobile_number: string | null;
+    mobile_verified_at: string | null;
+    barangay_id: number | null;
+    account_type: AccountType;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Option {
+    value: string;
+    label: string;
+}
+
+export interface Barangay {
+    id: number;
+    name: string;
 }

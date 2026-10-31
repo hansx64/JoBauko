@@ -1,4 +1,4 @@
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type Barangay, type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -9,6 +9,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
@@ -19,13 +20,24 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
+type ProfileForm = {
+    name: string;
+    email: string;
+    mobile_number: string;
+    barangay_id: string;
+};
+
+export default function Profile({ mustVerifyEmail, status, barangays }: { mustVerifyEmail: boolean; status?: string; barangays: Barangay[] }) {
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
         name: auth.user.name,
         email: auth.user.email,
+        mobile_number: auth.user.mobile_number ?? '',
+        barangay_id: auth.user.barangay_id ? String(auth.user.barangay_id) : '',
     });
+
+    const isSeeker = auth.user.account_type === 'seeker';
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -39,7 +51,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                    <HeadingSmall title="Profile information" description="Update your name, contact details and barangay" />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
@@ -94,6 +106,61 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                         A new verification link has been sent to your email address.
                                     </div>
                                 )}
+                            </div>
+                        )}
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="mobile_number">Mobile number</Label>
+
+                            <Input
+                                id="mobile_number"
+                                type="tel"
+                                inputMode="tel"
+                                className="mt-1 block w-full"
+                                value={data.mobile_number}
+                                onChange={(e) => setData('mobile_number', e.target.value)}
+                                required={isSeeker}
+                                autoComplete="tel"
+                                placeholder="0917 123 4567"
+                            />
+
+                            {auth.user.mobile_number && (
+                                <p className="text-muted-foreground text-sm">
+                                    {auth.user.mobile_verified_at ? (
+                                        'Verified.'
+                                    ) : (
+                                        <>
+                                            Unverified.{' '}
+                                            <Link href={route('mobile.verification.notice')} className="underline underline-offset-4">
+                                                Verify your mobile number
+                                            </Link>
+                                        </>
+                                    )}{' '}
+                                    Changing the number requires verifying it again.
+                                </p>
+                            )}
+
+                            <InputError className="mt-2" message={errors.mobile_number} />
+                        </div>
+
+                        {isSeeker && (
+                            <div className="grid gap-2">
+                                <Label htmlFor="barangay_id">Barangay</Label>
+
+                                <Select value={data.barangay_id} onValueChange={(value) => setData('barangay_id', value)}>
+                                    <SelectTrigger id="barangay_id" className="mt-1">
+                                        <SelectValue placeholder="Select your barangay" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {barangays.map((barangay) => (
+                                            <SelectItem key={barangay.id} value={String(barangay.id)}>
+                                                {barangay.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <InputError className="mt-2" message={errors.barangay_id} />
                             </div>
                         )}
 

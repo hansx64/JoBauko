@@ -43,7 +43,18 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user()?->only([
+                    'id',
+                    'name',
+                    'email',
+                    'email_verified_at',
+                    'mobile_number',
+                    'mobile_verified_at',
+                    'barangay_id',
+                    'account_type',
+                    'created_at',
+                    'updated_at',
+                ]),
             ],
         ]);
     }

@@ -122,8 +122,6 @@ erDiagram
         timestamp mobile_verified_at
         string password
         string account_type "seeker|organization|admin"
-        bigint province_id FK
-        bigint municipality_id FK
         bigint barangay_id FK
         boolean is_active
         timestamp deactivated_at
@@ -140,7 +138,6 @@ erDiagram
         string highest_education "elementary..doctorate"
         string current_education_status
         text summary
-        tinyint completion_percent
     }
     applicant_education {
         bigint id PK
@@ -261,8 +258,7 @@ erDiagram
         string official_email
         string contact_number
         string office_address
-        bigint province_id FK
-        bigint municipality_id FK
+        bigint barangay_id FK "nullable; offices outside Bauko use office_address"
         text description
         string logo_path
         string representative_name
@@ -301,9 +297,8 @@ erDiagram
         text benefits
         text application_instructions
         string min_education "nullable"
-        bigint province_id FK
-        bigint municipality_id FK
-        string location_text
+        bigint barangay_id FK "Bauko barangay, nullable"
+        string location_text "outside Bauko"
         boolean is_remote
         date application_start
         date application_deadline
@@ -367,6 +362,7 @@ erDiagram
         timestamp submitted_at
         timestamp first_reviewed_at
         timestamp decided_at
+        timestamp withdrawn_at
         softdeletes deleted_at
     }
     application_documents {
@@ -477,6 +473,7 @@ erDiagram
         text details
         string status "open|resolved|dismissed"
         bigint resolved_by FK
+        timestamp resolved_at
         text resolution_notes
     }
     audit_logs {
@@ -498,8 +495,11 @@ erDiagram
 - **users → applicant_profiles (1:0..1).** Only seekers get a profile. Classification is
   stored here, not on `users`, so it can never be confused with a permission role.
 - **Location** is normalized into `provinces → municipalities → barangays` (PSGC codes
-  kept in a `psgc_code` column). Users and opportunities reference these IDs, which
-  powers location filters, location-based matching and geographic reports.
+  in a `psgc_code` column). JoBauko serves Bauko, Mountain Province, so only its 22
+  barangays are seeded. Users store only `barangay_id`; the municipality and province
+  follow from it. Opportunities may be in a Bauko barangay (`barangay_id`) or elsewhere
+  (`location_text`, e.g. Baguio City, or `is_remote`).
+- **Profile completion** is computed from the profile tables when needed, not stored.
 - **skills** is a shared dictionary. `applicant_skills` and `opportunity_skills` are
   pivots onto it, so skill matching is an ID intersection instead of fuzzy text
   comparison. The resume parser also matches extracted text against this dictionary.
@@ -527,7 +527,7 @@ erDiagram
 | opportunities | `FULLTEXT(title, description, qualifications)` | keyword search |
 | opportunities | `(status, category, application_deadline)` | browse + filter |
 | opportunities | `(organization_id, status)` | org dashboard |
-| opportunities | `(province_id, municipality_id)` | location filter |
+| opportunities | `barangay_id` (FK index) | location filter |
 | applications | `UNIQUE(opportunity_id, user_id)`, `(user_id, status)`, `(opportunity_id, status)` | tracking & dashboards |
 | application_status_histories | `(application_id, created_at)` | timelines |
 | opportunity_matches | `(user_id, score)` | dashboard recommendations |
