@@ -513,8 +513,9 @@ erDiagram
   as the status change. It records from/to status, who, when and remarks.
 - **application_remarks** are internal to the organization and are never sent to the
   seeker; seeker-facing explanations go in the status history `remarks`.
-- **opportunity_matches** caches recommendation results. It is derived data, refreshed
-  by a queued job whenever a profile, resume review or opportunity changes.
+- **opportunity_matches** caches recommendation results. It is derived data: a seeker's
+  rows are recomputed on their next visit after their profile or any opportunity changed
+  (see section 4), so scores are never stale and nothing runs for inactive seekers.
 - **sms_logs.dedupe_key** (e.g. `status:{application_id}:{status}`) has a unique index,
   so the same message cannot be sent twice even if a job is retried.
 - **audit_logs** has no `updated_at`; the model refuses updates and deletes, and MySQL
@@ -555,6 +556,13 @@ Rules:
 
 - Criteria the opportunity doesn't specify are excluded from the denominator, so a
   posting with no skill list isn't scored down for it. The final score is normalized to 0–100.
+- Freshness: `MatchRefresher` keeps a global version (bumped when an opportunity or an
+  organization's verification changes) and a per-seeker marker (cleared by the
+  `matches.invalidate` middleware on any profile change). When they differ, the seeker's
+  scores are recomputed before the dashboard or browse page is shown. The details page
+  always scores live.
+- Public visibility: only published or closed opportunities of *verified* organizations
+  are listed (`Opportunity::visible()`); recommendations use the open subset.
 - Only opportunities that are currently open are scored. Scores below 30 aren't shown
   as recommendations but **never** block browsing or applying.
 - The UI labels the score as a *match indicator*, not an eligibility decision, and shows

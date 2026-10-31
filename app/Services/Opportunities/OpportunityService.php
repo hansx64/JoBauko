@@ -9,6 +9,7 @@ use App\Models\Organization;
 use App\Models\Skill;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
+use App\Services\Recommendation\MatchRefresher;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -71,6 +72,8 @@ class OpportunityService
             $this->audit->logChanges('opportunity.updated', $opportunity, $opportunity->organization_id);
 
             $this->syncRelated($opportunity, $data);
+
+            MatchRefresher::invalidateAll();
 
             return $opportunity;
         });
@@ -149,6 +152,8 @@ class OpportunityService
         $opportunity->forceFill(['application_deadline' => $deadline])->save();
 
         $this->audit->log('opportunity.deadline_extended', $opportunity, ['application_deadline' => $old], ['application_deadline' => $deadline], $opportunity->organization_id);
+
+        MatchRefresher::invalidateAll();
     }
 
     public function archive(Opportunity $opportunity): void
@@ -330,6 +335,8 @@ class OpportunityService
         $from = $opportunity->status;
 
         $opportunity->forceFill(['status' => $to, ...$extra])->save();
+
+        MatchRefresher::invalidateAll();
 
         $this->audit->log(
             $action,

@@ -7,6 +7,7 @@ use App\Models\Organization;
 use App\Models\User;
 use App\Notifications\OrganizationVerificationUpdated;
 use App\Services\Audit\AuditLogger;
+use App\Services\Recommendation\MatchRefresher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
@@ -62,6 +63,9 @@ class OrganizationVerificationService
             }
 
             $organization->save();
+
+            // Verification decides whether its opportunities are public.
+            MatchRefresher::invalidateAll();
 
             $this->audit->log(
                 $action,

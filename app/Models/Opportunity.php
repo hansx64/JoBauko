@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\EducationLevel;
 use App\Enums\OpportunityCategory;
 use App\Enums\OpportunityStatus;
+use App\Enums\VerificationStatus;
 use Database\Factories\OpportunityFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -153,6 +154,19 @@ class Opportunity extends Model
     public function skills(): BelongsToMany
     {
         return $this->belongsToMany(Skill::class, 'opportunity_skills')->withPivot('is_required')->orderBy('name');
+    }
+
+    /**
+     * Opportunities the public may see: published or closed listings of
+     * verified organizations. Drafts, archived and suspended listings, and
+     * anything from unverified or suspended organizations, stay hidden.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeVisible(Builder $query): void
+    {
+        $query->whereIn('status', [OpportunityStatus::Published, OpportunityStatus::Closed])
+            ->whereHas('organization', fn (Builder $q) => $q->where('verification_status', VerificationStatus::Verified));
     }
 
     /**

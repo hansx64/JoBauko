@@ -8,6 +8,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -87,6 +88,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function organizationMembership(): HasOne
     {
         return $this->hasOne(OrganizationMember::class);
+    }
+
+    /**
+     * @return BelongsToMany<Opportunity, $this>
+     */
+    public function savedOpportunities(): BelongsToMany
+    {
+        return $this->belongsToMany(Opportunity::class, 'saved_opportunities')->withPivot('created_at');
     }
 
     /**

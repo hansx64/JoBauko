@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\SkillType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class Skill extends Model
@@ -29,6 +30,14 @@ class Skill extends Model
         return [
             'type' => SkillType::class,
         ];
+    }
+
+    /**
+     * @return BelongsToMany<Opportunity, $this>
+     */
+    public function opportunities(): BelongsToMany
+    {
+        return $this->belongsToMany(Opportunity::class, 'opportunity_skills');
     }
 
     /**

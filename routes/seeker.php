@@ -7,11 +7,12 @@ use App\Http\Controllers\Seeker\InterestController;
 use App\Http\Controllers\Seeker\ProfileController;
 use App\Http\Controllers\Seeker\ResumeController;
 use App\Http\Controllers\Seeker\ResumeReviewController;
+use App\Http\Controllers\Seeker\SavedOpportunityController;
 use App\Http\Controllers\Seeker\SkillController;
 use App\Http\Controllers\Seeker\TrainingController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified', 'account:seeker'])
+Route::middleware(['auth', 'verified', 'account:seeker', 'matches.invalidate'])
     ->name('seeker.')
     ->group(function () {
         Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -25,6 +26,10 @@ Route::middleware(['auth', 'verified', 'account:seeker'])
             Route::put('skills', [SkillController::class, 'update'])->name('skills.update');
             Route::put('interests', [InterestController::class, 'update'])->name('interests.update');
         });
+
+        Route::get('saved', [SavedOpportunityController::class, 'index'])->name('saved.index');
+        Route::post('opportunities/{opportunity}/save', [SavedOpportunityController::class, 'store'])->name('saved.store');
+        Route::delete('opportunities/{opportunity}/save', [SavedOpportunityController::class, 'destroy'])->name('saved.destroy');
 
         Route::post('resume', [ResumeController::class, 'store'])->middleware('throttle:10,60')->name('resume.store');
         Route::get('resume/{resume}/file', [ResumeController::class, 'show'])->name('resume.file');

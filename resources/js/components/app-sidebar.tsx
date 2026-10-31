@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type AccountType, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Building2, LayoutGrid, Megaphone, ShieldCheck, UserRound } from 'lucide-react';
+import { Bookmark, Building2, LayoutGrid, Megaphone, Search, ShieldCheck, UserRound } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const navItemsByAccountType: Record<AccountType, NavItem[]> = {
@@ -12,6 +12,16 @@ const navItemsByAccountType: Record<AccountType, NavItem[]> = {
             title: 'Dashboard',
             url: '/dashboard',
             icon: LayoutGrid,
+        },
+        {
+            title: 'Browse opportunities',
+            url: '/opportunities',
+            icon: Search,
+        },
+        {
+            title: 'Saved',
+            url: '/saved',
+            icon: Bookmark,
         },
         {
             title: 'My profile',

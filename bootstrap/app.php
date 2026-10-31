@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureAccountType;
 use App\Http\Middleware\EnsureOrganizationMember;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\InvalidateMatches;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'account' => EnsureAccountType::class,
             'org.member' => EnsureOrganizationMember::class,
+            'matches.invalidate' => InvalidateMatches::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
