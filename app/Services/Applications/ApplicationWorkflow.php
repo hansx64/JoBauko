@@ -7,12 +7,15 @@ use App\Enums\OpportunityCategory;
 use App\Enums\OrganizationPermission;
 use App\Models\Application;
 use App\Models\ApplicationDocument;
+use App\Models\ApplicationRemark;
 use App\Models\Opportunity;
 use App\Models\OrganizationMember;
 use App\Models\User;
 use App\Notifications\ApplicationActivity;
 use App\Notifications\ApplicationStatusUpdated;
 use App\Services\Audit\AuditLogger;
+use App\Services\Recommendation\MatchScorer;
+use App\Services\Recommendation\SeekerSnapshot;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -38,7 +41,10 @@ class ApplicationWorkflow
 
     public const MAX_DOCUMENTS = 20;
 
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(
+        private readonly AuditLogger $audit,
+        private readonly MatchScorer $scorer,
+    ) {}
 
     /**
      * @param  array{cover_letter?: string|null, include_resume?: bool}  $data
@@ -76,6 +82,7 @@ class ApplicationWorkflow
                 $application->user_id = $user->id;
                 $application->resume_id = $resume?->id;
                 $application->status = ApplicationStatus::Submitted;
+                $application->match_score = $this->scorer->score(SeekerSnapshot::fromUser($user), $opportunity)->score;
                 $application->data_sharing_consented_at = now();
                 $application->submitted_at = now();
                 $application->save();
@@ -195,6 +202,18 @@ class ApplicationWorkflow
         return $document;
     }
 
+    /**
+     * Add an internal note of the organization. Never shown to the applicant.
+     */
+    public function addRemark(Application $application, User $author, string $body): ApplicationRemark
+    {
+        $remark = $application->remarks()->create(['user_id' => $author->id, 'body' => trim($body)]);
+
+        $this->audit->log('application.remark_added', $application, new: ['remark_id' => $remark->id], organizationId: $this->organizationId($application));
+
+        return $remark;
+    }
+
     private function ensureAcceptingApplications(Opportunity $opportunity): void
     {
         $visible = Opportunity::query()->visible()->whereKey($opportunity->id)->exists();
@@ -255,11 +274,14 @@ class ApplicationWorkflow
      */
     private function reviewers(Application $application): Collection
     {
-        return OrganizationMember::query()
+        /** @var Collection<int, OrganizationMember> $members */
+        $members = OrganizationMember::query()
             ->where('organization_id', $this->organizationId($application))
             ->where('is_active', true)
             ->with('user')
-            ->get()
+            ->get();
+
+        return $members
             ->filter(fn (OrganizationMember $member) => $member->hasPermission(OrganizationPermission::ViewApplications) && $member->user !== null)
             ->map(fn (OrganizationMember $member) => $member->user)
             ->values();

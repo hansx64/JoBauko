@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\OrganizationPermission;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -58,7 +59,30 @@ class HandleInertiaRequests extends Middleware
                     'created_at',
                     'updated_at',
                 ]),
+                'organization' => fn () => $this->organizationAccess($request),
             ],
         ]);
+    }
+
+    /**
+     * The signed-in member's role and permissions, so navigation only shows
+     * what the role can use. Routes and policies still enforce them.
+     *
+     * @return array{name: string, role: string, role_label: string, permissions: list<string>}|null
+     */
+    private function organizationAccess(Request $request): ?array
+    {
+        $membership = $request->user()?->organizationMembership;
+
+        if ($membership === null || ! $membership->is_active) {
+            return null;
+        }
+
+        return [
+            'name' => $membership->organization->name,
+            'role' => $membership->role->value,
+            'role_label' => $membership->role->label(),
+            'permissions' => array_map(fn (OrganizationPermission $p) => $p->value, $membership->role->permissions()),
+        ];
     }
 }

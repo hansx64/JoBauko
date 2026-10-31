@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { VerificationBanner } from '@/components/verification-banner';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type Paginated } from '@/types';
+import { type BreadcrumbItem, type Paginated, type SharedData } from '@/types';
 import { formatDate, type OpportunityListItem, type OrganizationSummary } from '@/types/organization';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Opportunities', href: '/org/opportunities' }];
@@ -35,7 +35,8 @@ interface OpportunitiesIndexProps {
 
 export default function OpportunitiesIndex({ organization, opportunities, filters, canCreate }: OpportunitiesIndexProps) {
     const [search, setSearch] = useState(filters.search);
-    const { errors } = usePage().props;
+    const { errors, auth } = usePage<SharedData>().props;
+    const canViewApplications = auth.organization?.permissions.includes('view_applications') ?? false;
 
     const visit = (params: { status?: string; search?: string }) =>
         router.get(
@@ -114,6 +115,7 @@ export default function OpportunitiesIndex({ organization, opportunities, filter
                                         <th className="px-4 py-3 font-medium">Category</th>
                                         <th className="px-4 py-3 font-medium">Status</th>
                                         <th className="px-4 py-3 font-medium">Deadline</th>
+                                        <th className="px-4 py-3 text-right font-medium">Applicants</th>
                                         <th className="px-4 py-3 font-medium">Last updated</th>
                                         <th className="px-4 py-3">
                                             <span className="sr-only">Actions</span>
@@ -133,6 +135,18 @@ export default function OpportunitiesIndex({ organization, opportunities, filter
                                                 <StatusBadge status={o.status} label={o.status_label} />
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">{formatDate(o.deadline)}</td>
+                                            <td className="px-4 py-3 text-right tabular-nums">
+                                                {o.applications_count > 0 && canViewApplications ? (
+                                                    <Link
+                                                        href={route('org.applications.index', { opportunity: o.id })}
+                                                        className="text-primary font-medium hover:underline"
+                                                    >
+                                                        {o.applications_count}
+                                                    </Link>
+                                                ) : (
+                                                    o.applications_count
+                                                )}
+                                            </td>
                                             <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">{formatDate(o.updated_at)}</td>
                                             <td className="px-2 py-3 text-right">
                                                 {canCreate && (

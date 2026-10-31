@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\AccountType;
+use App\Enums\ApplicationStatus;
 use App\Enums\AssistanceType;
 use App\Enums\Classification;
 use App\Enums\EducationLevel;
@@ -14,6 +15,7 @@ use App\Enums\OrganizationRole;
 use App\Enums\OrganizationType;
 use App\Enums\VerificationStatus;
 use App\Enums\WorkSetup;
+use App\Models\Application;
 use App\Models\Barangay;
 use App\Models\Opportunity;
 use App\Models\Organization;
@@ -21,6 +23,8 @@ use App\Models\Skill;
 use App\Models\User;
 use App\Services\Notifications\NotificationPreferenceService;
 use App\Services\Recommendation\MatchRefresher;
+use App\Services\Recommendation\MatchScorer;
+use App\Services\Recommendation\SeekerSnapshot;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -111,6 +115,9 @@ class DemoDataSeeder extends Seeder
         $this->seeker('demo.student@jobauko.test', 'Liza Pagaduan (Demo)', Classification::Student, EducationLevel::SeniorHigh, 'Abatan',
             'BS Agriculture', ['Organic Farming', 'Teamwork'], [[InterestCategory::Scholarship, 'Agriculture'], [InterestCategory::Livelihood, 'Farming']]);
 
+        $this->application('demo.seeker@jobauko.test', 'Municipal IT Assistant', ApplicationStatus::UnderReview, 'I maintain the computers in our barangay hall as a volunteer and would like to do the same for the municipality.');
+        $this->application('demo.student@jobauko.test', 'Bauko Municipal College Scholarship', ApplicationStatus::Submitted, null);
+
         MatchRefresher::invalidateAll();
 
         $this->command?->info('Demo data ready. Log in as demo.seeker@jobauko.test, demo.student@jobauko.test or demo.org@jobauko.test (password: password).');
@@ -180,6 +187,40 @@ class DemoDataSeeder extends Seeder
             foreach ($documents as $document) {
                 $opportunity->requiredDocuments()->create(['name' => $document, 'is_required' => true]);
             }
+        }
+    }
+
+    /**
+     * A demo application with its status history. Created directly rather
+     * than through ApplicationWorkflow because demo seekers have no files.
+     */
+    private function application(string $email, string $title, ApplicationStatus $status, ?string $coverLetter): void
+    {
+        $user = User::where('email', $email)->firstOrFail();
+        $opportunity = Opportunity::where('title', $title)->firstOrFail();
+
+        if (Application::withTrashed()->where(['user_id' => $user->id, 'opportunity_id' => $opportunity->id])->exists()) {
+            return;
+        }
+
+        $application = new Application(['cover_letter' => $coverLetter]);
+        $application->opportunity_id = $opportunity->id;
+        $application->user_id = $user->id;
+        $application->status = $status;
+        $application->match_score = app(MatchScorer::class)->score(SeekerSnapshot::fromUser($user), $opportunity)->score;
+        $application->data_sharing_consented_at = now()->subDays(2);
+        $application->submitted_at = now()->subDays(2);
+        $application->first_reviewed_at = $status === ApplicationStatus::Submitted ? null : now()->subDay();
+        $application->save();
+
+        $application->statusHistory()->create(['to_status' => ApplicationStatus::Submitted, 'changed_by' => $user->id]);
+
+        if ($status !== ApplicationStatus::Submitted) {
+            $application->statusHistory()->create([
+                'from_status' => ApplicationStatus::Submitted,
+                'to_status' => $status,
+                'changed_by' => $opportunity->organization->members()->value('user_id'),
+            ]);
         }
     }
 

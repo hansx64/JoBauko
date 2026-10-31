@@ -86,6 +86,30 @@ This keeps the "current organization" unambiguous and the isolation rules simple
 
 Organizations must be `verified` before any member can publish opportunities.
 
+**Enforcement.** Organization routes use `org.member` (active membership) and
+`org.can:{permission}` (e.g. `org.can:view_applications`); record-level checks are in
+`ApplicationPolicy` / `OpportunityPolicy`. The member's role and permissions are
+shared with the frontend as `auth.organization` so navigation hides what the role
+cannot use; the server never relies on that.
+
+**Personnel.** Organization administrators add personnel by name, email and role
+(`PersonnelService`). This creates an organization account with an unusable password
+and emails a signed invitation link (`invitations.show`, valid 3 days, resendable).
+Accepting it sets the password, verifies the email and signs the person in. An email
+that already has an account cannot be invited, so a person never belongs to two
+organizations and a seeker account never becomes personnel. Members are deactivated,
+never deleted, so their status changes and remarks stay attributable. Nobody can change
+their own role or access, and the last active administrator cannot be demoted or
+deactivated (checked under a row lock).
+
+**Applicant review.** The applicant list is scoped to the organization's own
+opportunities and can be filtered by opportunity, status and name and sorted by the
+match score stored at submission (`applications.match_score`). The review page shows
+the profile, resume, documents, cover letter, a live match score, the status history,
+allowed next statuses for the member's role, and internal remarks. Each opening of the
+review page is written to the audit log (`application.viewed`), since it discloses
+personal data.
+
 ## 3. Database design
 
 Conventions: `bigint unsigned` auto-increment keys, `timestamps()` on all mutable

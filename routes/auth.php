@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Auth\MobileVerificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\OrganizationRegistrationController;
@@ -24,6 +25,14 @@ Route::middleware('guest')->group(function () {
 
     Route::post('organizations/register', [OrganizationRegistrationController::class, 'store'])
         ->middleware('throttle:5,60');
+
+    Route::get('invitations/{user}', [InvitationController::class, 'show'])
+        ->middleware('signed')
+        ->name('invitations.show');
+
+    Route::post('invitations/{user}', [InvitationController::class, 'store'])
+        ->middleware(['signed', 'throttle:10,60'])
+        ->name('invitations.store');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

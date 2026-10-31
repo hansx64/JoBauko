@@ -1,7 +1,9 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { CircleAlert, Download, Eye, FileText, LoaderCircle, Upload } from 'lucide-react';
+import { CircleAlert, LoaderCircle, Upload } from 'lucide-react';
 import { FormEventHandler, useRef, useState } from 'react';
 
+import { DocumentRow } from '@/components/applications/document-row';
+import { StatusTimeline } from '@/components/applications/status-timeline';
 import InputError from '@/components/input-error';
 import { categoryIcons, categoryTones } from '@/components/opportunities/opportunity-card';
 import { StatusBadge } from '@/components/status-badge';
@@ -15,7 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
-import { type ApplicationDetails, type ApplicationHistoryEntry, formatDateTime, formatFileSize } from '@/types/application';
+import { type ApplicationDetails, formatFileSize } from '@/types/application';
 import { type OpportunityCardData } from '@/types/opportunity';
 import { formatDate } from '@/types/organization';
 
@@ -145,7 +147,12 @@ export default function ShowApplication({
                                 <CardTitle className="text-base">Status history</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <Timeline entries={application.history} organization={opportunity.organization.name} />
+                                <StatusTimeline
+                                    entries={application.history.map((entry) => ({
+                                        ...entry,
+                                        by: entry.by_applicant ? 'by you' : `by ${opportunity.organization.name}`,
+                                    }))}
+                                />
                             </CardContent>
                         </Card>
 
@@ -154,59 +161,6 @@ export default function ShowApplication({
                 </div>
             </div>
         </AppLayout>
-    );
-}
-
-function Timeline({ entries, organization }: { entries: ApplicationHistoryEntry[]; organization: string }) {
-    const newestFirst = [...entries].reverse();
-
-    return (
-        <ol className="relative grid gap-5 border-l pl-5">
-            {newestFirst.map((entry, index) => (
-                <li key={`${entry.status}-${entry.at}`} className="relative">
-                    <span
-                        className={cn(
-                            'ring-background absolute top-1 -left-[1.6rem] size-3 rounded-full ring-4',
-                            index === 0 ? 'bg-primary' : 'bg-muted-foreground/40',
-                        )}
-                    />
-                    <p className="text-sm font-medium">{entry.label}</p>
-                    <p className="text-muted-foreground text-xs">
-                        {formatDateTime(entry.at)} · {entry.by_applicant ? 'by you' : `by ${organization}`}
-                    </p>
-                    {entry.remarks && <p className="mt-1 text-sm whitespace-pre-line">{entry.remarks}</p>}
-                </li>
-            ))}
-        </ol>
-    );
-}
-
-function DocumentRow({ label, name, meta, url, previewUrl }: { label: string; name: string; meta?: string; url: string; previewUrl: string | null }) {
-    return (
-        <li className="flex flex-wrap items-center gap-3 p-3">
-            <FileText className="text-muted-foreground h-5 w-5 shrink-0" />
-            <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{label}</p>
-                <p className="text-muted-foreground truncate text-xs">
-                    {name}
-                    {meta && ` · ${meta}`}
-                </p>
-            </div>
-            <div className="flex gap-1">
-                {previewUrl && (
-                    <Button asChild size="sm" variant="ghost">
-                        <a href={previewUrl} target="_blank" rel="noreferrer">
-                            <Eye className="h-4 w-4" /> View
-                        </a>
-                    </Button>
-                )}
-                <Button asChild size="sm" variant="ghost">
-                    <a href={url}>
-                        <Download className="h-4 w-4" /> Download
-                    </a>
-                </Button>
-            </div>
-        </li>
     );
 }
 

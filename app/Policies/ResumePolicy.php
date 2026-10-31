@@ -8,8 +8,9 @@ use App\Models\User;
 class ResumePolicy
 {
     /**
-     * Viewing or downloading the file. Organization access to applicants'
-     * resumes is added with application management.
+     * Viewing or downloading the file from the seeker's own pages.
+     * Organizations get the resume submitted with an application through
+     * org.applications.resume, authorized by ApplicationPolicy.
      */
     public function view(User $user, Resume $resume): bool
     {

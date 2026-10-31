@@ -35,7 +35,7 @@ class OpportunityController extends Controller
         $filter = in_array($request->query('status'), self::FILTERS, true) ? $request->query('status') : 'all';
         $search = trim((string) $request->query('search'));
 
-        $query = $organization->opportunities()->latest('updated_at');
+        $query = $organization->opportunities()->withCount('applications')->latest('updated_at');
 
         match ($filter) {
             'all' => null,
@@ -59,6 +59,7 @@ class OpportunityController extends Controller
                 'status_label' => $o->displayStatusLabel(),
                 'deadline' => $o->application_deadline?->toDateString(),
                 'slots' => $o->slots,
+                'applications_count' => (int) $o->getAttribute('applications_count'),
                 'updated_at' => $o->updated_at->toIso8601String(),
             ]),
             'filters' => ['status' => $filter, 'search' => $search],

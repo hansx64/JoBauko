@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use App\Enums\ApplicationStatus;
+use Carbon\CarbonInterface;
 use Database\Factories\ApplicationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -18,11 +18,12 @@ use Illuminate\Support\Carbon;
  * @property int|null $resume_id
  * @property string|null $cover_letter
  * @property ApplicationStatus $status
- * @property Carbon|null $data_sharing_consented_at
- * @property Carbon $submitted_at
- * @property Carbon|null $first_reviewed_at
- * @property Carbon|null $decided_at
- * @property Carbon|null $withdrawn_at
+ * @property int|null $match_score
+ * @property CarbonInterface|null $data_sharing_consented_at
+ * @property CarbonInterface $submitted_at
+ * @property CarbonInterface|null $first_reviewed_at
+ * @property CarbonInterface|null $decided_at
+ * @property CarbonInterface|null $withdrawn_at
  * @property string|null $withdrawal_reason
  */
 class Application extends Model
@@ -50,6 +51,7 @@ class Application extends Model
     {
         return [
             'status' => ApplicationStatus::class,
+            'match_score' => 'integer',
             'data_sharing_consented_at' => 'datetime',
             'submitted_at' => 'datetime',
             'first_reviewed_at' => 'datetime',

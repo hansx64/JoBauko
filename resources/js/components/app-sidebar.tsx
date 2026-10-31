@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type AccountType, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Bookmark, Building2, ClipboardList, LayoutGrid, Megaphone, Search, ShieldCheck, UserRound } from 'lucide-react';
+import { Bookmark, Building2, ClipboardList, LayoutGrid, Megaphone, Search, ShieldCheck, UserRound, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const navItemsByAccountType: Record<AccountType, NavItem[]> = {
@@ -46,6 +46,18 @@ const navItemsByAccountType: Record<AccountType, NavItem[]> = {
             icon: Megaphone,
         },
         {
+            title: 'Applicants',
+            url: '/org/applications',
+            icon: ClipboardList,
+            permission: 'view_applications',
+        },
+        {
+            title: 'Personnel',
+            url: '/org/personnel',
+            icon: Users,
+            permission: 'manage_personnel',
+        },
+        {
             title: 'Organization profile',
             url: '/org/profile',
             icon: Building2,
@@ -67,7 +79,8 @@ const navItemsByAccountType: Record<AccountType, NavItem[]> = {
 
 export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
-    const navItems = navItemsByAccountType[auth.user.account_type];
+    const permissions = auth.organization?.permissions ?? [];
+    const navItems = navItemsByAccountType[auth.user.account_type].filter((item) => !item.permission || permissions.includes(item.permission));
     const homeUrl = navItems[0]?.url ?? '/dashboard';
 
     return (

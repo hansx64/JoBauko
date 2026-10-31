@@ -17,6 +17,7 @@ export interface OpportunityListItem {
     status_label: string;
     deadline: string | null;
     slots: number | null;
+    applications_count: number;
     updated_at: string;
 }
 

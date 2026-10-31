@@ -46,6 +46,17 @@ class ApplicationPolicy
             : Response::deny('Documents can only be added when the organization asks for further requirements.');
     }
 
+    public function addRemark(User $user, Application $application): Response
+    {
+        if (! $this->memberCan($user, $application, OrganizationPermission::ViewApplications)) {
+            return Response::denyAsNotFound();
+        }
+
+        return $this->memberCan($user, $application, OrganizationPermission::AddRemarks)
+            ? Response::allow()
+            : Response::deny('Your role does not allow adding remarks.');
+    }
+
     /**
      * Reviewers may move applications along; approving or rejecting needs
      * the decision permission.

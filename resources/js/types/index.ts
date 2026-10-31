@@ -1,7 +1,24 @@
 import { LucideIcon } from 'lucide-react';
 
+export type OrganizationPermission =
+    | 'manage_organization'
+    | 'manage_personnel'
+    | 'manage_opportunities'
+    | 'view_applications'
+    | 'add_remarks'
+    | 'review_applications'
+    | 'decide_applications';
+
+export interface OrganizationAccess {
+    name: string;
+    role: string;
+    role_label: string;
+    permissions: OrganizationPermission[];
+}
+
 export interface Auth {
     user: User;
+    organization: OrganizationAccess | null;
 }
 
 export interface BreadcrumbItem {
@@ -19,6 +36,8 @@ export interface NavItem {
     url: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    /** Organization permission required to show the item. */
+    permission?: OrganizationPermission;
 }
 
 export interface SharedData {
