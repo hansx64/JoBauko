@@ -1,6 +1,7 @@
-# Opportunity Portal — System Architecture
+# JoBauko — System Architecture
 
-This document is the design baseline for the Opportunity Portal. Database-dependent
+This document is the design baseline for JoBauko, the opportunity portal for the
+Municipality of Bauko, Mountain Province. Database-dependent
 modules are implemented against the schema described here; changes to the schema
 should be reflected in this file first.
 
