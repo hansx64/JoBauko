@@ -593,11 +593,11 @@ human-readable reason, so every score shown to a user can be traced back to its 
 
 | Criterion | Weight | Example reason |
 |---|---:|---|
-| Skills overlap (profile + reviewed resume skills ∩ opportunity skills) | 35 | "You have 4 of 5 required skills: Laravel, MySQL, ..." |
+| Skills overlap (profile + reviewed resume skills ∩ opportunity skills; names compared case-insensitively) | 35 | "You have 3 of 4 listed skills: Organic Farming, Composting, ..." |
 | Education level meets the minimum | 20 | "Your Bachelor's degree meets the College graduate requirement" |
 | Field / course relevance (course, experience industry vs. eligible courses / keywords) | 15 | "Your BS Information Technology course is eligible" |
 | Classification fit (e.g. scholarships ↔ students, livelihood target groups) | 10 | "This program targets Out-of-School Youth" |
-| Location (same municipality > same province > remote) | 10 | "Located in your municipality, Tagum City" |
+| Location (remote or same barangay = full; elsewhere in Bauko = 80%; outside Bauko = 30%) | 10 | "In your barangay, Abatan" |
 | Stated interests (category and field) | 10 | "You are interested in Agriculture livelihood programs" |
 
 Rules:
