@@ -7,8 +7,10 @@ use App\Models\Resume;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Database\Seeders\SkillSeeder;
+use Illuminate\Filesystem\LocalFilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 use ZipArchive;
@@ -29,11 +31,13 @@ class ResumeTest extends TestCase
         'Organic Agriculture Production NC II',
     ];
 
+    private LocalFilesystemAdapter $disk;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        Storage::fake('local');
+        $this->disk = Storage::fake('local');
         $this->seed(SkillSeeder::class);
     }
 
@@ -69,7 +73,7 @@ class ResumeTest extends TestCase
         $resume = Resume::sole();
         $response->assertRedirect("/resume/{$resume->id}/review");
 
-        Storage::disk('local')->assertExists($resume->disk_path);
+        $this->disk->assertExists($resume->disk_path);
         $this->assertStringStartsWith("resumes/{$user->id}/", $resume->disk_path);
         $this->assertSame('application/pdf', $resume->mime_type);
         $this->assertSame(ResumeExtractionStatus::Extracted, $resume->extraction_status);
@@ -135,7 +139,7 @@ class ResumeTest extends TestCase
         $this->post('/resume', ['resume' => $this->docxUpload()]);
 
         $this->assertModelMissing($first);
-        Storage::disk('local')->assertMissing($first->disk_path);
+        $this->disk->assertMissing($first->disk_path);
         $this->assertSame('maria-santos.docx', $user->currentResume()->first()->original_name);
     }
 
@@ -166,7 +170,7 @@ class ResumeTest extends TestCase
         $this->get("/resume/{$resume->id}/review")->assertForbidden();
         $this->delete("/resume/{$resume->id}")->assertForbidden();
 
-        auth()->logout();
+        Auth::guard('web')->logout();
         $this->get("/resume/{$resume->id}/file")->assertRedirect('/login');
     }
 
@@ -226,6 +230,6 @@ class ResumeTest extends TestCase
         $this->delete("/resume/{$resume->id}")->assertRedirect('/profile');
 
         $this->assertModelMissing($resume);
-        Storage::disk('local')->assertMissing($resume->disk_path);
+        $this->disk->assertMissing($resume->disk_path);
     }
 }
