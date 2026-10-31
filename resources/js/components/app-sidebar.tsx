@@ -7,7 +7,9 @@ import {
     Bookmark,
     Building2,
     ClipboardList,
+    FileBarChart,
     Flag,
+    History,
     LayoutGrid,
     Megaphone,
     MessageSquareText,
@@ -104,7 +106,7 @@ const navItemsByAccountType: Record<AccountType, NavItem[]> = {
             icon: ClipboardList,
         },
         {
-            title: 'Reports',
+            title: 'Flagged listings',
             url: '/admin/reports',
             icon: Flag,
         },
@@ -122,6 +124,16 @@ const navItemsByAccountType: Record<AccountType, NavItem[]> = {
             title: 'Delivery logs',
             url: '/admin/delivery-logs',
             icon: ScrollText,
+        },
+        {
+            title: 'Reports & analytics',
+            url: '/admin/analytics',
+            icon: FileBarChart,
+        },
+        {
+            title: 'Audit log',
+            url: '/admin/audit-logs',
+            icon: History,
         },
     ],
 };

@@ -694,6 +694,44 @@ stateDiagram-v2
 - `application_remarks` are internal notes of the organization and are never sent to
   the applicant.
 
+## 5b. Reports, analytics and the audit log
+
+- **Reports** (`app/Reports`). Each report is a class extending `Report`. Its
+  `build(ReportPeriod)` returns a `ReportResult`: summary figures, chart series and
+  `ReportTable`s. The web page (`/admin/analytics/{key}`), the PDF
+  (`resources/views/reports/pdf.blade.php`, dompdf, landscape when a table has more
+  than 6 columns) and the Excel workbook (`SpreadsheetExporter`, one sheet per table)
+  all render that same result, so the three never disagree.
+- **Period.** `from`/`to` (inclusive), defaulting to the current year so far. Each
+  report states which date it filters on, for example the account creation date or the
+  approval date.
+
+  | Report | Contents |
+  |---|---|
+  | Registered users | New accounts by type; seekers by classification × sex; age groups; per month |
+  | Organizations | Registrations by type and verification status, personnel, listings |
+  | Published opportunities | Listings first published, status today, slots, applications, approvals |
+  | Applications | Status mix, outcomes by category and classification, approval rate, time to first review |
+  | Approved applicants | **Named list** of people approved, with barangay, classification and organization |
+  | Opportunity categories | Supply and demand per category; breakdowns by employment type, education level, assistance type |
+  | Geographic distribution | Per barangay: seekers, local listings, applications and approvals by residents |
+  | Organization activity | Per organization: listings, applications received, reviewed and decided, applications waiting 14+ days, average days to first review |
+
+- **Privacy.** All reports are aggregates except *Approved applicants*
+  (`containsPersonalData()`). Viewing it is logged (`report.viewed`), and its PDF carries
+  a Data Privacy Act notice. Every export is logged (`report.exported`, with report,
+  format and period) and rate-limited (30 per minute). Spreadsheet text cells are
+  written as explicit strings, so names cannot be turned into formulas (CSV/formula
+  injection).
+- **Audit log viewer** (`/admin/audit-logs`). This is read-only: no route writes to
+  the log, and the database triggers reject updates and deletes.
+  - Filters: area (action prefix), action, organization, actor name or email, and date
+    range.
+  - Each entry shows who did what to which record, with a link to the record's admin
+    page where there is one; the old → new values; and the IP address.
+  - Labels live in `App\Support\AuditActions`. Add a label there when introducing a new
+    action.
+
 ## 6. Notifications and SMS
 
 - **Channels.** In-app (Laravel `database` notifications, shown under the bell and at

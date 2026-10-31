@@ -18,17 +18,17 @@ interface AdminReportsProps {
     statuses: Option[];
 }
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Reports', href: '/admin/reports' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Flagged listings', href: '/admin/reports' }];
 
 export default function AdminReports({ reports, filters, counts, statuses }: AdminReportsProps) {
     const isOpen = filters.status === 'open';
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Reports" />
+            <Head title="Flagged listings" />
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
                 <div>
-                    <h1 className="text-2xl font-semibold tracking-tight">Reports</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight">Flagged listings</h1>
                     <p className="text-muted-foreground">
                         Listings users flagged as fraudulent, misleading or otherwise against the rules. Oldest first.
                     </p>

@@ -6,13 +6,28 @@ export interface DailyCount {
     count: number;
 }
 
-const shortDate = (date: string) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+export type Granularity = 'day' | 'month';
+
+const formats: Record<Granularity, { tick: Intl.DateTimeFormatOptions; full: Intl.DateTimeFormatOptions }> = {
+    day: { tick: { month: 'short', day: 'numeric' }, full: { weekday: 'short', month: 'short', day: 'numeric' } },
+    month: { tick: { month: 'short', year: '2-digit' }, full: { month: 'long', year: 'numeric' } },
+};
+
+const formatDate = (date: string, options: Intl.DateTimeFormatOptions) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, options);
 
 /**
- * One count per day as columns on a single baseline. Hovering a day's band
- * shows its value.
+ * One count per day (or month) as columns on a single baseline. Hovering a
+ * column's band shows its value. Monthly data uses the first of the month.
  */
-export function DailyColumnChart({ data, unit }: { data: DailyCount[]; unit: [singular: string, plural: string] }) {
+export function DailyColumnChart({
+    data,
+    unit,
+    granularity = 'day',
+}: {
+    data: DailyCount[];
+    unit: [singular: string, plural: string];
+    granularity?: Granularity;
+}) {
     return (
         <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -20,7 +35,7 @@ export function DailyColumnChart({ data, unit }: { data: DailyCount[]; unit: [si
                     <CartesianGrid vertical={false} stroke="var(--border)" strokeWidth={1} />
                     <XAxis
                         dataKey="date"
-                        tickFormatter={shortDate}
+                        tickFormatter={(date: string) => formatDate(date, formats[granularity].tick)}
                         tickLine={false}
                         axisLine={{ stroke: 'var(--border)' }}
                         tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
@@ -34,7 +49,7 @@ export function DailyColumnChart({ data, unit }: { data: DailyCount[]; unit: [si
                         tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
                         width={48}
                     />
-                    <Tooltip cursor={{ fill: 'var(--muted)' }} content={(props) => <DayTooltip {...props} unit={unit} />} />
+                    <Tooltip cursor={{ fill: 'var(--muted)' }} content={(props) => <DayTooltip {...props} unit={unit} granularity={granularity} />} />
                     <Bar dataKey="count" fill="var(--viz-1)" radius={[4, 4, 0, 0]} maxBarSize={24} isAnimationActive={false} />
                 </BarChart>
             </ResponsiveContainer>
@@ -42,7 +57,12 @@ export function DailyColumnChart({ data, unit }: { data: DailyCount[]; unit: [si
     );
 }
 
-function DayTooltip({ active, payload, unit }: TooltipContentProps<ValueType, NameType> & { unit: [string, string] }) {
+function DayTooltip({
+    active,
+    payload,
+    unit,
+    granularity,
+}: TooltipContentProps<ValueType, NameType> & { unit: [string, string]; granularity: Granularity }) {
     const point = payload?.[0]?.payload as DailyCount | undefined;
 
     if (!active || !point) {
@@ -51,9 +71,7 @@ function DayTooltip({ active, payload, unit }: TooltipContentProps<ValueType, Na
 
     return (
         <div className="bg-popover text-popover-foreground rounded-md border px-3 py-2 text-xs shadow-md">
-            <p className="text-muted-foreground">
-                {new Date(`${point.date}T00:00:00`).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-            </p>
+            <p className="text-muted-foreground">{formatDate(point.date, formats[granularity].full)}</p>
             <p className="flex items-center gap-1.5 font-medium">
                 <span className="size-2 rounded-sm bg-[var(--viz-1)]" />
                 {point.count} {point.count === 1 ? unit[0] : unit[1]}
@@ -62,19 +80,19 @@ function DayTooltip({ active, payload, unit }: TooltipContentProps<ValueType, Na
     );
 }
 
-export function DailyCountTable({ data, label }: { data: DailyCount[]; label: string }) {
+export function DailyCountTable({ data, label, granularity = 'day' }: { data: DailyCount[]; label: string; granularity?: Granularity }) {
     return (
         <table className="w-full text-sm">
             <thead className="text-muted-foreground text-left text-xs">
                 <tr>
-                    <th className="py-1.5 font-medium">Date</th>
+                    <th className="py-1.5 font-medium">{granularity === 'month' ? 'Month' : 'Date'}</th>
                     <th className="py-1.5 text-right font-medium">{label}</th>
                 </tr>
             </thead>
             <tbody className="divide-y">
                 {[...data].reverse().map((row) => (
                     <tr key={row.date}>
-                        <td className="py-1.5">{shortDate(row.date)}</td>
+                        <td className="py-1.5">{formatDate(row.date, granularity === 'month' ? formats.month.full : formats.day.tick)}</td>
                         <td className="py-1.5 text-right tabular-nums">{row.count}</td>
                     </tr>
                 ))}

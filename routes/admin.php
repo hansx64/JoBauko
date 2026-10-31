@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ApplicationController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliveryLogController;
 use App\Http\Controllers\Admin\OpportunityController;
@@ -60,4 +62,12 @@ Route::middleware(['auth', 'verified', 'account:admin'])
         Route::put('sms-templates/{key}', [SmsTemplateController::class, 'update'])->name('sms-templates.update');
 
         Route::get('delivery-logs', [DeliveryLogController::class, 'index'])->name('delivery-logs.index');
+
+        Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+        Route::get('analytics/{key}', [AnalyticsController::class, 'show'])->name('analytics.show');
+        Route::get('analytics/{key}/export/{format}', [AnalyticsController::class, 'export'])
+            ->middleware('throttle:30,1')
+            ->name('analytics.export');
+
+        Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
     });

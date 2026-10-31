@@ -52,7 +52,7 @@ const decisions: { value: Decision; label: string; description: string }[] = [
 
 export default function AdminReportShow({ report, opportunity, related }: AdminReportShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Reports', href: '/admin/reports' },
+        { title: 'Flagged listings', href: '/admin/reports' },
         { title: `Report #${report.id}`, href: `/admin/reports/${report.id}` },
     ];
     const available = decisions.filter((d) => d.value !== 'suspend' || opportunity?.can_suspend);
