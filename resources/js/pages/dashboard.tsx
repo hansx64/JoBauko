@@ -1,8 +1,10 @@
+import { CompletionMeter } from '@/components/profile/completion-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type Completion } from '@/types/profile';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { BellRing, MapPin, Smartphone, UserRound } from 'lucide-react';
 
@@ -14,6 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface DashboardProps {
+    completion: Completion;
     classification: string | null;
     barangay: string | null;
     mobile: { masked: string | null; verified: boolean };
@@ -21,9 +24,10 @@ interface DashboardProps {
     selectedTopics: string[];
 }
 
-export default function Dashboard({ classification, barangay, mobile, smsConsent, selectedTopics }: DashboardProps) {
+export default function Dashboard({ completion, classification, barangay, mobile, smsConsent, selectedTopics }: DashboardProps) {
     const { auth } = usePage<SharedData>().props;
     const firstName = auth.user.name.split(' ')[0];
+    const nextStep = completion.sections.find((s) => !s.complete);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -52,6 +56,24 @@ export default function Dashboard({ classification, barangay, mobile, smsConsent
                         </CardContent>
                     </Card>
                 )}
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-baseline justify-between text-base">
+                            Profile completion
+                            <span className="text-2xl font-semibold tabular-nums">{completion.percent}%</span>
+                        </CardTitle>
+                        <CardDescription>
+                            {nextStep ? `Next: ${nextStep.hint}` : 'Your profile is complete. Keep it up to date as things change.'}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <CompletionMeter percent={completion.percent} />
+                        <Button asChild size="sm" variant={nextStep ? 'default' : 'outline'} className="shrink-0">
+                            <Link href={nextStep ? `/profile#${nextStep.key}` : '/profile'}>{nextStep ? 'Complete profile' : 'View profile'}</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
 
                 <div className="grid gap-4 md:grid-cols-3">
                     <Card>

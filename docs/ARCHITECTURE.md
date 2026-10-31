@@ -565,10 +565,14 @@ Rules:
 
 1. Upload (PDF/DOCX, ≤ 5 MB, MIME + extension checked) → stored at
    `storage/app/private/resumes/{user_id}/{uuid}.{ext}`.
-2. A queued `ExtractResumeData` job extracts text (`smalot/pdfparser` for PDF,
-   `ZipArchive` + `word/document.xml` for DOCX) and runs a rule-based extractor:
-   skills (dictionary match), education (degree keywords, school names, years),
-   certifications, experience lines and keywords.
+2. `ResumeService` extracts text during the upload request (`smalot/pdfparser` for
+   PDF, `ZipArchive` + `word/document.xml` for DOCX; typically well under a second)
+   and `ResumeDataExtractor` applies rules: section headings, skills (dictionary
+   match), education (degree keywords, school names, years), work experience (date
+   ranges), certifications (NC / eligibility / license patterns), trainings and
+   keywords. Scanned (image-only) files are marked failed with an explanation.
+   Extraction runs synchronously so it works without a queue worker; it can be moved
+   to a queued job if uploads grow large.
 3. The result is stored as `extracted_data` with status `extracted`. **It isn't used
    for matching** until the user opens the review screen, corrects it and confirms.
    Confirmed items are merged into the profile tables (`source = resume`).

@@ -80,6 +80,22 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * @return HasMany<Resume, $this>
+     */
+    public function resumes(): HasMany
+    {
+        return $this->hasMany(Resume::class);
+    }
+
+    /**
+     * @return HasOne<Resume, $this>
+     */
+    public function currentResume(): HasOne
+    {
+        return $this->hasOne(Resume::class)->where('is_current', true)->latestOfMany();
+    }
+
+    /**
      * @return HasMany<UserConsent, $this>
      */
     public function consents(): HasMany

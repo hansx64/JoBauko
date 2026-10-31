@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\AccountType;
 use App\Enums\ConsentType;
+use App\Services\Profiles\ProfileCompletion;
 use App\Support\MobileNumber;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,6 +34,7 @@ class DashboardController extends Controller
         $user = $request->user()->load(['applicantProfile', 'barangay', 'notificationPreferences']);
 
         return Inertia::render('dashboard', [
+            'completion' => app(ProfileCompletion::class)->for($user),
             'classification' => $user->applicantProfile?->classification->label(),
             'barangay' => $user->barangay?->name,
             'mobile' => [
