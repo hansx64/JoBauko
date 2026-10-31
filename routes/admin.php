@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ApplicationController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DeliveryLogController;
 use App\Http\Controllers\Admin\OpportunityController;
 use App\Http\Controllers\Admin\OrganizationController;
 use App\Http\Controllers\Admin\OrganizationDecisionController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SmsTemplateController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,4 +52,12 @@ Route::middleware(['auth', 'verified', 'account:admin'])
             Route::get('{report}', 'show')->name('show');
             Route::post('{report}/decision', 'decide')->name('decide');
         });
+
+        Route::resource('announcements', AnnouncementController::class);
+        Route::post('announcements/{announcement}/send', [AnnouncementController::class, 'send'])->name('announcements.send');
+
+        Route::get('sms-templates', [SmsTemplateController::class, 'index'])->name('sms-templates.index');
+        Route::put('sms-templates/{key}', [SmsTemplateController::class, 'update'])->name('sms-templates.update');
+
+        Route::get('delivery-logs', [DeliveryLogController::class, 'index'])->name('delivery-logs.index');
     });

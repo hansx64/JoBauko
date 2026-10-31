@@ -38,6 +38,7 @@ class ApplicationActivity extends Notification
             'application_id' => $this->application->id,
             'opportunity_id' => $this->application->opportunity_id,
             'event' => $this->event,
+            'url' => route('org.applications.show', $this->application, false),
             'message' => match ($this->event) {
                 'submitted' => "New application from {$applicant} for {$title}.",
                 'withdrawn' => "{$applicant} withdrew their application for {$title}.",

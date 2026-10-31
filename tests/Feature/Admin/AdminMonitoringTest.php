@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Enums\ApplicationStatus;
 use App\Enums\Classification;
 use App\Models\Application;
+use App\Models\Barangay;
 use App\Models\Opportunity;
 use App\Models\Organization;
 use App\Models\Report;
@@ -21,7 +22,8 @@ class AdminMonitoringTest extends TestCase
     {
         $this->seed(LocationSeeder::class);
         $admin = User::factory()->admin()->create();
-        $seeker = User::factory()->seeker()->create(['barangay_id' => 1]);
+        $barangayId = Barangay::orderBy('id')->value('id');
+        $seeker = User::factory()->seeker()->create(['barangay_id' => $barangayId]);
         $seeker->applicantProfile->update(['classification' => Classification::Student]);
         Organization::factory()->create();
         $job = Opportunity::factory()->job()->published()->create();
@@ -44,7 +46,7 @@ class AdminMonitoringTest extends TestCase
                 ->where('applicationsPerDay.29.count', 1)
                 ->where('openByCategory.0', ['key' => 'job', 'label' => 'Job', 'value' => 1])
                 ->where('applicationsByStatus.0.key', 'submitted')
-                ->where('seekersByBarangay', fn ($rows) => count($rows) >= 22 && collect($rows)->firstWhere('key', '1')['value'] >= 1)
+                ->where('seekersByBarangay', fn ($rows) => count($rows) >= 22 && collect($rows)->firstWhere('key', (string) $barangayId)['value'] >= 1)
                 ->where('classifications', fn ($rows) => collect($rows)->firstWhere('key', 'student')['value'] >= 1));
     }
 

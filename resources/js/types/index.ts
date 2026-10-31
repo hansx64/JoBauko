@@ -45,7 +45,24 @@ export interface SharedData {
     quote: { message: string; author: string };
     flash: { success: string | null };
     auth: Auth;
+    notifications: NotificationSummary | null;
     [key: string]: unknown;
+}
+
+export interface NotificationItem {
+    id: string;
+    kind: string;
+    title: string | null;
+    message: string;
+    body: string | null;
+    has_link: boolean;
+    read: boolean;
+    created_at: string;
+}
+
+export interface NotificationSummary {
+    unread: number;
+    recent: NotificationItem[];
 }
 
 export type AccountType = 'seeker' | 'organization' | 'admin';

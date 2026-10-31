@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Files\ApplicationDocumentController;
 use App\Http\Controllers\Files\OrganizationDocumentController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\OpportunityController;
 use App\Http\Controllers\Public\OpportunityReportController;
@@ -26,6 +27,10 @@ Route::get('privacy', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::get('notifications/{id}', [NotificationController::class, 'open'])->whereUuid('id')->name('notifications.open');
 });
 
 Route::get('organization-documents/{document}', [OrganizationDocumentController::class, 'show'])

@@ -696,16 +696,50 @@ stateDiagram-v2
 
 ## 6. Notifications and SMS
 
-- Channels: in-app (Laravel `database` notifications), email, SMS.
-- `NotificationPreferenceService::applyClassificationDefaults()` seeds topic rows at
-  registration (`source = classification_default`). Defaults only select topics. SMS
-  is **only** sent if the user also has an active `sms` consent in `user_consents`.
-- Every outbound SMS goes through `SmsService::send()`, which checks consent, the topic
-  preference, a verified mobile number and the dedupe key, then logs to `sms_logs` and
-  queues delivery. Drivers: `log` (development) and `semaphore` (Philippine gateway),
-  behind an `SmsGateway` interface so another provider can be added.
-- Announcements resolve their audience with a query builder over profiles
-  (classification, location, interests) **intersected with** recipients' preferences.
+- **Channels.** In-app (Laravel `database` notifications, shown under the bell and at
+  `/notifications`), email (`mail`) and SMS (`SmsChannel`). In-app is always on.
+- **Who gets what** (`NotificationChannels::for(user, topic)`). Seekers choose email
+  and SMS per topic at *Settings → Notifications*.
+  - Email needs the topic switched on and a verified email address.
+  - SMS also needs an active `sms` consent in `user_consents` and a verified mobile
+    number.
+  - `applyClassificationDefaults()` pre-selects topics at registration
+    (`source = classification_default`); saving the settings page sets `source = user`.
+  - Giving or withdrawing SMS consent there goes through `ConsentRecorder`, so the
+    history is kept.
+  - Personnel and administrators have no topic preferences: they receive operational
+    messages (verification, moderation, invitations, account status) by in-app and
+    email.
+- **Notices sent** (each implements `HasTopic`):
+
+  | Notification | Topic | Trigger |
+  |---|---|---|
+  | `ApplicationStatusUpdated` | status_updates | organization changes an application's status |
+  | `DeadlineReminder` | deadlines | daily at 07:00 (`notifications:deadline-reminders`): saved, not applied, closes within 3 days |
+  | `NewOpportunityMatch` | jobs / scholarships / livelihood / training | `NotifyMatchingSeekers` job on publish or reopen; seekers who opted into the topic by email or SMS and score ≥ 60 |
+  | `AnnouncementPublished` | announcements | an administrator sends an announcement |
+
+  Automatic notices claim a key in `notification_dedupes` first, so repeated runs never
+  notify twice.
+- **SMS.** `SmsSender` renders the template (`sms_templates`, editable by
+  administrators, placeholders fixed per `SmsTemplateKey`), caps it at 320 characters
+  (two SMS, plain GSM text), and claims `sms_logs.dedupe_key`. It then sends and records
+  the outcome; failures are logged, never thrown. A template that is switched off is
+  not sent. Drivers: `log` (development) and `semaphore` (`SMS_DRIVER=semaphore`,
+  `SEMAPHORE_API_KEY`, optional `SEMAPHORE_SENDER_NAME`).
+- **Email log.** The `LogNotificationEmail` listener writes every notification email to
+  `email_logs`. Administrators see both logs at *Delivery logs*, with mobile numbers
+  masked. "Sent" means the provider accepted the message.
+- **Announcements.** Drafted, reviewed (recipient count per channel), then sent once by
+  the queued `SendAnnouncement` job in chunks of 200.
+  - Audience: seekers (optionally narrowed by classification and barangay), active
+    organization personnel, and/or administrators. Only active accounts with a verified
+    email are included.
+  - Seekers get email and SMS only if they chose them for announcements.
+  - Sent announcements cannot be edited or deleted.
+- **Queue.** Announcements and new-opportunity alerts run on the queue
+  (`QUEUE_CONNECTION=database`). `composer run dev` starts a worker. In production run
+  `php artisan queue:work` and the scheduler (`php artisan schedule:run` every minute).
 
 ## 7. Security
 

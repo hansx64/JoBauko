@@ -52,6 +52,7 @@ class OrganizationVerificationUpdated extends Notification
             'organization_id' => $this->organization->id,
             'status' => $this->organization->verification_status->value,
             'reason' => $this->organization->status_reason,
+            'url' => route('org.dashboard', absolute: false),
             'message' => "{$this->organization->name}: {$this->organization->verification_status->label()}",
         ];
     }

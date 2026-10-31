@@ -14,6 +14,8 @@ use App\Services\Recommendation\MatchRefresher;
 use App\Services\Recommendation\MatchScorer;
 use App\Support\MobileNumber;
 use App\Support\OpportunityCard;
+use Closure;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +39,63 @@ class DashboardController extends Controller
         };
     }
 
+    /**
+     * The seeker's best current matches, highest score first.
+     *
+     * @param  Closure(Opportunity, array<string, mixed>|null): array<string, mixed>  $card
+     * @return list<array<string, mixed>>
+     */
+    private function recommended(User $user, Closure $card): array
+    {
+        $matches = DB::table('opportunity_matches')
+            ->where('user_id', $user->id)
+            ->where('score', '>=', MatchScorer::RECOMMENDATION_THRESHOLD)
+            ->orderByDesc('score')
+            ->limit(6)
+            ->get(['opportunity_id', 'score', 'reasons'])
+            ->keyBy('opportunity_id');
+
+        /** @var EloquentCollection<int, Opportunity> $opportunities */
+        $opportunities = Opportunity::query()->visible()->open()
+            ->whereIn('id', $matches->keys())
+            ->with(['organization', 'barangay', 'jobDetail'])
+            ->get();
+
+        return $opportunities
+            ->sortByDesc(fn ($o) => $matches[$o->id]->score)
+            ->values()
+            ->map(fn ($o) => $card($o, [
+                'score' => (int) $matches[$o->id]->score,
+                'reasons' => json_decode($matches[$o->id]->reasons, true)['reasons'] ?? [],
+            ]))
+            ->all();
+    }
+
+    /**
+     * The three newest open opportunities of each category.
+     *
+     * @param  Closure(Opportunity, array<string, mixed>|null): array<string, mixed>  $card
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private function latestByCategory(Closure $card): array
+    {
+        $latest = [];
+
+        foreach (OpportunityCategory::cases() as $category) {
+            /** @var EloquentCollection<int, Opportunity> $opportunities */
+            $opportunities = Opportunity::query()->visible()->open()
+                ->where('category', $category)
+                ->with(['organization', 'barangay', 'jobDetail'])
+                ->latest('published_at')
+                ->limit(3)
+                ->get();
+
+            $latest[$category->value] = $opportunities->map(fn ($o) => $card($o, null))->all();
+        }
+
+        return $latest;
+    }
+
     private function seekerDashboard(Request $request): Response
     {
         $user = $request->user()->load(['applicantProfile', 'barangay', 'notificationPreferences']);
@@ -45,34 +104,8 @@ class DashboardController extends Controller
 
         app(MatchRefresher::class)->ensureFresh($user);
 
-        $matches = DB::table('opportunity_matches')
-            ->where('user_id', $user->id)
-            ->where('score', '>=', MatchScorer::RECOMMENDATION_THRESHOLD)
-            ->orderByDesc('score')
-            ->limit(6)
-            ->get()
-            ->keyBy('opportunity_id');
-
-        $recommended = Opportunity::query()->visible()->open()
-            ->whereIn('id', $matches->keys())
-            ->with(['organization', 'barangay', 'jobDetail'])
-            ->get()
-            ->sortByDesc(fn (Opportunity $o) => $matches[$o->id]->score)
-            ->values()
-            ->map(fn (Opportunity $o) => $card($o, [
-                'score' => (int) $matches[$o->id]->score,
-                'reasons' => json_decode($matches[$o->id]->reasons, true)['reasons'] ?? [],
-            ]));
-
-        $latest = collect(OpportunityCategory::cases())->mapWithKeys(fn (OpportunityCategory $category) => [
-            $category->value => Opportunity::query()->visible()->open()
-                ->where('category', $category)
-                ->with(['organization', 'barangay', 'jobDetail'])
-                ->latest('published_at')
-                ->limit(3)
-                ->get()
-                ->map(fn (Opportunity $o) => $card($o)),
-        ]);
+        $recommended = $this->recommended($user, $card);
+        $latest = $this->latestByCategory($card);
 
         $saved = $user->savedOpportunities()->visible()
             ->with(['organization', 'barangay', 'jobDetail'])
@@ -107,7 +140,7 @@ class DashboardController extends Controller
             ],
             'smsConsent' => $user->hasActiveConsent(ConsentType::Sms),
             'selectedTopics' => $user->notificationPreferences
-                ->filter(fn ($preference) => $preference->sms || $preference->email)
+                ->filter(fn ($preference) => $preference->sms)
                 ->map(fn ($preference) => $preference->topic->label())
                 ->values(),
         ]);

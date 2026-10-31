@@ -3,8 +3,10 @@
 namespace App\Http\Middleware;
 
 use App\Enums\OrganizationPermission;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -61,7 +63,29 @@ class HandleInertiaRequests extends Middleware
                 ]),
                 'organization' => fn () => $this->organizationAccess($request),
             ],
+            'notifications' => fn () => $this->notificationSummary($request),
         ]);
+    }
+
+    /**
+     * Unread count and the latest few, for the bell in the header.
+     *
+     * @return array{unread: int, recent: list<array<string, mixed>>}|null
+     */
+    private function notificationSummary(Request $request): ?array
+    {
+        $user = $request->user();
+
+        if ($user === null) {
+            return null;
+        }
+
+        return [
+            'unread' => $user->unreadNotifications()->count(),
+            'recent' => $user->notifications()->latest()->limit(5)->get()
+                ->map(fn (DatabaseNotification $n) => NotificationController::present($n))
+                ->all(),
+        ];
     }
 
     /**

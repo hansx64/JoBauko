@@ -336,6 +336,9 @@ export default function Dashboard({
                                         )
                                     }
                                 />
+                                <Link href={route('notification-preferences.edit')} className="text-primary text-sm font-medium hover:underline">
+                                    Notification settings →
+                                </Link>
                             </CardContent>
                         </Card>
                     </aside>

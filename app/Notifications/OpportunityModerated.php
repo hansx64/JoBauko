@@ -50,6 +50,7 @@ class OpportunityModerated extends Notification
             'opportunity_id' => $this->opportunity->id,
             'status' => $this->opportunity->status->value,
             'reason' => $this->opportunity->suspension_reason,
+            'url' => route('org.opportunities.edit', $this->opportunity, false),
             'message' => $this->suspended()
                 ? "“{$this->opportunity->title}” was suspended by an administrator."
                 : "“{$this->opportunity->title}” was reinstated.",

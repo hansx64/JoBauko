@@ -4,6 +4,7 @@ namespace App\Services\Opportunities;
 
 use App\Enums\OpportunityCategory;
 use App\Enums\OpportunityStatus;
+use App\Jobs\NotifyMatchingSeekers;
 use App\Models\Opportunity;
 use App\Models\Organization;
 use App\Models\Skill;
@@ -94,6 +95,8 @@ class OpportunityService
         }
 
         $this->setStatus($opportunity, OpportunityStatus::Published, 'opportunity.published', ['published_at' => now()]);
+
+        NotifyMatchingSeekers::dispatch($opportunity->id);
     }
 
     /**
@@ -138,6 +141,8 @@ class OpportunityService
             'application_deadline' => $deadline,
             'reopened_at' => now(),
         ]);
+
+        NotifyMatchingSeekers::dispatch($opportunity->id);
     }
 
     public function extendDeadline(Opportunity $opportunity, string $deadline): void
