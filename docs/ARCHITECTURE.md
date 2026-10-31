@@ -783,15 +783,19 @@ stateDiagram-v2
 
 | Concern | Measure |
 |---|---|
-| Authentication | Laravel session auth (starter kit), email verification, password reset, bcrypt hashing, mobile OTP verification (hashed code in cache, throttled) |
-| Authorization | Account-type middleware per area, organization-membership middleware, Policies for every model action, organization role permissions |
+| Authentication | Laravel session auth (starter kit), email verification, password reset, bcrypt hashing, mobile OTP verification (hashed code in cache, throttled). In production passwords need 10+ characters with letters and numbers and are checked against known breaches (`Password::defaults`, k-anonymity lookup) |
+| Authorization | Account-type middleware per area, organization-membership middleware, Policies for every model action, organization role permissions. `RouteProtectionTest` fails if a new route is reachable without sign-in, if an area route lacks its account-type check, or if a state-changing route accepts GET |
 | Data isolation | Org queries scoped by the member's `organization_id`; policies re-check ownership; tests cover cross-organization access attempts |
 | CSRF / XSS / SQLi | Laravel CSRF (Inertia sends XSRF token), React escaping (no `dangerouslySetInnerHTML` on user content), Eloquent / bound parameters only |
 | Rate limiting | Login, registration, OTP, applications, report submissions, exports |
 | Files | Private disk, MIME + extension + size validation, random file names, streamed via policy-checked controllers |
-| Sessions | Encrypted database sessions, regenerate on login, `SESSION_SECURE_COOKIE` in production |
+| Sessions | Encrypted database sessions, regenerate on login, HTTP-only `SameSite=Lax` cookies, `SESSION_SECURE_COOKIE` in production; deactivation deletes the person's sessions |
+| Browser headers | `SecurityHeaders` middleware: nonce-based Content Security Policy on HTML pages (scripts run only with the per-request nonce; no `unsafe-inline` scripts; `frame-ancestors 'none'`, `object-src 'none'`), `nosniff`, `X-Frame-Options: DENY`, strict referrer policy, Permissions-Policy, COOP, HSTS over HTTPS in production. File responses get no CSP so the browser PDF viewer works |
+| Transport | `URL::forceScheme('https')` when `APP_URL` is https, so emailed and signed links use HTTPS; `TRUSTED_PROXIES` for TLS-terminating proxies |
+| Dependencies | `composer audit` clean. `npm audit --omit=dev` clean (Inertia upgraded to 2.3.x, dropping `deepmerge`). Remaining npm advisories are in ESLint tooling only, which never ships to browsers; their suggested "fix" is a downgrade to ESLint 4, so they are tracked rather than forced |
 | Audit | `AuditLogger` service; append-only table protected by DB triggers |
-| Privacy (RA 10173) | Privacy notice + consent at registration (versioned in `user_consents`), SMS consent separate and revocable, minimal data in organization views until the seeker applies, account deactivation |
+| Privacy (RA 10173) | Privacy notice + consent at registration (versioned in `user_consents`), SMS consent separate and revocable, minimal data in organization views until the seeker applies, account deactivation. Self-service deletion (`AccountEraser`) erases the account, profile, applications **and their uploaded files**; audit entries are kept with the person unlinked. Reports with personal data are audited on view and export |
+| Configuration | `php artisan jobauko:check` verifies a live server: production mode, debug off, HTTPS, secure and encrypted sessions, a real queue, mailer and contacts, SMS gateway, barangays loaded, an administrator, no demo accounts, built assets |
 
 ## 8. Packages
 

@@ -39,4 +39,17 @@ return [
         'max_attempts' => 5,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Reverse proxy
+    |--------------------------------------------------------------------------
+    |
+    | Behind a load balancer or proxy that terminates HTTPS, list its IP
+    | addresses (comma separated, or "*" for any) so request IPs in the audit
+    | log and the HTTPS check are correct.
+    |
+    */
+
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
 ];
