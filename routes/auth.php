@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\MobileVerificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\OrganizationRegistrationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
@@ -17,6 +18,12 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store'])
         ->middleware('throttle:10,60');
+
+    Route::get('organizations/register', [OrganizationRegistrationController::class, 'create'])
+        ->name('organizations.register');
+
+    Route::post('organizations/register', [OrganizationRegistrationController::class, 'store'])
+        ->middleware('throttle:5,60');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

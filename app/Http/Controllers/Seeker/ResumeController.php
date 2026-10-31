@@ -21,10 +21,10 @@ class ResumeController extends Controller
 
         if ($resume->extraction_status === ResumeExtractionStatus::Extracted) {
             return to_route('seeker.resume.review', $resume)
-                ->with('status', 'Resume uploaded. Review what we found before adding it to your profile.');
+                ->with('success', 'Resume uploaded. Review what we found before adding it to your profile.');
         }
 
-        return to_route('seeker.profile.edit')->with('status', 'Resume uploaded.');
+        return to_route('seeker.profile.edit')->with('success', 'Resume uploaded.');
     }
 
     /**
@@ -59,7 +59,7 @@ class ResumeController extends Controller
 
         return $resume->refresh()->extraction_status === ResumeExtractionStatus::Extracted
             ? to_route('seeker.resume.review', $resume)
-            : back()->with('status', 'We still could not read this resume. You can fill in your profile by hand.');
+            : back()->with('success', 'We still could not read this resume. You can fill in your profile by hand.');
     }
 
     public function destroy(Resume $resume, ResumeService $resumes): RedirectResponse
@@ -68,6 +68,6 @@ class ResumeController extends Controller
 
         $resumes->remove($resume);
 
-        return to_route('seeker.profile.edit')->with('status', 'Resume removed.');
+        return to_route('seeker.profile.edit')->with('success', 'Resume removed.');
     }
 }

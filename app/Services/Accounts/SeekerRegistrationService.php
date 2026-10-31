@@ -49,7 +49,8 @@ class SeekerRegistrationService
 
             $this->preferences->applyClassificationDefaults($user, $classification);
 
-            return $user;
+            // Reload so database defaults (e.g. is_active) are present.
+            return $user->refresh();
         });
     }
 }

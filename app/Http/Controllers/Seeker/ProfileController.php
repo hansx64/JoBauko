@@ -69,7 +69,6 @@ class ProfileController extends Controller
                 'educationStatuses' => EducationStatus::options(),
                 'interestCategories' => InterestCategory::options(),
             ],
-            'status' => $request->session()->get('status'),
         ]);
     }
 
@@ -77,6 +76,6 @@ class ProfileController extends Controller
     {
         $this->profile($request)->update($request->validated());
 
-        return back()->with('status', 'Personal information saved.');
+        return back()->with('success', 'Personal information saved.');
     }
 }

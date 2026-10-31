@@ -221,8 +221,14 @@ export default function Register({ barangays, classifications, classificationTop
                     </Button>
                 </div>
 
-                <div className="text-muted-foreground text-center text-sm">
-                    Already have an account? <TextLink href={route('login')}>Log in</TextLink>
+                <div className="text-muted-foreground grid gap-1 text-center text-sm">
+                    <span>
+                        Already have an account? <TextLink href={route('login')}>Log in</TextLink>
+                    </span>
+                    <span>
+                        Posting opportunities for an organization?{' '}
+                        <TextLink href={route('organizations.register')}>Register your organization</TextLink>
+                    </span>
                 </div>
             </form>
         </AuthLayout>

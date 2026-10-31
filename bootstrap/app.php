@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureAccountType;
+use App\Http\Middleware\EnsureOrganizationMember;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'account' => EnsureAccountType::class,
+            'org.member' => EnsureOrganizationMember::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

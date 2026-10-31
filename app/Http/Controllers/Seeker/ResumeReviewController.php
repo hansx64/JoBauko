@@ -58,6 +58,6 @@ class ResumeReviewController extends Controller
 
         $review->apply($resume, $this->profile($request), $request->validated());
 
-        return to_route('seeker.profile.edit')->with('status', 'Your profile has been updated from your resume.');
+        return to_route('seeker.profile.edit')->with('success', 'Your profile has been updated from your resume.');
     }
 }

@@ -80,6 +80,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * The user's membership in an organization (organization accounts only).
+     *
+     * @return HasOne<OrganizationMember, $this>
+     */
+    public function organizationMembership(): HasOne
+    {
+        return $this->hasOne(OrganizationMember::class);
+    }
+
+    /**
      * @return HasMany<Resume, $this>
      */
     public function resumes(): HasMany

@@ -17,7 +17,7 @@ class ExperienceController extends Controller
     {
         $this->profile($request)->experience()->create($request->validated());
 
-        return back()->with('status', 'Work experience added.');
+        return back()->with('success', 'Work experience added.');
     }
 
     public function update(ExperienceRequest $request, ApplicantExperience $experience): RedirectResponse
@@ -26,7 +26,7 @@ class ExperienceController extends Controller
 
         $experience->update($request->validated());
 
-        return back()->with('status', 'Work experience updated.');
+        return back()->with('success', 'Work experience updated.');
     }
 
     public function destroy(Request $request, ApplicantExperience $experience): RedirectResponse
@@ -35,6 +35,6 @@ class ExperienceController extends Controller
 
         $experience->delete();
 
-        return back()->with('status', 'Work experience removed.');
+        return back()->with('success', 'Work experience removed.');
     }
 }

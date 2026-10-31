@@ -1,8 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import { Building2, UserRoundX, Users, UsersRound } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import { Building2, Clock, UserRoundX, Users, UsersRound } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,6 +17,7 @@ interface AdminDashboardProps {
         seekers: number;
         organizationUsers: number;
         inactiveUsers: number;
+        pendingOrganizations: number;
     };
     classifications: { label: string; total: number }[];
 }
@@ -38,6 +39,20 @@ export default function AdminDashboard({ stats, classifications }: AdminDashboar
                     <h1 className="text-2xl font-semibold tracking-tight">Platform overview</h1>
                     <p className="text-muted-foreground">Live figures from the JoBauko database.</p>
                 </div>
+
+                {stats.pendingOrganizations > 0 && (
+                    <Link
+                        href={route('admin.organizations.index', { status: 'pending' })}
+                        className="flex items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+                    >
+                        <span className="flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            {stats.pendingOrganizations} {stats.pendingOrganizations === 1 ? 'organization is' : 'organizations are'} waiting for
+                            verification
+                        </span>
+                        <span className="font-medium">Review →</span>
+                    </Link>
+                )}
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {tiles.map((tile) => (

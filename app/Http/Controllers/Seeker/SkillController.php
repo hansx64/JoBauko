@@ -31,6 +31,6 @@ class SkillController extends Controller
             $profile->skills()->sync($sync->all());
         });
 
-        return back()->with('status', 'Skills saved.');
+        return back()->with('success', 'Skills saved.');
     }
 }

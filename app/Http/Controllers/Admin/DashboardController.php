@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\AccountType;
 use App\Enums\Classification;
+use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ApplicantProfile;
+use App\Models\Organization;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -34,6 +36,7 @@ class DashboardController extends Controller
                 'seekers' => (int) ($accountCounts[AccountType::Seeker->value] ?? 0),
                 'organizationUsers' => (int) ($accountCounts[AccountType::Organization->value] ?? 0),
                 'inactiveUsers' => User::where('is_active', false)->count(),
+                'pendingOrganizations' => Organization::where('verification_status', VerificationStatus::Pending)->count(),
             ],
             'classifications' => array_map(fn (Classification $c) => [
                 'label' => $c->label(),

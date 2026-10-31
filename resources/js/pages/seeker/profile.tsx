@@ -34,7 +34,6 @@ interface ProfilePageProps {
     completion: Completion;
     skillSuggestions: string[];
     options: ProfileOptions;
-    status?: string;
 }
 
 function formatMonth(date: string | null) {
@@ -42,8 +41,7 @@ function formatMonth(date: string | null) {
 }
 
 export default function Profile(props: ProfilePageProps) {
-    const { personal, education, experience, certifications, trainings, skills, interests, resume, completion, skillSuggestions, options, status } =
-        props;
+    const { personal, education, experience, certifications, trainings, skills, interests, resume, completion, skillSuggestions, options } = props;
 
     const educationFields: FieldDef[] = [
         { name: 'level', label: 'Level', type: 'select', required: true, options: options.educationLevels },
@@ -84,12 +82,6 @@ export default function Profile(props: ProfilePageProps) {
                     <h1 className="text-2xl font-semibold tracking-tight">My profile</h1>
                     <p className="text-muted-foreground">Keep your profile up to date to get better opportunity recommendations.</p>
                 </div>
-
-                {status && (
-                    <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900 dark:border-teal-900 dark:bg-teal-950/40 dark:text-teal-100">
-                        {status}
-                    </div>
-                )}
 
                 <div className="grid items-start gap-6 lg:grid-cols-[1fr_20rem]">
                     <div className="grid min-w-0 gap-6">

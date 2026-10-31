@@ -17,7 +17,7 @@ class CertificationController extends Controller
     {
         $this->profile($request)->certifications()->create($request->validated());
 
-        return back()->with('status', 'Certification added.');
+        return back()->with('success', 'Certification added.');
     }
 
     public function update(CertificationRequest $request, ApplicantCertification $certification): RedirectResponse
@@ -26,7 +26,7 @@ class CertificationController extends Controller
 
         $certification->update($request->validated());
 
-        return back()->with('status', 'Certification updated.');
+        return back()->with('success', 'Certification updated.');
     }
 
     public function destroy(Request $request, ApplicantCertification $certification): RedirectResponse
@@ -35,6 +35,6 @@ class CertificationController extends Controller
 
         $certification->delete();
 
-        return back()->with('status', 'Certification removed.');
+        return back()->with('success', 'Certification removed.');
     }
 }

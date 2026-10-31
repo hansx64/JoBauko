@@ -17,7 +17,7 @@ class EducationController extends Controller
     {
         $this->profile($request)->education()->create($request->validated());
 
-        return back()->with('status', 'Education added.');
+        return back()->with('success', 'Education added.');
     }
 
     public function update(EducationRequest $request, ApplicantEducation $education): RedirectResponse
@@ -26,7 +26,7 @@ class EducationController extends Controller
 
         $education->update($request->validated());
 
-        return back()->with('status', 'Education updated.');
+        return back()->with('success', 'Education updated.');
     }
 
     public function destroy(Request $request, ApplicantEducation $education): RedirectResponse
@@ -35,6 +35,6 @@ class EducationController extends Controller
 
         $education->delete();
 
-        return back()->with('status', 'Education removed.');
+        return back()->with('success', 'Education removed.');
     }
 }

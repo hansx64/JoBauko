@@ -23,8 +23,7 @@ class DashboardController extends Controller
 
         return match ($user->account_type) {
             AccountType::Admin => to_route('admin.dashboard'),
-            // Organization accounts are created starting in Phase 4.
-            AccountType::Organization => abort(403, 'The organization area is not available yet.'),
+            AccountType::Organization => to_route('org.dashboard'),
             AccountType::Seeker => $this->seekerDashboard($request),
         };
     }

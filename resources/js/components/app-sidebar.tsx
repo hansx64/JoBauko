@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type AccountType, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, ShieldCheck, UserRound } from 'lucide-react';
+import { Building2, LayoutGrid, Megaphone, ShieldCheck, UserRound } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const navItemsByAccountType: Record<AccountType, NavItem[]> = {
@@ -19,12 +19,33 @@ const navItemsByAccountType: Record<AccountType, NavItem[]> = {
             icon: UserRound,
         },
     ],
-    organization: [],
+    organization: [
+        {
+            title: 'Dashboard',
+            url: '/org/dashboard',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Opportunities',
+            url: '/org/opportunities',
+            icon: Megaphone,
+        },
+        {
+            title: 'Organization profile',
+            url: '/org/profile',
+            icon: Building2,
+        },
+    ],
     admin: [
         {
             title: 'Admin dashboard',
             url: '/admin/dashboard',
             icon: ShieldCheck,
+        },
+        {
+            title: 'Organizations',
+            url: '/admin/organizations',
+            icon: Building2,
         },
     ],
 };

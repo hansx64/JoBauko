@@ -26,6 +26,6 @@ class InterestController extends Controller
             $profile->interests()->createMany($interests->all());
         });
 
-        return back()->with('status', 'Interests saved.');
+        return back()->with('success', 'Interests saved.');
     }
 }

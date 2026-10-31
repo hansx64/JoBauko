@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Files\OrganizationDocumentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,7 +20,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
 
+Route::get('organization-documents/{document}', [OrganizationDocumentController::class, 'show'])
+    ->middleware(['auth', 'verified'])
+    ->name('organization-documents.show');
+
 require __DIR__.'/seeker.php';
+require __DIR__.'/organization.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

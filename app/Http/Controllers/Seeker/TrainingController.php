@@ -17,7 +17,7 @@ class TrainingController extends Controller
     {
         $this->profile($request)->trainings()->create($request->validated());
 
-        return back()->with('status', 'Training added.');
+        return back()->with('success', 'Training added.');
     }
 
     public function update(TrainingRequest $request, ApplicantTraining $training): RedirectResponse
@@ -26,7 +26,7 @@ class TrainingController extends Controller
 
         $training->update($request->validated());
 
-        return back()->with('status', 'Training updated.');
+        return back()->with('success', 'Training updated.');
     }
 
     public function destroy(Request $request, ApplicantTraining $training): RedirectResponse
@@ -35,6 +35,6 @@ class TrainingController extends Controller
 
         $training->delete();
 
-        return back()->with('status', 'Training removed.');
+        return back()->with('success', 'Training removed.');
     }
 }

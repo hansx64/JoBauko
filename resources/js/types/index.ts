@@ -24,6 +24,7 @@ export interface NavItem {
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
+    flash: { success: string | null };
     auth: Auth;
     [key: string]: unknown;
 }
@@ -53,4 +54,14 @@ export interface Option {
 export interface Barangay {
     id: number;
     name: string;
+}
+
+export interface Paginated<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    from: number | null;
+    to: number | null;
+    total: number;
+    links: { url: string | null; label: string; active: boolean }[];
 }
