@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ApplicationStatus;
 use Carbon\CarbonInterface;
 use Database\Factories\ApplicationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,6 +31,9 @@ class Application extends Model
 {
     /** @use HasFactory<ApplicationFactory> */
     use HasFactory, SoftDeletes;
+
+    /** An open application with no status change for this many days is stalled. */
+    public const STALLED_DAYS = 14;
 
     /**
      * The attributes that are mass assignable.
@@ -108,6 +112,18 @@ class Application extends Model
     public function remarks(): HasMany
     {
         return $this->hasMany(ApplicationRemark::class)->latest();
+    }
+
+    /**
+     * Open applications whose status has not changed for STALLED_DAYS:
+     * the organization may have forgotten them.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeStalled(Builder $query): void
+    {
+        $query->whereIn('status', ApplicationStatus::active())
+            ->whereDoesntHave('statusHistory', fn (Builder $h) => $h->where('created_at', '>=', now()->subDays(self::STALLED_DAYS)));
     }
 
     public function canBeWithdrawn(): bool

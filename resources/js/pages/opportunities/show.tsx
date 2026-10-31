@@ -20,6 +20,7 @@ import { ReactNode } from 'react';
 
 import { matchLabel } from '@/components/opportunities/match-badge';
 import { categoryIcons, categoryTones, deadlineText } from '@/components/opportunities/opportunity-card';
+import { ReportListing, type ReportingOptions } from '@/components/opportunities/report-listing';
 import { SaveButton } from '@/components/opportunities/save-button';
 import { StatusBadge } from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
@@ -65,10 +66,12 @@ export default function ShowOpportunity({
     opportunity,
     isSeeker,
     application,
+    reporting,
 }: {
     opportunity: OpportunityDetails;
     isSeeker: boolean;
     application: Pick<ApplicationSummary, 'id' | 'status' | 'status_label' | 'submitted_at'> | null;
+    reporting: ReportingOptions | null;
 }) {
     const { auth } = usePage<SharedData>().props;
     const Icon = categoryIcons[opportunity.category];
@@ -333,6 +336,7 @@ export default function ShowOpportunity({
                                         )}
                                     </div>
                                 )}
+                                {reporting && <ReportListing slug={opportunity.slug} reporting={reporting} />}
                             </CardContent>
                         </Card>
 

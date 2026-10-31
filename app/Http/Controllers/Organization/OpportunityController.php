@@ -156,6 +156,7 @@ class OpportunityController extends Controller
             'status' => $opportunity->displayStatus(),
             'status_label' => $opportunity->displayStatusLabel(),
             'stored_status' => $opportunity->status->value,
+            'suspension_reason' => $opportunity->status === OpportunityStatus::Suspended ? $opportunity->suspension_reason : null,
             'was_published' => $opportunity->published_at !== null,
             'category' => $opportunity->category->value,
             'title' => $opportunity->title,

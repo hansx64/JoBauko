@@ -10,6 +10,7 @@ use App\Http\Controllers\Organization\Concerns\ResolvesOrganization;
 use App\Models\Application;
 use App\Models\Opportunity;
 use App\Models\Organization;
+use App\Support\DailyCounts;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -45,24 +46,15 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        $since = today()->subDays(29);
-        $perDay = (clone $applications)->toBase()
-            ->where('submitted_at', '>=', $since)
-            ->selectRaw('date(submitted_at) as day, count(*) as total')
-            ->groupBy('day')
-            ->pluck('total', 'day');
+        $perDay = DailyCounts::lastDays((clone $applications)->toBase(), 'submitted_at');
 
         return [
             'total' => (int) $byStatus->sum(),
             'awaitingReview' => (int) ($byStatus[ApplicationStatus::Submitted->value] ?? 0),
             'inProgress' => (int) collect(ApplicationStatus::active())->sum(fn (ApplicationStatus $s) => $byStatus[$s->value] ?? 0),
             'approved' => (int) ($byStatus[ApplicationStatus::Approved->value] ?? 0),
-            'last30Days' => (int) $perDay->sum(),
-            'perDay' => collect(range(0, 29))->map(function (int $offset) use ($since, $perDay) {
-                $day = $since->copy()->addDays($offset)->toDateString();
-
-                return ['date' => $day, 'count' => (int) ($perDay[$day] ?? 0)];
-            }),
+            'last30Days' => array_sum(array_column($perDay, 'count')),
+            'perDay' => $perDay,
             'byStatus' => collect(ApplicationStatus::cases())
                 ->map(fn (ApplicationStatus $s) => ['status' => $s->value, 'label' => $s->label(), 'count' => (int) ($byStatus[$s->value] ?? 0)])
                 ->filter(fn (array $row) => $row['count'] > 0)

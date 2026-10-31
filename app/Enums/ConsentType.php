@@ -7,6 +7,14 @@ enum ConsentType: string
     case PrivacyNotice = 'privacy_notice';
     case Sms = 'sms';
 
+    public function label(): string
+    {
+        return match ($this) {
+            self::PrivacyNotice => 'Privacy notice',
+            self::Sms => 'SMS notifications',
+        };
+    }
+
     /**
      * The version of the statement the user is currently agreeing to.
      */

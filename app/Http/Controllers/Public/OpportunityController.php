@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Public;
 use App\Enums\EducationLevel;
 use App\Enums\EmploymentType;
 use App\Enums\OpportunityCategory;
+use App\Enums\ReportReason;
 use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Barangay;
 use App\Models\Opportunity;
 use App\Models\Organization;
 use App\Models\Skill;
+use App\Models\User;
 use App\Services\Recommendation\MatchRefresher;
 use App\Services\Recommendation\MatchScorer;
 use App\Services\Recommendation\SeekerSnapshot;
@@ -164,7 +166,30 @@ class OpportunityController extends Controller
                 'status_label' => $application->status->label(),
                 'submitted_at' => $application->submitted_at->toIso8601String(),
             ] : null,
+            'reporting' => $this->reporting($user, $opportunity),
         ]);
+    }
+
+    /**
+     * Signed-in users outside the publishing organization can report a
+     * listing; administrators act on it directly instead.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function reporting(?User $user, Opportunity $opportunity): ?array
+    {
+        if ($user === null || $user->isAdmin() || $user->organizationMembership?->organization_id === $opportunity->organization_id) {
+            return null;
+        }
+
+        return [
+            'alreadyReported' => $opportunity->reports()->open()->where('reporter_id', $user->id)->exists(),
+            'reasons' => array_map(fn (ReportReason $r) => [
+                'value' => $r->value,
+                'label' => $r->label(),
+                'requires_details' => $r->requiresDetails(),
+            ], ReportReason::cases()),
+        ];
     }
 
     /**

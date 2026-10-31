@@ -195,6 +195,12 @@ export default function OpportunityForm({ organization, opportunity, publishProb
                 {readOnly && (
                     <Alert>
                         <p>This opportunity is {opportunity?.status_label.toLowerCase()} and can no longer be edited.</p>
+                        {opportunity?.suspension_reason && (
+                            <p className="mt-1">
+                                <span className="font-medium">Reason given by the administrator: </span>
+                                {opportunity.suspension_reason}
+                            </p>
+                        )}
                     </Alert>
                 )}
 

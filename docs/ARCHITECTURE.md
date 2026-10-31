@@ -110,6 +110,30 @@ allowed next statuses for the member's role, and internal remarks. Each opening 
 review page is written to the audit log (`application.viewed`), since it discloses
 personal data.
 
+**Administration.** All system administrators have the same rights; every action
+below is written to the audit log.
+
+- *Accounts* (`AccountStatusService`). Deactivation requires a reason, ends all of the
+  person's sessions at once (database session rows are deleted) and emails them the
+  reason. Accounts are never deleted from the admin area. Admins cannot deactivate
+  themselves, which also guarantees one active administrator always remains. Opening a
+  user's page is logged (`user.viewed`). Admins see a seeker *summary* (classification,
+  profile completeness, application statuses), not the full profile or documents, which
+  are shared only with organizations the seeker applies to.
+- *Opportunities* (`OpportunityService::suspend/reinstate`). Drafts, published and
+  closed listings can be suspended with a reason sent to the organization. The previous
+  status is stored (`status_before_suspension`) and restored on reinstatement. A
+  suspended listing is hidden and locked; applications already received stay with the
+  organization.
+- *Applications*. Read-only monitoring across organizations: status, dates and an
+  indicator for open applications with no status change in 14 days
+  (`Application::scopeStalled`). Cover letters, documents and remarks are not shown.
+- *Reports* (`ReportService`). Signed-in users other than admins and the publishing
+  organization can report a visible listing, once while a report is open. The
+  organization is never told who reported. An admin decision (suspend, resolved another
+  way, dismiss) closes every open report on the same listing; reporters get an in-app
+  notice of the outcome without the admin's notes.
+
 ## 3. Database design
 
 Conventions: `bigint unsigned` auto-increment keys, `timestamps()` on all mutable

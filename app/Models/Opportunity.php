@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -31,6 +32,10 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $application_deadline
  * @property Carbon|null $published_at
  * @property Carbon|null $reopened_at
+ * @property string|null $suspension_reason
+ * @property OpportunityStatus|null $status_before_suspension
+ * @property Carbon|null $suspended_at
+ * @property int|null $suspended_by
  */
 class Opportunity extends Model
 {
@@ -79,6 +84,8 @@ class Opportunity extends Model
             'slots' => 'integer',
             'published_at' => 'datetime',
             'reopened_at' => 'datetime',
+            'status_before_suspension' => OpportunityStatus::class,
+            'suspended_at' => 'datetime',
         ];
     }
 
@@ -154,6 +161,22 @@ class Opportunity extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(Application::class);
+    }
+
+    /**
+     * @return MorphMany<Report, $this>
+     */
+    public function reports(): MorphMany
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function suspender(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'suspended_by')->withTrashed();
     }
 
     /**

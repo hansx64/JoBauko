@@ -8,10 +8,12 @@ use App\Models\Opportunity;
 use App\Models\Organization;
 use App\Models\Skill;
 use App\Models\User;
+use App\Notifications\OpportunityModerated;
 use App\Services\Audit\AuditLogger;
 use App\Services\Recommendation\MatchRefresher;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -161,6 +163,48 @@ class OpportunityService
         $this->ensureStatus($opportunity, [OpportunityStatus::Draft, OpportunityStatus::Published, OpportunityStatus::Closed], 'archive');
 
         $this->setStatus($opportunity, OpportunityStatus::Archived, 'opportunity.archived');
+    }
+
+    /**
+     * Administrator takedown. The listing is hidden and locked until it is
+     * reinstated; the organization is told why.
+     */
+    public function suspend(Opportunity $opportunity, User $admin, string $reason): void
+    {
+        $this->ensureStatus($opportunity, [OpportunityStatus::Draft, OpportunityStatus::Published, OpportunityStatus::Closed], 'suspend');
+
+        $this->setStatus($opportunity, OpportunityStatus::Suspended, 'opportunity.suspended', [
+            'status_before_suspension' => $opportunity->status->value,
+            'suspension_reason' => $reason,
+            'suspended_at' => now(),
+            'suspended_by' => $admin->id,
+        ]);
+
+        $this->notifyOrganization($opportunity);
+    }
+
+    /**
+     * Lift a suspension, returning the listing to the status it had before.
+     */
+    public function reinstate(Opportunity $opportunity): void
+    {
+        $this->ensureStatus($opportunity, [OpportunityStatus::Suspended], 'reinstate');
+
+        $this->setStatus($opportunity, $opportunity->status_before_suspension ?? OpportunityStatus::Closed, 'opportunity.reinstated', [
+            'status_before_suspension' => null,
+            'suspension_reason' => null,
+            'suspended_at' => null,
+            'suspended_by' => null,
+        ]);
+
+        $this->notifyOrganization($opportunity);
+    }
+
+    private function notifyOrganization(Opportunity $opportunity): void
+    {
+        $recipients = $opportunity->organization->members()->where('is_active', true)->with('user')->get()->pluck('user')->filter();
+
+        Notification::send($recipients, new OpportunityModerated($opportunity));
     }
 
     /**

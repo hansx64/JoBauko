@@ -26,6 +26,7 @@ export interface OpportunityFormData {
     status: string;
     status_label: string;
     stored_status: string;
+    suspension_reason: string | null;
     was_published: boolean;
     category: string;
     title: string;
