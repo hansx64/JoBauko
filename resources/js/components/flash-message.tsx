@@ -1,29 +1,42 @@
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { CircleCheck, X } from 'lucide-react';
+import { CircleAlert, CircleCheck, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { cn } from '@/lib/utils';
+
 /**
- * Shows the success message flashed by the last action. Validation errors
- * are shown next to the fields they belong to instead.
+ * Shows the success or error message flashed by the last action. Validation
+ * errors are shown next to the fields they belong to instead.
  */
 export function FlashMessage() {
     const { flash } = usePage<SharedData>().props;
-    const [visible, setVisible] = useState(Boolean(flash.success));
+    const message = flash.error ?? flash.success;
+    const isError = Boolean(flash.error);
+    const [visible, setVisible] = useState(Boolean(message));
 
     useEffect(() => {
-        setVisible(Boolean(flash.success));
-    }, [flash.success]);
+        setVisible(Boolean(message));
+    }, [message]);
 
-    if (!visible || !flash.success) {
+    if (!visible || !message) {
         return null;
     }
 
+    const Icon = isError ? CircleAlert : CircleCheck;
+
     return (
-        <div className="px-4 pt-4 md:px-6" role="status">
-            <div className="flex items-start gap-3 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900 dark:border-teal-900 dark:bg-teal-950/40 dark:text-teal-100">
-                <CircleCheck className="mt-0.5 h-4 w-4 shrink-0" />
-                <p className="flex-1">{flash.success}</p>
+        <div className="px-4 pt-4 md:px-6" role={isError ? 'alert' : 'status'}>
+            <div
+                className={cn(
+                    'flex items-start gap-3 rounded-lg border px-4 py-3 text-sm',
+                    isError
+                        ? 'border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950/40 dark:text-red-100'
+                        : 'border-teal-200 bg-teal-50 text-teal-900 dark:border-teal-900 dark:bg-teal-950/40 dark:text-teal-100',
+                )}
+            >
+                <Icon className="mt-0.5 h-4 w-4 shrink-0" />
+                <p className="flex-1">{message}</p>
                 <button type="button" onClick={() => setVisible(false)} className="opacity-70 hover:opacity-100" aria-label="Dismiss">
                     <X className="h-4 w-4" />
                 </button>

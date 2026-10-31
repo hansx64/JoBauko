@@ -48,6 +48,9 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // Discard the key for the browser history kept while signed in.
+        Inertia::clearHistory();
+
         return redirect('/');
     }
 }

@@ -260,7 +260,9 @@ class ApplicationTest extends TestCase
         $this->actingAs($seeker)->post("/opportunities/{$job->slug}/apply", ['consent' => '1', 'documents' => [$transcript => $this->pdf()]]);
         $document = Application::sole()->documents()->sole();
 
-        $this->get("/application-documents/{$document->id}")->assertOk()->assertHeader('Cache-Control', 'no-store, private');
+        $cache = (string) $this->get("/application-documents/{$document->id}")->assertOk()->headers->get('Cache-Control');
+        $this->assertStringContainsString('no-store', $cache);
+        $this->assertStringContainsString('private', $cache);
         $this->actingAs($staff)->get("/application-documents/{$document->id}?preview=1")->assertOk();
 
         $outsider = User::factory()->organization()->create();

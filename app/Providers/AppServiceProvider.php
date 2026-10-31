@@ -5,7 +5,10 @@ namespace App\Providers;
 use App\Services\Sms\LogSmsGateway;
 use App\Services\Sms\SemaphoreSmsGateway;
 use App\Services\Sms\SmsGateway;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -41,6 +44,11 @@ class AppServiceProvider extends ServiceProvider
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
+
+        // An overall ceiling against scraping and runaway clients; individual
+        // actions are throttled more tightly in the route files.
+        RateLimiter::for('web', fn (Request $request) => Limit::perMinute(config('jobauko.requests_per_minute'))
+            ->by($request->user()?->id ? 'user:'.$request->user()->id : 'ip:'.$request->ip()));
 
         // Stricter passwords in production, including a check against known
         // breached passwords (k-anonymity lookup; the password never leaves the server).

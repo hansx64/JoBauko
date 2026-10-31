@@ -35,11 +35,10 @@ class AccountStatusService
                 'deactivated_at' => now(),
                 'deactivation_reason' => $reason,
                 'deactivated_by' => $admin->id,
-                'remember_token' => null,
             ])->save();
 
             // End every open session now instead of on the next request.
-            DB::table('sessions')->where('user_id', $user->id)->delete();
+            UserSessions::end($user);
 
             $this->audit->log('user.deactivated', $user, ['is_active' => true], ['is_active' => false, 'reason' => $reason], $user->organizationMembership?->organization_id);
         });

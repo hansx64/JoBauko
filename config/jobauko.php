@@ -52,4 +52,17 @@ return [
 
     'trusted_proxies' => env('TRUSTED_PROXIES'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Overall request limit
+    |--------------------------------------------------------------------------
+    |
+    | Requests per minute for each signed-in user, or each IP address for
+    | visitors, across the whole site. Sign-in, registration, codes, uploads,
+    | applications, reports and exports have stricter limits of their own.
+    |
+    */
+
+    'requests_per_minute' => (int) env('RATE_LIMIT_PER_MINUTE', 120),
+
 ];
