@@ -26,7 +26,7 @@ import { StatusBadge } from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import PublicLayout from '@/layouts/public-layout';
+import BrowseLayout from '@/layouts/browse-layout';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { type ApplicationSummary } from '@/types/application';
@@ -78,7 +78,12 @@ export default function ShowOpportunity({
     const match = opportunity.match;
 
     return (
-        <PublicLayout>
+        <BrowseLayout
+            breadcrumbs={[
+                { title: 'Browse opportunities', href: '/opportunities' },
+                { title: opportunity.title, href: `/opportunities/${opportunity.slug}` },
+            ]}
+        >
             <Head title={opportunity.title} />
             <div className="mx-auto max-w-6xl px-4 py-8">
                 <Link
@@ -414,7 +419,7 @@ export default function ShowOpportunity({
                     </aside>
                 </div>
             </div>
-        </PublicLayout>
+        </BrowseLayout>
     );
 }
 

@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import PublicLayout from '@/layouts/public-layout';
+import BrowseLayout from '@/layouts/browse-layout';
 import { cn } from '@/lib/utils';
 import { type Barangay, type Option, type Paginated } from '@/types';
 import { type OpportunityCardData } from '@/types/opportunity';
@@ -228,7 +228,7 @@ export default function Browse({ opportunities, filters, isSeeker, options }: Br
     );
 
     return (
-        <PublicLayout>
+        <BrowseLayout breadcrumbs={[{ title: 'Browse opportunities', href: '/opportunities' }]}>
             <Head title="Browse opportunities" />
             <div className="mx-auto max-w-6xl px-4 py-8">
                 <div className="mb-6 space-y-4">
@@ -349,7 +349,7 @@ export default function Browse({ opportunities, filters, isSeeker, options }: Br
                     </div>
                 </div>
             </div>
-        </PublicLayout>
+        </BrowseLayout>
     );
 }
 
