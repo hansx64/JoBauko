@@ -57,7 +57,7 @@ export default function OpportunitiesIndex({ organization, opportunities, filter
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">Opportunities</h1>
-                        <p className="text-muted-foreground">Jobs, scholarships and livelihood programs posted by {organization.name}.</p>
+                        <p className="text-muted-foreground">Jobs, scholarships, livelihood programs and trainings posted by {organization.name}.</p>
                     </div>
                     {canCreate && (
                         <Button asChild>

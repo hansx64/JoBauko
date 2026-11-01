@@ -30,7 +30,7 @@ class NotifyMatchingSeekers implements ShouldQueue
 
     public function handle(MatchScorer $scorer): void
     {
-        $opportunity = Opportunity::query()->visible()->open()->with(['organization', 'livelihoodDetail', 'skills'])->find($this->opportunityId);
+        $opportunity = Opportunity::query()->visible()->open()->with(['organization', 'livelihoodDetail', 'trainingDetail', 'skills'])->find($this->opportunityId);
 
         if ($opportunity === null) {
             return;

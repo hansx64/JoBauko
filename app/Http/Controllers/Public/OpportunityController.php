@@ -106,7 +106,7 @@ class OpportunityController extends Controller
         abort_unless(Opportunity::query()->visible()->whereKey($opportunity->id)->exists(), 404);
 
         $opportunity->load([
-            'organization', 'barangay', 'jobDetail', 'scholarshipDetail', 'livelihoodDetail',
+            'organization', 'barangay', 'jobDetail', 'scholarshipDetail', 'livelihoodDetail', 'trainingDetail',
             'requirements', 'requiredDocuments', 'skills',
         ]);
 
@@ -150,6 +150,17 @@ class OpportunityController extends Controller
                     'target_beneficiaries' => $opportunity->livelihoodDetail->target_beneficiaries,
                     'assistance_provided' => $opportunity->livelihoodDetail->assistance_provided,
                     'training_requirements' => $opportunity->livelihoodDetail->training_requirements,
+                ] : null,
+                'training' => $opportunity->trainingDetail ? [
+                    'training_type' => $opportunity->trainingDetail->training_type->label(),
+                    'dates' => $opportunity->trainingDetail->dateLabel(),
+                    'schedule' => $opportunity->trainingDetail->schedule,
+                    'duration_hours' => $opportunity->trainingDetail->duration_hours,
+                    'fee' => $opportunity->trainingDetail->feeLabel(),
+                    'certificate' => $opportunity->trainingDetail->certificate,
+                    'topics' => $opportunity->trainingDetail->topics,
+                    'inclusions' => $opportunity->trainingDetail->inclusions,
+                    'target_participants' => $opportunity->trainingDetail->target_participants,
                 ] : null,
                 'organization_details' => [
                     'type' => $opportunity->organization->type->label(),

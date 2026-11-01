@@ -8,7 +8,7 @@ export interface OpportunityCardData {
     id: number;
     slug: string;
     title: string;
-    category: 'job' | 'scholarship' | 'livelihood';
+    category: 'job' | 'scholarship' | 'livelihood' | 'training';
     category_label: string;
     organization: { name: string; logo_url: string | null };
     location: string;

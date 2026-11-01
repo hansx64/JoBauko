@@ -29,7 +29,7 @@ interface DashboardProps {
         recent: { id: number; title: string; organization: string; status: string; status_label: string; updated_at: string | null }[];
     };
     recommended: OpportunityCardData[];
-    latest: Record<'job' | 'scholarship' | 'livelihood', OpportunityCardData[]>;
+    latest: Record<'job' | 'scholarship' | 'livelihood' | 'training', OpportunityCardData[]>;
     saved: OpportunityCardData[];
     savedCount: number;
     deadlines: { id: number; slug: string; title: string; deadline: string; days_left: number }[];
@@ -45,6 +45,7 @@ const latestTabs = [
     { key: 'job', label: 'Jobs' },
     { key: 'scholarship', label: 'Scholarships' },
     { key: 'livelihood', label: 'Livelihood' },
+    { key: 'training', label: 'Trainings' },
 ] as const;
 
 export default function Dashboard({

@@ -5,6 +5,7 @@ namespace App\Reports;
 use App\Enums\ApplicationStatus;
 use App\Enums\OpportunityCategory;
 use App\Models\Opportunity;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Opportunities first published in the period, with where they stand now.
@@ -23,7 +24,7 @@ class PublishedOpportunitiesReport extends Report
 
     public function description(): string
     {
-        return 'Jobs, scholarships and livelihood programs published, with slots offered and applications received.';
+        return 'Jobs, scholarships, livelihood programs, and trainings and seminars published, with slots offered and applications received.';
     }
 
     public function periodBasis(): string
@@ -33,6 +34,7 @@ class PublishedOpportunitiesReport extends Report
 
     public function build(ReportPeriod $period): ReportResult
     {
+        /** @var Collection<int, Opportunity> $opportunities */
         $opportunities = Opportunity::query()
             ->whereBetween('published_at', [$period->from, $period->to])
             ->with(['organization:id,name', 'barangay:id,name'])

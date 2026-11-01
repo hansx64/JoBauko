@@ -66,6 +66,19 @@ export interface OpportunityFormData {
         training_requirements: string | null;
         target_classifications: string[];
     } | null;
+    training: {
+        training_type: string;
+        starts_on: string | null;
+        ends_on: string | null;
+        schedule: string | null;
+        duration_hours: number | null;
+        fee: string | null;
+        certificate: string | null;
+        topics: string | null;
+        inclusions: string | null;
+        target_participants: string | null;
+        target_classifications: string[];
+    } | null;
 }
 
 export interface OpportunityFormOptions {
@@ -74,6 +87,7 @@ export interface OpportunityFormOptions {
     employmentTypes: Option[];
     workSetups: Option[];
     assistanceTypes: Option[];
+    trainingTypes: Option[];
     classifications: Option[];
 }
 

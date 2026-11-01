@@ -2,7 +2,6 @@
 
 namespace App\Services\Recommendation;
 
-use App\Enums\AssistanceType;
 use App\Enums\Classification;
 use App\Enums\EmploymentType;
 use App\Enums\InterestCategory;
@@ -181,6 +180,7 @@ class MatchScorer
                 default => [0.0],
             },
             OpportunityCategory::Livelihood => $this->livelihoodFit($classification, $opportunity),
+            OpportunityCategory::Training => $this->trainingFit($classification, $opportunity),
             OpportunityCategory::Job => match (true) {
                 $classification === Classification::Student => $opportunity->jobDetail?->employment_type === EmploymentType::Internship
                     ? [1.0, 'Internships are a good fit for students']
@@ -212,6 +212,26 @@ class MatchScorer
     }
 
     /**
+     * @return array{0: float, 1?: ?string}
+     */
+    private function trainingFit(Classification $classification, Opportunity $opportunity): array
+    {
+        $targets = $opportunity->trainingDetail?->target_classifications ?? [];
+
+        if ($targets !== []) {
+            return in_array($classification->value, $targets, true)
+                ? [1.0, "This training is meant for {$classification->label()} residents"]
+                : [0.0];
+        }
+
+        return match ($classification) {
+            Classification::Unemployed, Classification::OutOfSchoolYouth, Classification::FreshGraduate, Classification::CareerShifter => [1.0, "Training can help {$classification->label()} residents build new skills"],
+            Classification::SelfEmployed, Classification::Student => [0.6],
+            default => [0.5],
+        };
+    }
+
+    /**
      * @return array{0: float, 1?: ?string, 2?: ?string}|null
      */
     private function location(SeekerSnapshot $seeker, Opportunity $opportunity): ?array
@@ -238,14 +258,11 @@ class MatchScorer
             return [0.0, null, 'Add your areas of interest to your profile.'];
         }
 
-        $isTraining = $opportunity->livelihoodDetail?->assistance_type === AssistanceType::SkillsTraining
-            || Str::contains(mb_strtolower($opportunity->title), 'training');
-
         $matching = array_filter($seeker->interests, fn (array $interest) => match ($interest['category']) {
             InterestCategory::Job => $opportunity->category === OpportunityCategory::Job,
             InterestCategory::Scholarship => $opportunity->category === OpportunityCategory::Scholarship,
             InterestCategory::Livelihood => $opportunity->category === OpportunityCategory::Livelihood,
-            InterestCategory::Training => $isTraining,
+            InterestCategory::Training => $opportunity->category === OpportunityCategory::Training,
         });
 
         if ($matching === []) {

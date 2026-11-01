@@ -239,6 +239,7 @@ class OpportunityService
             OpportunityCategory::Job => ! $opportunity->jobDetail()->exists(),
             OpportunityCategory::Scholarship => ! $opportunity->scholarshipDetail()->exists(),
             OpportunityCategory::Livelihood => ! $opportunity->livelihoodDetail()->exists(),
+            OpportunityCategory::Training => ! $opportunity->trainingDetail()->exists(),
         };
 
         if ($missingDetails) {
@@ -246,6 +247,7 @@ class OpportunityService
                 OpportunityCategory::Job => 'Choose the employment type.',
                 OpportunityCategory::Scholarship => 'Choose the educational level the scholarship is for.',
                 OpportunityCategory::Livelihood => 'Choose the type of livelihood assistance.',
+                OpportunityCategory::Training => 'Choose whether this is a training, seminar, workshop or orientation.',
             };
         }
 
@@ -302,6 +304,7 @@ class OpportunityService
             OpportunityCategory::Job->value => ['jobDetail', 'job', 'employment_type'],
             OpportunityCategory::Scholarship->value => ['scholarshipDetail', 'scholarship', 'education_level'],
             OpportunityCategory::Livelihood->value => ['livelihoodDetail', 'livelihood', 'assistance_type'],
+            OpportunityCategory::Training->value => ['trainingDetail', 'training', 'training_type'],
         ];
 
         foreach ($relations as $category => [$relation, $key, $requiredField]) {

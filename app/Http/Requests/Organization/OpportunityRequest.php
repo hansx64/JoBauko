@@ -8,6 +8,7 @@ use App\Enums\EducationLevel;
 use App\Enums\EmploymentType;
 use App\Enums\OpportunityCategory;
 use App\Enums\OpportunityStatus;
+use App\Enums\TrainingType;
 use App\Enums\WorkSetup;
 use App\Models\Barangay;
 use App\Models\Opportunity;
@@ -102,6 +103,21 @@ class OpportunityRequest extends FormRequest
             'livelihood.training_requirements' => ['nullable', 'string', 'max:3000'],
             'livelihood.target_classifications' => ['nullable', 'array'],
             'livelihood.target_classifications.*' => [Rule::enum(Classification::class)],
+
+            // Training and seminar details
+            'training' => ['nullable', 'array'],
+            'training.training_type' => [$category === 'training' ? $requiredWhenStrict : 'nullable', Rule::enum(TrainingType::class)],
+            'training.starts_on' => ['nullable', 'date'],
+            'training.ends_on' => array_filter(['nullable', 'date', $this->filled('training.starts_on') ? 'after_or_equal:training.starts_on' : null]),
+            'training.schedule' => ['nullable', 'string', 'max:255'],
+            'training.duration_hours' => ['nullable', 'integer', 'min:1', 'max:5000'],
+            'training.fee' => ['nullable', 'numeric', 'min:0', 'max:1000000'],
+            'training.certificate' => ['nullable', 'string', 'max:255'],
+            'training.topics' => [$category === 'training' ? $requiredWhenStrict : 'nullable', 'string', 'max:3000'],
+            'training.inclusions' => ['nullable', 'string', 'max:3000'],
+            'training.target_participants' => ['nullable', 'string', 'max:3000'],
+            'training.target_classifications' => ['nullable', 'array'],
+            'training.target_classifications.*' => [Rule::enum(Classification::class)],
         ];
     }
 
@@ -135,6 +151,12 @@ class OpportunityRequest extends FormRequest
             'livelihood.assistance_type' => 'type of assistance',
             'livelihood.target_beneficiaries' => 'target beneficiaries',
             'livelihood.assistance_provided' => 'assistance provided',
+            'training.training_type' => 'type of training',
+            'training.starts_on' => 'start date',
+            'training.ends_on' => 'end date',
+            'training.duration_hours' => 'number of hours',
+            'training.fee' => 'fee',
+            'training.topics' => 'what participants will learn',
             'requirements.*' => 'requirement',
             'documents.*.name' => 'document name',
             'skills.*' => 'skill',

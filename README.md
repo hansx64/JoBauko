@@ -1,6 +1,6 @@
 # JoBauko
 
-JoBauko is the opportunity portal of the Municipality of Bauko, Mountain Province. It brings jobs, scholarships and livelihood programs into one place for the residents of Bauko's 22 barangays:
+JoBauko is the opportunity portal of the Municipality of Bauko, Mountain Province. It brings jobs, scholarships, livelihood programs, and trainings and seminars into one place for the residents of Bauko's 22 barangays:
 
 - seekers find opportunities and apply online;
 - organizations publish opportunities and review applicants;

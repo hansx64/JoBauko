@@ -36,8 +36,9 @@ export default function Privacy({ version, contactEmail }: PrivacyProps) {
                 </div>
 
                 <p className="leading-relaxed">
-                    JoBauko connects residents of Bauko, Mountain Province with jobs, scholarships and livelihood programs. We respect your privacy
-                    and process personal data in accordance with the Data Privacy Act of 2012 (Republic Act No. 10173) and its implementing rules.
+                    JoBauko connects residents of Bauko, Mountain Province with jobs, scholarships, livelihood programs and trainings. We respect your
+                    privacy and process personal data in accordance with the Data Privacy Act of 2012 (Republic Act No. 10173) and its implementing
+                    rules.
                 </p>
 
                 <Section title="What we collect">

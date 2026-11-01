@@ -64,7 +64,7 @@ export default function Applications({
                         <p className="font-medium">{counts.all === 0 ? 'You have not applied to anything yet' : 'No applications in this list'}</p>
                         <p className="text-muted-foreground text-sm">
                             {counts.all === 0
-                                ? 'Find a job, scholarship or livelihood program and apply from its details page.'
+                                ? 'Find a job, scholarship, livelihood program or training and apply from its details page.'
                                 : 'Choose another filter to see your other applications.'}
                         </p>
                         {counts.all === 0 && (

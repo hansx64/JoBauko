@@ -8,6 +8,7 @@ use App\Enums\EducationLevel;
 use App\Enums\EmploymentType;
 use App\Enums\OpportunityCategory;
 use App\Enums\OpportunityStatus;
+use App\Enums\TrainingType;
 use App\Enums\WorkSetup;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Organization\Concerns\ResolvesOrganization;
@@ -137,6 +138,7 @@ class OpportunityController extends Controller
                 'employmentTypes' => EmploymentType::options(),
                 'workSetups' => WorkSetup::options(),
                 'assistanceTypes' => AssistanceType::options(),
+                'trainingTypes' => TrainingType::options(),
                 'classifications' => Classification::options(),
             ],
             'barangays' => Barangay::orderBy('name')->get(['id', 'name']),
@@ -149,7 +151,8 @@ class OpportunityController extends Controller
      */
     private function formData(Opportunity $opportunity): array
     {
-        $opportunity->load(['jobDetail', 'scholarshipDetail', 'livelihoodDetail', 'requirements', 'requiredDocuments', 'skills']);
+        $opportunity->load(['jobDetail', 'scholarshipDetail', 'livelihoodDetail', 'trainingDetail', 'requirements', 'requiredDocuments', 'skills']);
+        $training = $opportunity->trainingDetail;
 
         return [
             'id' => $opportunity->id,
@@ -195,6 +198,19 @@ class OpportunityController extends Controller
                 'assistance_provided' => $opportunity->livelihoodDetail->assistance_provided,
                 'training_requirements' => $opportunity->livelihoodDetail->training_requirements,
                 'target_classifications' => $opportunity->livelihoodDetail->target_classifications ?? [],
+            ] : null,
+            'training' => $training ? [
+                'training_type' => $training->training_type->value,
+                'starts_on' => $training->starts_on?->toDateString(),
+                'ends_on' => $training->ends_on?->toDateString(),
+                'schedule' => $training->schedule,
+                'duration_hours' => $training->duration_hours,
+                'fee' => $training->fee,
+                'certificate' => $training->certificate,
+                'topics' => $training->topics,
+                'inclusions' => $training->inclusions,
+                'target_participants' => $training->target_participants,
+                'target_classifications' => $training->target_classifications ?? [],
             ] : null,
         ];
     }

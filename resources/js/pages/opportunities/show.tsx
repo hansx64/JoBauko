@@ -59,6 +59,17 @@ interface OpportunityDetails extends OpportunityCardData {
         assistance_provided: string | null;
         training_requirements: string | null;
     } | null;
+    training: {
+        training_type: string;
+        dates: string | null;
+        schedule: string | null;
+        duration_hours: number | null;
+        fee: string;
+        certificate: string | null;
+        topics: string | null;
+        inclusions: string | null;
+        target_participants: string | null;
+    } | null;
     organization_details: { type: string; description: string | null; official_email: string; contact_number: string; office_address: string };
 }
 
@@ -219,6 +230,40 @@ export default function ShowOpportunity({
                                     {opportunity.livelihood.training_requirements && (
                                         <Detail label="Training requirements">
                                             <Prose>{opportunity.livelihood.training_requirements}</Prose>
+                                        </Detail>
+                                    )}
+                                </dl>
+                            </Section>
+                        )}
+
+                        {opportunity.training && (
+                            <Section title="Training details">
+                                <dl className="grid gap-4 text-sm sm:grid-cols-2">
+                                    <Detail label="Type">{opportunity.training.training_type}</Detail>
+                                    <Detail label="Fee">{opportunity.training.fee}</Detail>
+                                    {opportunity.training.dates && <Detail label="Dates">{opportunity.training.dates}</Detail>}
+                                    {opportunity.training.schedule && <Detail label="Schedule">{opportunity.training.schedule}</Detail>}
+                                    {opportunity.training.duration_hours !== null && (
+                                        <Detail label="Length">
+                                            {opportunity.training.duration_hours} {opportunity.training.duration_hours === 1 ? 'hour' : 'hours'}
+                                        </Detail>
+                                    )}
+                                    {opportunity.training.certificate && <Detail label="Certificate">{opportunity.training.certificate}</Detail>}
+                                </dl>
+                                <dl className="grid gap-4 text-sm">
+                                    {opportunity.training.topics && (
+                                        <Detail label="What you will learn">
+                                            <Prose>{opportunity.training.topics}</Prose>
+                                        </Detail>
+                                    )}
+                                    {opportunity.training.inclusions && (
+                                        <Detail label="What is provided">
+                                            <Prose>{opportunity.training.inclusions}</Prose>
+                                        </Detail>
+                                    )}
+                                    {opportunity.training.target_participants && (
+                                        <Detail label="Who should attend">
+                                            <Prose>{opportunity.training.target_participants}</Prose>
                                         </Detail>
                                     )}
                                 </dl>

@@ -10,7 +10,6 @@ enum AssistanceType: string
 
     case StarterKit = 'starter_kit';
     case CashGrant = 'cash_grant';
-    case SkillsTraining = 'skills_training';
     case Livestock = 'livestock';
     case FarmInputs = 'farm_inputs';
     case Equipment = 'equipment';
@@ -23,7 +22,6 @@ enum AssistanceType: string
         return match ($this) {
             self::StarterKit => 'Starter kit',
             self::CashGrant => 'Cash grant',
-            self::SkillsTraining => 'Skills training',
             self::Livestock => 'Livestock dispersal',
             self::FarmInputs => 'Seeds and farm inputs',
             self::Equipment => 'Tools and equipment',

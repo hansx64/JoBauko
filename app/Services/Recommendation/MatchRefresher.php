@@ -66,7 +66,7 @@ class MatchRefresher
         $rows = Opportunity::query()
             ->visible()
             ->open()
-            ->with(['skills', 'barangay', 'jobDetail', 'scholarshipDetail', 'livelihoodDetail'])
+            ->with(['skills', 'barangay', 'jobDetail', 'scholarshipDetail', 'livelihoodDetail', 'trainingDetail'])
             ->get()
             ->map(function (Opportunity $opportunity) use ($snapshot, $user, $now) {
                 $result = $this->scorer->score($snapshot, $opportunity);

@@ -138,6 +138,14 @@ class Opportunity extends Model
     }
 
     /**
+     * @return HasOne<TrainingDetail, $this>
+     */
+    public function trainingDetail(): HasOne
+    {
+        return $this->hasOne(TrainingDetail::class);
+    }
+
+    /**
      * @return HasMany<OpportunityRequirement, $this>
      */
     public function requirements(): HasMany

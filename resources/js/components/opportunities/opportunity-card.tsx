@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BriefcaseBusiness, CalendarClock, GraduationCap, MapPin, Sprout, Wallet } from 'lucide-react';
+import { BriefcaseBusiness, CalendarClock, GraduationCap, MapPin, Presentation, Sprout, Wallet } from 'lucide-react';
 
 import { MatchBadge } from '@/components/opportunities/match-badge';
 import { SaveButton } from '@/components/opportunities/save-button';
@@ -12,12 +12,14 @@ export const categoryIcons = {
     job: BriefcaseBusiness,
     scholarship: GraduationCap,
     livelihood: Sprout,
+    training: Presentation,
 };
 
 export const categoryTones = {
     job: 'bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-200',
     scholarship: 'bg-violet-50 text-violet-800 dark:bg-violet-950 dark:text-violet-200',
     livelihood: 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200',
+    training: 'bg-orange-50 text-orange-800 dark:bg-orange-950 dark:text-orange-200',
 };
 
 export function deadlineText(opportunity: Pick<OpportunityCardData, 'deadline' | 'days_left' | 'accepting'>) {

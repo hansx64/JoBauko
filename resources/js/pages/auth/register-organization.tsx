@@ -71,8 +71,8 @@ export default function RegisterOrganization({ organizationTypes, barangays }: {
                 <div className="mb-8 space-y-2">
                     <h1 className="text-3xl font-bold tracking-tight">Register your organization</h1>
                     <p className="text-muted-foreground">
-                        Companies, LGUs, government agencies, schools and NGOs can post jobs, scholarships and livelihood programs for the people of
-                        Bauko. Every organization is verified by the JoBauko administrator before its opportunities are published.
+                        Companies, LGUs, government agencies, schools and NGOs can post jobs, scholarships, livelihood programs and trainings for the
+                        people of Bauko. Every organization is verified by the JoBauko administrator before its opportunities are published.
                     </p>
                 </div>
 

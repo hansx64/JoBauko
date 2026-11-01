@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\EmploymentType;
 use App\Enums\OpportunityCategory;
 use App\Enums\OpportunityStatus;
+use App\Enums\TrainingType;
 use App\Enums\WorkSetup;
 use App\Models\Opportunity;
 use App\Models\Organization;
@@ -46,6 +47,18 @@ class OpportunityFactory extends Factory
             ->afterCreating(fn (Opportunity $o) => $o->jobDetail()->create([
                 'employment_type' => EmploymentType::FullTime,
                 'work_setup' => WorkSetup::Onsite,
+            ]));
+    }
+
+    /**
+     * A training with its details row, ready to publish.
+     */
+    public function training(): static
+    {
+        return $this->state(['category' => OpportunityCategory::Training])
+            ->afterCreating(fn (Opportunity $o) => $o->trainingDetail()->create([
+                'training_type' => TrainingType::SkillsTraining,
+                'topics' => 'Hands-on practice of the skills listed.',
             ]));
     }
 

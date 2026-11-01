@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { type OpportunityCardData } from '@/types/opportunity';
 
 interface WelcomeProps {
-    categories: { value: 'job' | 'scholarship' | 'livelihood'; label: string; open: number }[];
+    categories: { value: 'job' | 'scholarship' | 'livelihood' | 'training'; label: string; open: number }[];
     latest: OpportunityCardData[];
     featuredOrganizations: { id: number; name: string; type: string; logo_url: string | null; open_count: number }[];
     totals: { open: number; organizations: number };
@@ -19,7 +19,8 @@ interface WelcomeProps {
 const categoryBlurbs = {
     job: 'Full-time, part-time, contractual and internship work from employers in and around Bauko.',
     scholarship: 'Educational assistance from the LGU, agencies, schools and private sponsors.',
-    livelihood: 'Starter kits, farm inputs, training and other support to start or grow a livelihood.',
+    livelihood: 'Starter kits, farm inputs, cash grants and other support to start or grow a livelihood.',
+    training: 'Skills trainings, seminars and workshops to learn a trade or earn a certificate.',
 };
 
 const steps = [
@@ -69,7 +70,7 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
                         </p>
                         <h1 className="text-4xl font-bold tracking-tight text-balance md:text-6xl">Discover Opportunities. Build Your Future.</h1>
                         <p className="max-w-2xl text-lg text-blue-100 md:text-xl">
-                            Find jobs, scholarships, and livelihood programs that match your skills, qualifications, and aspirations.
+                            Find jobs, scholarships, livelihood programs and trainings that match your skills, qualifications, and aspirations.
                         </p>
                     </div>
 
@@ -125,7 +126,7 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
             {/* Categories */}
             <section className="mx-auto max-w-6xl px-4 py-16">
                 <SectionHeading title="What are you looking for?" subtitle="Three kinds of opportunities, one place to find them." />
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {categories.map((category) => {
                         const Icon = categoryIcons[category.value];
                         return (

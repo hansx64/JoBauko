@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Enums\AssistanceType;
 use App\Enums\NotificationTopic;
 use App\Enums\OpportunityCategory;
 use App\Enums\SmsTemplateKey;
@@ -33,9 +32,8 @@ class NewOpportunityMatch extends Notification implements HasTopic
         return match ($opportunity->category) {
             OpportunityCategory::Job => NotificationTopic::Jobs,
             OpportunityCategory::Scholarship => NotificationTopic::Scholarships,
-            OpportunityCategory::Livelihood => $opportunity->livelihoodDetail?->assistance_type === AssistanceType::SkillsTraining
-                ? NotificationTopic::Training
-                : NotificationTopic::Livelihood,
+            OpportunityCategory::Livelihood => NotificationTopic::Livelihood,
+            OpportunityCategory::Training => NotificationTopic::Training,
         };
     }
 

@@ -93,7 +93,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                         <p className="text-foreground flex items-center gap-2 font-semibold">
                             <AppLogoIcon className="size-5 fill-current" /> JoBauko
                         </p>
-                        <p>Jobs, scholarships and livelihood programs for the people of Bauko, Mountain Province.</p>
+                        <p>Jobs, scholarships, livelihood programs and trainings for the people of Bauko, Mountain Province.</p>
                     </div>
                     <div className="space-y-2">
                         <p className="text-foreground font-medium">Explore</p>
@@ -111,6 +111,11 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                             <li>
                                 <Link href="/opportunities?category=livelihood" className="hover:text-foreground">
                                     Livelihood programs
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/opportunities?category=training" className="hover:text-foreground">
+                                    Trainings and seminars
                                 </Link>
                             </li>
                         </ul>

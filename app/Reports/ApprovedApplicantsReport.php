@@ -5,6 +5,7 @@ namespace App\Reports;
 use App\Enums\ApplicationStatus;
 use App\Enums\OpportunityCategory;
 use App\Models\Application;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * People whose applications were approved in the period: the municipality's
@@ -25,7 +26,7 @@ class ApprovedApplicantsReport extends Report
 
     public function description(): string
     {
-        return 'Each person approved for a job, scholarship or livelihood program, with their barangay and classification.';
+        return 'Each person approved for a job, scholarship, livelihood program, or training or seminar, with their barangay and classification.';
     }
 
     public function periodBasis(): string
@@ -40,6 +41,7 @@ class ApprovedApplicantsReport extends Report
 
     public function build(ReportPeriod $period): ReportResult
     {
+        /** @var Collection<int, Application> $applications */
         $applications = Application::query()
             ->where('status', ApplicationStatus::Approved)
             ->whereBetween('decided_at', [$period->from, $period->to])

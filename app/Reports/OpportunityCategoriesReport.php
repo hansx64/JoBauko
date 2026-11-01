@@ -7,6 +7,7 @@ use App\Enums\AssistanceType;
 use App\Enums\EducationLevel;
 use App\Enums\EmploymentType;
 use App\Enums\OpportunityCategory;
+use App\Enums\TrainingType;
 use App\Models\Opportunity;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +29,7 @@ class OpportunityCategoriesReport extends Report
 
     public function description(): string
     {
-        return 'Jobs, scholarships and livelihood programs compared, with breakdowns by employment type, education level and assistance type.';
+        return 'Jobs, scholarships, livelihood programs, and trainings and seminars compared, with breakdowns by employment type, education level, assistance type and training type.';
     }
 
     public function periodBasis(): string
@@ -82,12 +83,13 @@ class OpportunityCategoriesReport extends Report
                 $this->breakdown('Jobs by employment type', 'Employment type', 'job_details', 'employment_type', EmploymentType::cases(), $period),
                 $this->breakdown('Scholarships by education level', 'Education level', 'scholarship_details', 'education_level', EducationLevel::cases(), $period),
                 $this->breakdown('Livelihood programs by assistance type', 'Assistance type', 'livelihood_details', 'assistance_type', AssistanceType::cases(), $period),
+                $this->breakdown('Trainings and seminars by type', 'Type', 'training_details', 'training_type', TrainingType::cases(), $period),
             ],
         );
     }
 
     /**
-     * @param  list<EmploymentType|EducationLevel|AssistanceType>  $cases
+     * @param  list<EmploymentType|EducationLevel|AssistanceType|TrainingType>  $cases
      */
     private function breakdown(string $title, string $heading, string $table, string $column, array $cases, ReportPeriod $period): ReportTable
     {

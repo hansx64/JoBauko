@@ -11,6 +11,7 @@ enum OpportunityCategory: string
     case Job = 'job';
     case Scholarship = 'scholarship';
     case Livelihood = 'livelihood';
+    case Training = 'training';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum OpportunityCategory: string
             self::Job => 'Job',
             self::Scholarship => 'Scholarship',
             self::Livelihood => 'Livelihood Program',
+            self::Training => 'Training / Seminar',
         };
     }
 
@@ -27,6 +29,7 @@ enum OpportunityCategory: string
             self::Job => 'Jobs',
             self::Scholarship => 'Scholarships',
             self::Livelihood => 'Livelihood Programs',
+            self::Training => 'Trainings & Seminars',
         };
     }
 }

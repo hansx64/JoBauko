@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { BriefcaseBusiness, CircleAlert, GraduationCap, LoaderCircle, Plus, Sprout, X } from 'lucide-react';
+import { BriefcaseBusiness, CircleAlert, GraduationCap, LoaderCircle, Plus, Presentation, Sprout, X } from 'lucide-react';
 import { FormEventHandler, KeyboardEvent, ReactNode, useState } from 'react';
 
 import InputError from '@/components/input-error';
@@ -58,6 +58,19 @@ type FormShape = {
         training_requirements: string;
         target_classifications: string[];
     };
+    training: {
+        training_type: string;
+        starts_on: string;
+        ends_on: string;
+        schedule: string;
+        duration_hours: string;
+        fee: string;
+        certificate: string;
+        topics: string;
+        inclusions: string;
+        target_participants: string;
+        target_classifications: string[];
+    };
 };
 
 const NONE = 'none';
@@ -67,6 +80,7 @@ const categoryMeta: Record<string, { icon: typeof BriefcaseBusiness; titleLabel:
     job: { icon: BriefcaseBusiness, titleLabel: 'Job title', titlePlaceholder: 'e.g. Municipal IT Assistant' },
     scholarship: { icon: GraduationCap, titleLabel: 'Scholarship name', titlePlaceholder: 'e.g. Bauko Municipal Scholarship Program' },
     livelihood: { icon: Sprout, titleLabel: 'Program name', titlePlaceholder: 'e.g. Highland Vegetable Starter Kit Program' },
+    training: { icon: Presentation, titleLabel: 'Training or seminar title', titlePlaceholder: 'e.g. Shielded Metal Arc Welding NC I Training' },
 };
 
 export default function OpportunityForm({ organization, opportunity, publishProblems, options, barangays, skillSuggestions }: OpportunityFormProps) {
@@ -124,6 +138,19 @@ export default function OpportunityForm({ organization, opportunity, publishProb
             assistance_provided: s(opportunity?.livelihood?.assistance_provided),
             training_requirements: s(opportunity?.livelihood?.training_requirements),
             target_classifications: opportunity?.livelihood?.target_classifications ?? [],
+        },
+        training: {
+            training_type: s(opportunity?.training?.training_type),
+            starts_on: s(opportunity?.training?.starts_on),
+            ends_on: s(opportunity?.training?.ends_on),
+            schedule: s(opportunity?.training?.schedule),
+            duration_hours: s(opportunity?.training?.duration_hours),
+            fee: s(opportunity?.training?.fee),
+            certificate: s(opportunity?.training?.certificate),
+            topics: s(opportunity?.training?.topics),
+            inclusions: s(opportunity?.training?.inclusions),
+            target_participants: s(opportunity?.training?.target_participants),
+            target_classifications: opportunity?.training?.target_classifications ?? [],
         },
     });
 
@@ -206,7 +233,7 @@ export default function OpportunityForm({ organization, opportunity, publishProb
 
                 <fieldset disabled={readOnly || form.processing} className="grid gap-6">
                     <Section title="Type of opportunity">
-                        <div className="grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Category">
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" role="radiogroup" aria-label="Category">
                             {options.categories.map((category) => {
                                 const Icon = categoryMeta[category.value].icon;
                                 const locked = !isNew && (opportunity.was_published || !isDraft);
@@ -400,31 +427,111 @@ export default function OpportunityForm({ organization, opportunity, publishProb
                                 label="Especially for"
                                 hint="Used to recommend this program to the right people. It does not restrict who may apply."
                             >
-                                <div className="flex flex-wrap gap-2">
-                                    {options.classifications.map((c) => {
-                                        const checked = data.livelihood.target_classifications.includes(c.value);
-                                        return (
-                                            <label
-                                                key={c.value}
-                                                className="has-[:checked]:border-primary has-[:checked]:bg-primary/5 flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm"
-                                            >
-                                                <Checkbox
-                                                    checked={checked}
-                                                    onCheckedChange={(value) =>
-                                                        setData('livelihood', {
-                                                            ...data.livelihood,
-                                                            target_classifications:
-                                                                value === true
-                                                                    ? [...data.livelihood.target_classifications, c.value]
-                                                                    : data.livelihood.target_classifications.filter((v) => v !== c.value),
-                                                        })
-                                                    }
-                                                />
-                                                {c.label}
-                                            </label>
-                                        );
-                                    })}
-                                </div>
+                                <ClassificationPicker
+                                    options={options.classifications}
+                                    selected={data.livelihood.target_classifications}
+                                    onChange={(selected) => setData('livelihood', { ...data.livelihood, target_classifications: selected })}
+                                />
+                            </Field>
+                            <Field label="Minimum educational attainment" error={errors.min_education}>
+                                <OptionSelect
+                                    value={data.min_education}
+                                    options={options.educationLevels}
+                                    onChange={(v) => setData('min_education', v)}
+                                    noneLabel="No requirement"
+                                />
+                            </Field>
+                        </Section>
+                    )}
+
+                    {data.category === 'training' && (
+                        <Section title="Training or seminar details">
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <Field label="Type *" error={errors['training.training_type']}>
+                                    <OptionSelect
+                                        value={data.training.training_type}
+                                        options={options.trainingTypes}
+                                        onChange={(v) => setData('training', { ...data.training, training_type: v })}
+                                    />
+                                </Field>
+                                <Field label="Fee (₱)" error={errors['training.fee']} hint="Leave empty if the training is free.">
+                                    <Input
+                                        type="number"
+                                        min={0}
+                                        step="0.01"
+                                        value={data.training.fee}
+                                        onChange={(e) => setData('training', { ...data.training, fee: e.target.value })}
+                                    />
+                                </Field>
+                                <Field label="Starts on" error={errors['training.starts_on']}>
+                                    <Input
+                                        type="date"
+                                        value={data.training.starts_on}
+                                        onChange={(e) => setData('training', { ...data.training, starts_on: e.target.value })}
+                                    />
+                                </Field>
+                                <Field label="Ends on" error={errors['training.ends_on']} hint="Leave empty for a one-day event.">
+                                    <Input
+                                        type="date"
+                                        value={data.training.ends_on}
+                                        onChange={(e) => setData('training', { ...data.training, ends_on: e.target.value })}
+                                    />
+                                </Field>
+                                <Field label="Schedule" error={errors['training.schedule']}>
+                                    <Input
+                                        value={data.training.schedule}
+                                        onChange={(e) => setData('training', { ...data.training, schedule: e.target.value })}
+                                        placeholder="e.g. Saturdays, 8:00 AM – 5:00 PM"
+                                    />
+                                </Field>
+                                <Field label="Total number of hours" error={errors['training.duration_hours']}>
+                                    <Input
+                                        type="number"
+                                        min={1}
+                                        value={data.training.duration_hours}
+                                        onChange={(e) => setData('training', { ...data.training, duration_hours: e.target.value })}
+                                    />
+                                </Field>
+                            </div>
+                            <Field label="Certificate given" error={errors['training.certificate']}>
+                                <Input
+                                    value={data.training.certificate}
+                                    onChange={(e) => setData('training', { ...data.training, certificate: e.target.value })}
+                                    placeholder="e.g. TESDA National Certificate II, certificate of attendance"
+                                />
+                            </Field>
+                            <Field label="What participants will learn *" error={errors['training.topics']} hint="One topic per line works well.">
+                                <Textarea
+                                    rows={4}
+                                    value={data.training.topics}
+                                    onChange={(e) => setData('training', { ...data.training, topics: e.target.value })}
+                                />
+                            </Field>
+                            <Field label="What is provided" error={errors['training.inclusions']}>
+                                <Textarea
+                                    rows={3}
+                                    value={data.training.inclusions}
+                                    onChange={(e) => setData('training', { ...data.training, inclusions: e.target.value })}
+                                    placeholder="e.g. Training materials, meals, transportation allowance, starter toolkit"
+                                />
+                            </Field>
+                            <Field label="Who should attend" error={errors['training.target_participants']}>
+                                <Textarea
+                                    rows={3}
+                                    value={data.training.target_participants}
+                                    onChange={(e) => setData('training', { ...data.training, target_participants: e.target.value })}
+                                    placeholder="e.g. Out-of-school youth and unemployed residents interested in welding"
+                                />
+                            </Field>
+                            <Field
+                                label="Especially for"
+                                hint="Used to recommend this training to the right people. It does not restrict who may apply."
+                            >
+                                <ClassificationPicker
+                                    options={options.classifications}
+                                    selected={data.training.target_classifications}
+                                    onChange={(selected) => setData('training', { ...data.training, target_classifications: selected })}
+                                />
                             </Field>
                             <Field label="Minimum educational attainment" error={errors.min_education}>
                                 <OptionSelect
@@ -646,6 +753,25 @@ function Alert({ children }: { children: ReactNode }) {
         <div className="flex gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
             <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
             <div className="space-y-1">{children}</div>
+        </div>
+    );
+}
+
+function ClassificationPicker({ options, selected, onChange }: { options: Option[]; selected: string[]; onChange: (selected: string[]) => void }) {
+    return (
+        <div className="flex flex-wrap gap-2">
+            {options.map((c) => (
+                <label
+                    key={c.value}
+                    className="has-[:checked]:border-primary has-[:checked]:bg-primary/5 flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm"
+                >
+                    <Checkbox
+                        checked={selected.includes(c.value)}
+                        onCheckedChange={(value) => onChange(value === true ? [...selected, c.value] : selected.filter((v) => v !== c.value))}
+                    />
+                    {c.label}
+                </label>
+            ))}
         </div>
     );
 }

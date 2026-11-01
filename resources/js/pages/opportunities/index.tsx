@@ -45,7 +45,7 @@ interface BrowseProps {
 }
 
 const ANY = 'any';
-const tabLabels: Record<string, string> = { '': 'All', job: 'Jobs', scholarship: 'Scholarships', livelihood: 'Livelihood' };
+const tabLabels: Record<string, string> = { '': 'All', job: 'Jobs', scholarship: 'Scholarships', livelihood: 'Livelihood', training: 'Trainings' };
 
 export default function Browse({ opportunities, filters, isSeeker, options }: BrowseProps) {
     const [query, setQuery] = useState(filters.q);
@@ -234,7 +234,7 @@ export default function Browse({ opportunities, filters, isSeeker, options }: Br
                 <div className="mb-6 space-y-4">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Opportunities</h1>
-                        <p className="text-muted-foreground">Jobs, scholarships and livelihood programs from verified organizations.</p>
+                        <p className="text-muted-foreground">Jobs, scholarships, livelihood programs and trainings from verified organizations.</p>
                     </div>
                     <form onSubmit={submitSearch} className="flex gap-2">
                         <div className="relative flex-1">

@@ -127,7 +127,7 @@ class ApplicationController extends Controller
                 'applicantProfile.trainings',
                 'applicantProfile.skills',
             ]),
-            'opportunity' => fn ($q) => $q->withTrashed()->with(['organization', 'requiredDocuments', 'skills', 'jobDetail', 'scholarshipDetail', 'livelihoodDetail']),
+            'opportunity' => fn ($q) => $q->withTrashed()->with(['organization', 'requiredDocuments', 'skills', 'jobDetail', 'scholarshipDetail', 'livelihoodDetail', 'trainingDetail']),
             'resume',
             'documents',
             'statusHistory.changer',

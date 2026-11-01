@@ -298,6 +298,7 @@ erDiagram
     opportunities ||--o| job_details : "category=job"
     opportunities ||--o| scholarship_details : "category=scholarship"
     opportunities ||--o| livelihood_details : "category=livelihood"
+    opportunities ||--o| training_details : "category=training"
     opportunities ||--o{ opportunity_requirements : lists
     opportunities ||--o{ opportunity_skills : requires
     skills ||--o{ opportunity_skills : "referenced by"
@@ -352,7 +353,7 @@ erDiagram
         bigint id PK
         bigint organization_id FK
         bigint created_by FK
-        string category "job|scholarship|livelihood"
+        string category "job|scholarship|livelihood|training"
         string title
         string slug UK
         text description
@@ -391,10 +392,24 @@ erDiagram
     }
     livelihood_details {
         bigint opportunity_id PK,FK
-        string assistance_type "starter_kit|cash_grant|training|loan|..."
+        string assistance_type "starter_kit|cash_grant|livestock|loan|..."
         text target_beneficiaries
         text assistance_provided
         text training_requirements
+        json target_classifications
+    }
+    training_details {
+        bigint opportunity_id PK,FK
+        string training_type "skills_training|seminar|workshop|orientation"
+        date starts_on
+        date ends_on
+        string schedule
+        smallint duration_hours
+        decimal fee "null or 0 = free"
+        string certificate
+        text topics
+        text inclusions
+        text target_participants
         json target_classifications
     }
     opportunity_requirements {
@@ -567,7 +582,7 @@ erDiagram
   pivots onto it, so skill matching is an ID intersection instead of fuzzy text
   comparison. The resume parser also matches extracted text against this dictionary.
 - **Category-specific opportunity fields** use one-to-one detail tables
-  (`job_details`, `scholarship_details`, `livelihood_details`) keyed by
+  (`job_details`, `scholarship_details`, `livelihood_details`, `training_details`) keyed by
   `opportunity_id`. Shared fields stay in `opportunities`; no nullable column sprawl.
 - **applications** has a unique index on `(opportunity_id, user_id)` (one application
   per seeker per opportunity; a withdrawn application can be reactivated by the
@@ -611,7 +626,7 @@ human-readable reason, so every score shown to a user can be traced back to its 
 | Skills overlap (profile + reviewed resume skills ∩ opportunity skills; names compared case-insensitively) | 35 | "You have 3 of 4 listed skills: Organic Farming, Composting, ..." |
 | Education level meets the minimum | 20 | "Your Bachelor's degree meets the College graduate requirement" |
 | Field / course relevance (course, experience industry vs. eligible courses / keywords) | 15 | "Your BS Information Technology course is eligible" |
-| Classification fit (e.g. scholarships ↔ students, livelihood target groups) | 10 | "This program targets Out-of-School Youth" |
+| Classification fit (e.g. scholarships ↔ students, livelihood and training target groups) | 10 | "This program targets Out-of-School Youth" |
 | Location (remote or same barangay = full; elsewhere in Bauko = 80%; outside Bauko = 30%) | 10 | "In your barangay, Abatan" |
 | Stated interests (category and field) | 10 | "You are interested in Agriculture livelihood programs" |
 

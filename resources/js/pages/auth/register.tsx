@@ -53,7 +53,7 @@ export default function Register({ barangays, classifications, classificationTop
     const suggestedTopics = data.classification ? (classificationTopics[data.classification] ?? []) : [];
 
     return (
-        <AuthLayout title="Create an account" description="Find jobs, scholarships and livelihood programs in Bauko">
+        <AuthLayout title="Create an account" description="Find jobs, scholarships, livelihood programs and trainings in Bauko">
             <Head title="Register" />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-5">

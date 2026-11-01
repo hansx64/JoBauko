@@ -13,6 +13,7 @@ use App\Enums\OpportunityCategory;
 use App\Enums\OpportunityStatus;
 use App\Enums\OrganizationRole;
 use App\Enums\OrganizationType;
+use App\Enums\TrainingType;
 use App\Enums\VerificationStatus;
 use App\Enums\WorkSetup;
 use App\Models\Application;
@@ -26,6 +27,7 @@ use App\Services\Recommendation\MatchRefresher;
 use App\Services\Recommendation\MatchScorer;
 use App\Services\Recommendation\SeekerSnapshot;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -94,12 +96,22 @@ class DemoDataSeeder extends Seeder
         ], ['employment_type' => EmploymentType::FullTime, 'salary_min' => 14000, 'salary_max' => 16000, 'work_setup' => WorkSetup::Onsite, 'min_experience_years' => 1],
             ['Highland Vegetable Farming', 'Crop Production', 'Organic Farming'], ['Resume / CV']);
 
-        $this->opportunity($coop, OpportunityCategory::Livelihood, 'Traditional Weaving Skills Training', [
+        $this->opportunity($coop, OpportunityCategory::Training, 'Traditional Weaving Skills Training', [
             'description' => 'A four-week hands-on training on traditional Cordillera weaving, with a starter loom for graduates.',
             'barangay_id' => $barangay('Sadsadan'),
             'slots' => 20,
-        ], ['assistance_type' => AssistanceType::SkillsTraining, 'target_beneficiaries' => 'Women and out-of-school youth interested in weaving.', 'assistance_provided' => 'Free training, materials and a starter loom.', 'target_classifications' => [Classification::OutOfSchoolYouth->value, Classification::Unemployed->value]],
-            ['Weaving', 'Handicraft Making'], []);
+        ], [
+            'training_type' => TrainingType::SkillsTraining,
+            'starts_on' => now()->addWeeks(10)->startOfWeek()->toDateString(),
+            'ends_on' => now()->addWeeks(13)->endOfWeek(Carbon::FRIDAY)->toDateString(),
+            'schedule' => 'Monday to Friday, 8:00 AM – 4:00 PM',
+            'duration_hours' => 140,
+            'certificate' => 'Certificate of completion',
+            'topics' => "Preparing and dyeing yarn\nSetting up a backstrap loom\nTraditional Cordillera patterns",
+            'inclusions' => 'Training materials, snacks and a starter loom for graduates.',
+            'target_participants' => 'Women and out-of-school youth interested in weaving.',
+            'target_classifications' => [Classification::OutOfSchoolYouth->value, Classification::Unemployed->value],
+        ], ['Weaving', 'Handicraft Making'], []);
 
         $this->opportunity($cafe, OpportunityCategory::Job, 'Barista (Part-time)', [
             'description' => 'Prepare coffee drinks and serve customers at our café. Training is provided.',
@@ -178,6 +190,7 @@ class DemoDataSeeder extends Seeder
             OpportunityCategory::Job => 'jobDetail',
             OpportunityCategory::Scholarship => 'scholarshipDetail',
             OpportunityCategory::Livelihood => 'livelihoodDetail',
+            OpportunityCategory::Training => 'trainingDetail',
         };
         $opportunity->{$relation}()->updateOrCreate([], $details);
 
