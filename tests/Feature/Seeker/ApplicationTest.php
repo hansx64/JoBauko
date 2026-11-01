@@ -8,6 +8,7 @@ use App\Enums\OpportunityStatus;
 use App\Enums\OrganizationRole;
 use App\Models\Application;
 use App\Models\Opportunity;
+use App\Models\OpportunityDocument;
 use App\Models\Organization;
 use App\Models\Resume;
 use App\Models\User;
@@ -121,6 +122,60 @@ class ApplicationTest extends TestCase
         ])->assertSessionHasErrors("documents.{$transcript}");
 
         $this->assertDatabaseCount('applications', 0);
+    }
+
+    public function test_a_resume_document_is_covered_by_the_profile_resume()
+    {
+        [$job, $staff] = $this->jobWithDocuments();
+        $resumeDocument = $job->requiredDocuments()->create(['name' => 'Resume / CV', 'is_required' => true]);
+        $transcript = $job->requiredDocuments()->where('name', 'Transcript of Records')->value('id');
+        $seeker = $this->seekerWithResume();
+
+        $this->actingAs($seeker)
+            ->get("/opportunities/{$job->slug}/apply")
+            ->assertInertia(fn ($page) => $page
+                ->where('documents', fn ($documents) => collect($documents)->firstWhere('id', $resumeDocument->id)['is_resume'] === true
+                    && collect($documents)->firstWhere('id', $transcript)['is_resume'] === false));
+
+        $this->post("/opportunities/{$job->slug}/apply", ['consent' => '1', 'documents' => [$transcript => $this->pdf()]])
+            ->assertSessionHasNoErrors();
+
+        $application = Application::sole();
+        $this->assertSame($seeker->currentResume->id, $application->resume_id);
+        $this->assertSame(['Transcript of Records'], $application->documents()->pluck('label')->all());
+
+        // The organization does not see the resume document as missing.
+        $this->actingAs($staff)
+            ->get(route('org.applications.show', $application))
+            ->assertInertia(fn ($page) => $page->where('application.missing_documents', []));
+    }
+
+    public function test_a_resume_document_must_be_uploaded_when_no_profile_resume_is_sent()
+    {
+        $scholarship = Opportunity::factory()->published()->create(['category' => OpportunityCategory::Scholarship]);
+        $resumeDocument = $scholarship->requiredDocuments()->create(['name' => 'Updated résumé', 'is_required' => true]);
+
+        $this->actingAs(User::factory()->seeker()->create())
+            ->post("/opportunities/{$scholarship->slug}/apply", ['consent' => '1'])
+            ->assertSessionHasErrors("documents.{$resumeDocument->id}");
+
+        $this->actingAs($this->seekerWithResume())
+            ->post("/opportunities/{$scholarship->slug}/apply", ['consent' => '1', 'include_resume' => '0'])
+            ->assertSessionHasErrors("documents.{$resumeDocument->id}");
+
+        $this->assertDatabaseCount('applications', 0);
+    }
+
+    public function test_resume_documents_are_recognized_by_name()
+    {
+        $isResume = fn (string $name) => (new OpportunityDocument(['name' => $name]))->isResume();
+
+        foreach (['Resume / CV', 'Updated Résumé', 'Curriculum Vitae', 'CV with 2x2 photo'] as $name) {
+            $this->assertTrue($isResume($name), $name);
+        }
+        foreach (['Transcript of Records', 'Barangay Certificate of Residency', 'Certificate of Employment'] as $name) {
+            $this->assertFalse($isResume($name), $name);
+        }
     }
 
     public function test_a_job_application_needs_a_resume_but_a_scholarship_does_not()

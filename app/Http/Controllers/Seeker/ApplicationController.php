@@ -91,6 +91,7 @@ class ApplicationController extends Controller
                 'id' => $document->id,
                 'name' => $document->name,
                 'is_required' => $document->is_required,
+                'is_resume' => $document->isResume(),
                 'accept' => collect(explode(',', SubmitApplicationRequest::fileTypes($document)))->map(fn ($type) => '.'.$type)->implode(','),
                 'types_label' => strtoupper(str_replace(',jpeg', '', SubmitApplicationRequest::fileTypes($document))),
             ]),

@@ -21,6 +21,7 @@ interface RequiredDocument {
     id: number;
     name: string;
     is_required: boolean;
+    is_resume: boolean;
     accept: string;
     types_label: string;
 }
@@ -59,6 +60,8 @@ export default function Apply({ opportunity, instructions, documents, resume, re
     });
     const fieldErrors = errors as Record<string, string | undefined>;
     const blocked = resumeRequired && resume === null;
+    // The profile resume is sent for any document that asks for a resume, so it is not uploaded twice.
+    const resumeSent = resume !== null && (resumeRequired || data.include_resume);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -126,7 +129,7 @@ export default function Apply({ opportunity, instructions, documents, resume, re
                                         <AlertDescription>
                                             <p>
                                                 {resumeRequired
-                                                    ? 'Upload your resume on your profile, then come back to apply.'
+                                                    ? 'Upload your resume or create one with the resume builder on your profile, then come back to apply.'
                                                     : 'A resume is optional for this opportunity, but it can help your application.'}{' '}
                                                 <Link href={route('seeker.profile.edit')} className="font-medium underline">
                                                     Upload a resume
@@ -170,16 +173,32 @@ export default function Apply({ opportunity, instructions, documents, resume, re
                                                     {document.is_required ? '(required)' : '(optional)'}
                                                 </span>
                                             </Label>
-                                            <Input
-                                                id={`document-${document.id}`}
-                                                type="file"
-                                                accept={document.accept}
-                                                required={document.is_required}
-                                                onChange={(e) =>
-                                                    setData('documents', { ...data.documents, [document.id]: e.target.files?.[0] ?? null })
-                                                }
-                                            />
-                                            <p className="text-muted-foreground text-xs">Accepted: {document.types_label}</p>
+                                            {document.is_resume && resumeSent ? (
+                                                <p
+                                                    id={`document-${document.id}`}
+                                                    className="bg-muted/50 flex items-center gap-2 rounded-md p-3 text-sm"
+                                                >
+                                                    <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
+                                                    <span className="min-w-0">
+                                                        Your resume from your profile,{' '}
+                                                        <span className="font-medium break-all">{resume.original_name}</span>, is sent for this. No
+                                                        need to upload it again.
+                                                    </span>
+                                                </p>
+                                            ) : (
+                                                <>
+                                                    <Input
+                                                        id={`document-${document.id}`}
+                                                        type="file"
+                                                        accept={document.accept}
+                                                        required={document.is_required}
+                                                        onChange={(e) =>
+                                                            setData('documents', { ...data.documents, [document.id]: e.target.files?.[0] ?? null })
+                                                        }
+                                                    />
+                                                    <p className="text-muted-foreground text-xs">Accepted: {document.types_label}</p>
+                                                </>
+                                            )}
                                             <InputError message={fieldErrors[`documents.${document.id}`]} />
                                         </div>
                                     ))}

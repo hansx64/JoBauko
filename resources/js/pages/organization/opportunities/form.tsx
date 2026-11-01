@@ -115,9 +115,7 @@ export default function OpportunityForm({ organization, opportunity, publishProb
         contact_email: s(opportunity?.contact_email),
         contact_number: s(opportunity?.contact_number),
         requirements: opportunity?.requirements ?? [],
-        documents: opportunity?.documents.map((d) => ({ id: d.id, name: d.name, is_required: d.is_required })) ?? [
-            { id: null, name: 'Resume / CV', is_required: true },
-        ],
+        documents: opportunity?.documents.map((d) => ({ id: d.id, name: d.name, is_required: d.is_required })) ?? [],
         skills: opportunity?.skills ?? [],
         job: {
             employment_type: s(opportunity?.job?.employment_type),
@@ -611,7 +609,14 @@ export default function OpportunityForm({ organization, opportunity, publishProb
                                     <InputError key={key} message={message} />
                                 ))}
                         </Field>
-                        <Field label="Documents applicants must submit">
+                        <Field
+                            label="Documents applicants must submit"
+                            hint={
+                                data.category === 'job'
+                                    ? "Every job application includes the applicant's resume from their profile, so you don't need to list it here."
+                                    : 'Applicants can send the resume on their profile with their application, so you only need to list other documents.'
+                            }
+                        >
                             <div className="grid gap-2">
                                 {data.documents.map((doc, index) => (
                                     <div key={index}>

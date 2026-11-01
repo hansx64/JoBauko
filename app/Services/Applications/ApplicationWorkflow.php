@@ -9,6 +9,7 @@ use App\Models\Application;
 use App\Models\ApplicationDocument;
 use App\Models\ApplicationRemark;
 use App\Models\Opportunity;
+use App\Models\OpportunityDocument;
 use App\Models\OrganizationMember;
 use App\Models\User;
 use App\Notifications\ApplicationActivity;
@@ -65,7 +66,9 @@ class ApplicationWorkflow
         }
 
         $requirements = $opportunity->requiredDocuments()->get()->keyBy('id');
-        $missing = $requirements->filter(fn ($requirement) => $requirement->is_required && ! isset($files[$requirement->id]));
+        $missing = $requirements->filter(fn (OpportunityDocument $requirement) => $requirement->is_required
+            && ! isset($files[$requirement->id])
+            && ! ($resume !== null && $requirement->isResume()));
 
         if ($missing->isNotEmpty()) {
             throw ValidationException::withMessages($missing->mapWithKeys(

@@ -68,7 +68,7 @@ class DemoDataSeeder extends Seeder
             'slots' => 1,
             'benefits' => 'Contract of service with possibility of renewal.',
         ], ['employment_type' => EmploymentType::Contractual, 'salary_min' => 18000, 'salary_max' => 22000, 'work_setup' => WorkSetup::Onsite, 'min_experience_years' => 0],
-            ['Networking', 'Technical Support', 'Computer Hardware Servicing', 'Microsoft Office'], ['Resume / CV', 'Transcript of Records']);
+            ['Networking', 'Technical Support', 'Computer Hardware Servicing', 'Microsoft Office'], ['Transcript of Records']);
 
         $this->opportunity($lgu, OpportunityCategory::Scholarship, 'Bauko Municipal College Scholarship', [
             'description' => 'Financial assistance for deserving college students from Bauko, covering tuition and a monthly allowance.',
@@ -94,7 +94,7 @@ class DemoDataSeeder extends Seeder
             'barangay_id' => $barangay('Abatan'),
             'slots' => 2,
         ], ['employment_type' => EmploymentType::FullTime, 'salary_min' => 14000, 'salary_max' => 16000, 'work_setup' => WorkSetup::Onsite, 'min_experience_years' => 1],
-            ['Highland Vegetable Farming', 'Crop Production', 'Organic Farming'], ['Resume / CV']);
+            ['Highland Vegetable Farming', 'Crop Production', 'Organic Farming'], []);
 
         $this->opportunity($coop, OpportunityCategory::Training, 'Traditional Weaving Skills Training', [
             'description' => 'A four-week hands-on training on traditional Cordillera weaving, with a starter loom for graduates.',
@@ -119,7 +119,7 @@ class DemoDataSeeder extends Seeder
             'min_education' => EducationLevel::SeniorHigh,
             'slots' => 3,
         ], ['employment_type' => EmploymentType::PartTime, 'salary_min' => 9000, 'work_setup' => WorkSetup::Onsite, 'min_experience_years' => 0],
-            ['Customer Service', 'Food and Beverage Services', 'Cashiering'], ['Resume / CV']);
+            ['Customer Service', 'Food and Beverage Services', 'Cashiering'], []);
 
         $this->seeker('demo.seeker@jobauko.test', 'Juan Bayawon (Demo)', Classification::FreshGraduate, EducationLevel::CollegeGraduate, 'Poblacion',
             'BS Information Technology', ['Networking', 'Technical Support', 'Microsoft Office', 'Customer Service'], [[InterestCategory::Job, 'Information Technology']]);

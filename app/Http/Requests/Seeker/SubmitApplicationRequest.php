@@ -33,7 +33,7 @@ class SubmitApplicationRequest extends FormRequest
             $types = self::fileTypes($document);
 
             $rules["documents.{$document->id}"] = [
-                $document->is_required ? 'required' : 'nullable',
+                $document->is_required && ! $this->coveredByResume($document) ? 'required' : 'nullable',
                 'file',
                 'mimes:'.$types,
                 'extensions:'.$types,
@@ -63,6 +63,17 @@ class SubmitApplicationRequest extends FormRequest
         }
 
         return $messages;
+    }
+
+    /**
+     * A resume document is satisfied by the profile resume sent with the
+     * application.
+     */
+    private function coveredByResume(OpportunityDocument $document): bool
+    {
+        return $document->isResume()
+            && $this->boolean('include_resume', true)
+            && $this->user()?->currentResume !== null;
     }
 
     /**

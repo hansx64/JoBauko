@@ -40,4 +40,14 @@ class OpportunityDocument extends Model
     {
         return $this->belongsTo(Opportunity::class);
     }
+
+    /**
+     * Whether this asks for the applicant's resume, e.g. "Resume / CV". The
+     * resume on the applicant's profile is sent with the application and
+     * stands in for it, so it is not uploaded twice.
+     */
+    public function isResume(): bool
+    {
+        return preg_match('/\b(r[eé]sum[eé]|cv|curriculum vitae)\b/iu', $this->name) === 1;
+    }
 }

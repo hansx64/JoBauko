@@ -11,6 +11,7 @@ use App\Models\ApplicationDocument;
 use App\Models\ApplicationRemark;
 use App\Models\ApplicationStatusHistory;
 use App\Models\Opportunity;
+use App\Models\OpportunityDocument;
 use App\Models\Organization;
 use App\Services\Audit\AuditLogger;
 use App\Services\Recommendation\MatchScorer;
@@ -169,6 +170,8 @@ class ApplicationController extends Controller
                 'missing_documents' => $application->opportunity->requiredDocuments
                     ->where('is_required', true)
                     ->whereNotIn('id', $application->documents->pluck('opportunity_document_id')->filter())
+                    // The profile resume sent with the application stands in for a resume document.
+                    ->reject(fn (OpportunityDocument $document) => $application->resume_id !== null && $document->isResume())
                     ->pluck('name')
                     ->values(),
                 'history' => $application->statusHistory->map(fn (ApplicationStatusHistory $entry) => [
