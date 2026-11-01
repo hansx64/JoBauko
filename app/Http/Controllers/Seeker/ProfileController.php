@@ -55,6 +55,7 @@ class ProfileController extends Controller
                 'original_name' => $resume->original_name,
                 'size_bytes' => $resume->size_bytes,
                 'is_pdf' => $resume->isPdf(),
+                'is_generated' => $resume->is_generated,
                 'uploaded_at' => $resume->created_at->toIso8601String(),
                 'extraction_status' => $resume->extraction_status->value,
                 'extraction_label' => $resume->extraction_status->label(),

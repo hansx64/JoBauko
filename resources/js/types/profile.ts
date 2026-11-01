@@ -56,6 +56,7 @@ export interface ResumeSummary {
     original_name: string;
     size_bytes: number;
     is_pdf: boolean;
+    is_generated: boolean;
     uploaded_at: string;
     extraction_status: 'pending' | 'extracted' | 'failed' | 'reviewed';
     extraction_label: string;

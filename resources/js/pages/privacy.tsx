@@ -45,6 +45,11 @@ export default function Privacy({ version, contactEmail }: PrivacyProps) {
                         <li>Account details: full name, email address, mobile number, barangay and password (stored only in hashed form).</li>
                         <li>Your current status (for example Student or Unemployed) and the profile details you choose to add.</li>
                         <li>Resumes and supporting documents you upload.</li>
+                        <li>
+                            Details you add in the resume builder: objective, languages, and, only if you choose, civil status and nationality. If you
+                            list character references, their names, positions and contact details are stored and printed on your resume, so list only
+                            people who have agreed.
+                        </li>
                         <li>Your applications, saved opportunities and notification preferences.</li>
                         <li>Technical records such as login times and IP addresses, used for security.</li>
                     </ul>

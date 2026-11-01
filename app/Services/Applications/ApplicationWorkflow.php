@@ -61,7 +61,7 @@ class ApplicationWorkflow
         $resume = ($data['include_resume'] ?? true) ? $user->currentResume : null;
 
         if ($resume === null && $opportunity->category === OpportunityCategory::Job) {
-            throw ValidationException::withMessages(['resume' => 'A resume is required for job applications. Upload one on your profile first.']);
+            throw ValidationException::withMessages(['resume' => 'A resume is required for job applications. Upload one on your profile, or create one with the resume builder.']);
         }
 
         $requirements = $opportunity->requiredDocuments()->get()->keyBy('id');

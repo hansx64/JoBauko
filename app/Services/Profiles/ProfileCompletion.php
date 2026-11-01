@@ -72,7 +72,7 @@ class ProfileCompletion
                 'label' => 'Resume',
                 'weight' => 10,
                 'complete' => $user->currentResume !== null,
-                'hint' => 'Upload your resume as a PDF or Word (DOCX) file.',
+                'hint' => 'Upload your resume as a PDF or Word (DOCX) file, or create one with the resume builder.',
             ],
         ];
 

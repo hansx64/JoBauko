@@ -115,6 +115,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * @return HasOne<ResumeDetail, $this>
+     */
+    public function resumeDetail(): HasOne
+    {
+        return $this->hasOne(ResumeDetail::class);
+    }
+
+    /**
      * @return HasMany<Application, $this>
      */
     public function applications(): HasMany

@@ -33,19 +33,51 @@ class ResumeService
         $extension = $file->getMimeType() === ResumeTextExtractor::PDF ? 'pdf' : 'docx';
         $path = $file->storeAs("resumes/{$user->id}", Str::uuid().'.'.$extension, self::DISK);
 
-        $resume = DB::transaction(function () use ($user, $file, $path) {
+        $resume = $this->makeCurrent($user, [
+            'disk_path' => $path,
+            'original_name' => Str::limit($file->getClientOriginalName(), 250, ''),
+            'mime_type' => $file->getMimeType(),
+            'size_bytes' => $file->getSize(),
+            'extraction_status' => ResumeExtractionStatus::Pending,
+        ]);
+
+        $this->extract($resume);
+
+        return $resume->refresh();
+    }
+
+    /**
+     * Store a PDF made by the resume builder as the user's current resume.
+     * Its contents already come from the profile, so there is nothing to read
+     * back or review.
+     */
+    public function storeGenerated(User $user, string $pdf, string $fileName): Resume
+    {
+        $path = "resumes/{$user->id}/".Str::uuid().'.pdf';
+        Storage::disk(self::DISK)->put($path, $pdf);
+
+        return $this->makeCurrent($user, [
+            'disk_path' => $path,
+            'original_name' => $fileName,
+            'mime_type' => ResumeTextExtractor::PDF,
+            'size_bytes' => strlen($pdf),
+            'is_generated' => true,
+            'extraction_status' => ResumeExtractionStatus::Reviewed,
+            'reviewed_at' => now(),
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function makeCurrent(User $user, array $attributes): Resume
+    {
+        return DB::transaction(function () use ($user, $attributes) {
             $previous = $user->resumes()->where('is_current', true)->get();
 
             $user->resumes()->update(['is_current' => false]);
 
-            $resume = $user->resumes()->create([
-                'disk_path' => $path,
-                'original_name' => Str::limit($file->getClientOriginalName(), 250, ''),
-                'mime_type' => $file->getMimeType(),
-                'size_bytes' => $file->getSize(),
-                'is_current' => true,
-                'extraction_status' => ResumeExtractionStatus::Pending,
-            ]);
+            $resume = $user->resumes()->create([...$attributes, 'is_current' => true]);
 
             // Previous versions are kept only while an application still
             // refers to them; otherwise they are deleted (data minimization).
@@ -53,10 +85,6 @@ class ResumeService
 
             return $resume;
         });
-
-        $this->extract($resume);
-
-        return $resume->refresh();
     }
 
     /**

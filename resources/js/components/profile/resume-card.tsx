@@ -1,5 +1,5 @@
 import { Link, useForm } from '@inertiajs/react';
-import { Download, Eye, FileText, LoaderCircle, RefreshCw, Trash2, Upload } from 'lucide-react';
+import { Download, Eye, FilePen, FileText, LoaderCircle, RefreshCw, Trash2, Upload } from 'lucide-react';
 import { ChangeEvent, useRef } from 'react';
 
 import InputError from '@/components/input-error';
@@ -44,8 +44,8 @@ export function ResumeCard({ resume }: { resume: ResumeSummary | null }) {
             <CardHeader>
                 <CardTitle className="text-base">Resume</CardTitle>
                 <CardDescription>
-                    PDF or Word (DOCX), up to 5 MB. We read it to suggest profile details. Nothing is added until you review it. Only you, and
-                    organizations you apply to, can open it.
+                    Upload a PDF or Word (DOCX) file up to 5 MB, or create one from your profile with the resume builder. We read uploaded resumes to
+                    suggest profile details; nothing is added until you review it. Only you, and organizations you apply to, can open it.
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
@@ -56,11 +56,18 @@ export function ResumeCard({ resume }: { resume: ResumeSummary | null }) {
                             <div className="min-w-0">
                                 <p className="truncate font-medium">{resume.original_name}</p>
                                 <p className="text-muted-foreground text-sm">
-                                    {formatSize(resume.size_bytes)} · uploaded {new Date(resume.uploaded_at).toLocaleDateString()}
+                                    {formatSize(resume.size_bytes)} · {resume.is_generated ? 'created' : 'uploaded'}{' '}
+                                    {new Date(resume.uploaded_at).toLocaleDateString()}
                                 </p>
-                                <Badge variant={statusVariant[resume.extraction_status]} className="mt-1">
-                                    {resume.extraction_label}
-                                </Badge>
+                                {resume.is_generated ? (
+                                    <Badge variant="secondary" className="mt-1">
+                                        Made with the resume builder
+                                    </Badge>
+                                ) : (
+                                    <Badge variant={statusVariant[resume.extraction_status]} className="mt-1">
+                                        {resume.extraction_label}
+                                    </Badge>
+                                )}
                                 {resume.extraction_error && <p className="text-muted-foreground mt-1 text-sm">{resume.extraction_error}</p>}
                             </div>
                         </div>
@@ -110,7 +117,13 @@ export function ResumeCard({ resume }: { resume: ResumeSummary | null }) {
                     />
                     <Button onClick={() => fileInput.current?.click()} disabled={upload.processing}>
                         {upload.processing ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                        {upload.processing ? 'Uploading and reading…' : resume ? 'Replace resume' : 'Upload resume'}
+                        {upload.processing ? 'Uploading and reading…' : resume ? 'Upload a new resume' : 'Upload resume'}
+                    </Button>
+                    <Button variant="outline" asChild>
+                        <Link href={route('seeker.resume-builder.edit')}>
+                            <FilePen className="h-4 w-4" />{' '}
+                            {resume?.is_generated ? 'Update with the resume builder' : 'Create with the resume builder'}
+                        </Link>
                     </Button>
                     {resume?.extraction_status === 'failed' && (
                         <Button

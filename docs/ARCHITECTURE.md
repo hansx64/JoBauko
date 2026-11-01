@@ -160,6 +160,7 @@ erDiagram
     applicant_profiles ||--o{ applicant_interests : has
     skills ||--o{ applicant_skills : "referenced by"
     users ||--o{ resumes : uploads
+    users ||--o| resume_details : "resume builder"
 
     users {
         bigint id PK
@@ -246,11 +247,25 @@ erDiagram
         string original_name
         string mime_type
         int size_bytes
+        boolean is_generated "made by the resume builder"
         boolean is_current
         string extraction_status "pending|extracted|failed|reviewed"
         longtext extracted_text
         json extracted_data
         timestamp reviewed_at
+    }
+    resume_details {
+        bigint id PK
+        bigint user_id FK "unique"
+        string desired_position
+        text objective
+        json languages
+        json references "max 3: name, position, organization, contact"
+        string civil_status "optional"
+        string nationality "optional"
+        boolean show_birthdate
+        boolean show_sex
+        boolean include_certification
     }
     user_consents {
         bigint id PK
@@ -634,6 +649,17 @@ Rules:
    Confirmed items are merged into the profile tables (`source = resume`).
 4. Preview/download go through `ResumeController` behind `ResumePolicy` (owner, or
    members of an organization the seeker applied to).
+5. **Resume builder.** `ResumeBuilder` turns the profile (contact, work experience,
+   education, trainings, certifications, skills) plus `resume_details` (objective,
+   languages, character references, opt-in personal details) into a one-page
+   chronological resume (`resources/views/resumes/standard.blade.php`, dompdf, letter
+   size, font subsetting on). Work experience comes before education when there is
+   any; otherwise education leads. Date of birth and sex are printed only when the
+   seeker opts in (RA 10911 bars employers from requiring age). Preview/download
+   streams the PDF without storing it; "Use as my resume" stores it through
+   `ResumeService::storeGenerated` as the current resume (`is_generated = true`,
+   status `reviewed`, since its content already comes from the profile), replacing
+   the previous one under the same keep-if-attached rule as uploads.
 
 ## 5a. Application workflow
 

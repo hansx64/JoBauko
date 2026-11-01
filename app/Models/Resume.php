@@ -23,6 +23,7 @@ class Resume extends Model
         'original_name',
         'mime_type',
         'size_bytes',
+        'is_generated',
         'is_current',
         'extraction_status',
         'extracted_text',
@@ -49,6 +50,7 @@ class Resume extends Model
     {
         return [
             'is_current' => 'boolean',
+            'is_generated' => 'boolean',
             'size_bytes' => 'integer',
             'extraction_status' => ResumeExtractionStatus::class,
             'extracted_data' => 'array',

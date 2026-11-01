@@ -15,7 +15,7 @@ Built with Laravel 12 (PHP 8.4), React 19 with Inertia 2, Tailwind 4 and shadcn/
 
 | Account | Can |
 |---|---|
-| Opportunity seeker | Build a profile and upload a resume. Browse and save opportunities. See explained match scores. Apply with documents, track status and withdraw. Choose email/SMS notifications. |
+| Opportunity seeker | Build a profile and upload a resume, or create one from the profile with the resume builder. Browse and save opportunities. See explained match scores. Apply with documents, track status and withdraw. Choose email/SMS notifications. |
 | Organization personnel | Register and verify the organization. Publish and manage opportunities. Review applicants by role (Admin, Recruitment Officer, Reviewer). Invite personnel. Use the organization dashboard. |
 | System administrator | Verify or suspend organizations. Manage user accounts. Monitor and suspend opportunities. Handle flagged listings. Send announcements and edit SMS templates. View delivery logs, reports (PDF/Excel) and the audit log. |
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Seeker\EducationController;
 use App\Http\Controllers\Seeker\ExperienceController;
 use App\Http\Controllers\Seeker\InterestController;
 use App\Http\Controllers\Seeker\ProfileController;
+use App\Http\Controllers\Seeker\ResumeBuilderController;
 use App\Http\Controllers\Seeker\ResumeController;
 use App\Http\Controllers\Seeker\ResumeReviewController;
 use App\Http\Controllers\Seeker\SavedOpportunityController;
@@ -48,6 +49,11 @@ Route::middleware(['auth', 'verified', 'account:seeker', 'matches.invalidate'])
         Route::get('resume/{resume}/file', [ResumeController::class, 'show'])->name('resume.file');
         Route::post('resume/{resume}/extract', [ResumeController::class, 'extract'])->middleware('throttle:10,60')->name('resume.extract');
         Route::delete('resume/{resume}', [ResumeController::class, 'destroy'])->name('resume.destroy');
+        Route::get('resume-builder', [ResumeBuilderController::class, 'edit'])->name('resume-builder.edit');
+        Route::put('resume-builder', [ResumeBuilderController::class, 'update'])->name('resume-builder.update');
+        Route::get('resume-builder/pdf', [ResumeBuilderController::class, 'pdf'])->middleware('throttle:30,1')->name('resume-builder.pdf');
+        Route::post('resume-builder/save', [ResumeBuilderController::class, 'store'])->middleware('throttle:10,60')->name('resume-builder.store');
+
         Route::get('resume/{resume}/review', [ResumeReviewController::class, 'show'])->name('resume.review');
         Route::post('resume/{resume}/review', [ResumeReviewController::class, 'store'])->name('resume.review.store');
     });

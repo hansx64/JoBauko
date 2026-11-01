@@ -8,6 +8,7 @@ import {
     Building2,
     ClipboardList,
     FileBarChart,
+    FilePen,
     Flag,
     History,
     LayoutGrid,
@@ -48,6 +49,11 @@ const navItemsByAccountType: Record<AccountType, NavItem[]> = {
             title: 'My profile',
             url: '/profile',
             icon: UserRound,
+        },
+        {
+            title: 'Resume builder',
+            url: '/resume-builder',
+            icon: FilePen,
         },
     ],
     organization: [
