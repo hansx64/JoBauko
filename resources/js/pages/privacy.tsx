@@ -1,4 +1,5 @@
 import AppLogoIcon from '@/components/app-logo-icon';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Head, Link } from '@inertiajs/react';
 import { type ReactNode } from 'react';
 
@@ -21,11 +22,12 @@ export default function Privacy({ version, contactEmail }: PrivacyProps) {
         <div className="bg-background min-h-screen">
             <Head title="Privacy Notice" />
             <header className="border-b">
-                <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-4">
+                <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-4">
                     <Link href={route('home')} className="flex items-center gap-2 font-semibold">
                         <AppLogoIcon className="size-8" alt="" />
                         JoBauko
                     </Link>
+                    <AppearanceToggleDropdown />
                 </div>
             </header>
 

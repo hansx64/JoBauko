@@ -1,45 +1,62 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export type Appearance = 'light' | 'dark' | 'system';
 
-const prefersDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-const applyTheme = (appearance: Appearance) => {
-    const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
-
-    document.documentElement.classList.toggle('dark', isDark);
-};
+const STORAGE_KEY = 'appearance';
+const CHANGE_EVENT = 'appearance-change';
 
 const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-const handleSystemThemeChange = () => {
-    const currentAppearance = localStorage.getItem('appearance') as Appearance;
-    applyTheme(currentAppearance || 'system');
+// Storage can be unavailable (private browsing, blocked site data); the theme then follows the system.
+function savedAppearance(): Appearance {
+    try {
+        const value = localStorage.getItem(STORAGE_KEY);
+        return value === 'light' || value === 'dark' ? value : 'system';
+    } catch {
+        return 'system';
+    }
+}
+
+const applyTheme = (appearance: Appearance) => {
+    const isDark = appearance === 'dark' || (appearance === 'system' && mediaQuery.matches);
+
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 };
 
 export function initializeTheme() {
-    const savedAppearance = (localStorage.getItem('appearance') as Appearance) || 'system';
+    applyTheme(savedAppearance());
 
-    applyTheme(savedAppearance);
-
-    // Add the event listener for system theme changes...
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    // Follow the device while the choice is "System".
+    mediaQuery.addEventListener('change', () => applyTheme(savedAppearance()));
 }
 
 export function useAppearance() {
-    const [appearance, setAppearance] = useState<Appearance>('system');
+    const [appearance, setAppearance] = useState<Appearance>(savedAppearance);
 
-    const updateAppearance = (mode: Appearance) => {
-        setAppearance(mode);
-        localStorage.setItem('appearance', mode);
-        applyTheme(mode);
-    };
-
+    // Keep every theme switch on the page (and in other tabs) in step.
     useEffect(() => {
-        const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
-        updateAppearance(savedAppearance || 'system');
+        const sync = () => setAppearance(savedAppearance());
 
-        return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+        window.addEventListener(CHANGE_EVENT, sync);
+        window.addEventListener('storage', sync);
+
+        return () => {
+            window.removeEventListener(CHANGE_EVENT, sync);
+            window.removeEventListener('storage', sync);
+        };
+    }, []);
+
+    const updateAppearance = useCallback((mode: Appearance) => {
+        try {
+            localStorage.setItem(STORAGE_KEY, mode);
+        } catch {
+            // Not saved; it still applies until the page is reloaded.
+        }
+
+        setAppearance(mode);
+        applyTheme(mode);
+        window.dispatchEvent(new Event(CHANGE_EVENT));
     }, []);
 
     return { appearance, updateAppearance };
