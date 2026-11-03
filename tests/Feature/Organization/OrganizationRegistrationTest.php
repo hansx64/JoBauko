@@ -21,14 +21,11 @@ class OrganizationRegistrationTest extends TestCase
 
     private LocalFilesystemAdapter $private;
 
-    private LocalFilesystemAdapter $public;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->private = Storage::fake('local');
-        $this->public = Storage::fake('public');
     }
 
     /**
@@ -79,9 +76,29 @@ class OrganizationRegistrationTest extends TestCase
 
         $document = $organization->documents()->sole();
         $this->private->assertExists($document->disk_path);
-        $this->public->assertExists($organization->logo_path);
+        $this->private->assertExists($organization->logo_path);
 
         $this->assertTrue(AuditLog::where('action', 'organization.registered')->exists());
+    }
+
+    public function test_logos_are_served_publicly_from_the_uploads_disk()
+    {
+        $this->post('/organizations/register', $this->validData());
+        $organization = Organization::sole();
+        Auth::guard('web')->logout();
+
+        $url = $organization->logoUrl();
+        $this->assertStringContainsString("/organizations/{$organization->id}/logo?v=", $url);
+
+        $response = $this->get($url)->assertOk();
+        $this->assertStringContainsString('public', $response->headers->get('Cache-Control'));
+
+        // Still cacheable for signed-in visitors, unlike private pages.
+        $seeker = User::factory()->create();
+        $this->actingAs($seeker)->get($url)->assertOk()->assertHeaderMissing('Pragma');
+
+        $organization->update(['logo_path' => null]);
+        $this->get("/organizations/{$organization->id}/logo")->assertNotFound();
     }
 
     public function test_at_least_one_verification_document_is_required()

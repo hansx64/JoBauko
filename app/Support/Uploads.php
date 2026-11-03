@@ -6,15 +6,15 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Where private uploads live: resumes, application documents and
- * organization verification documents. They are never public and are only
- * served through controllers that check who is asking. The disk is chosen
- * with UPLOADS_DISK: "local" (storage/app/private) or "google" (Google Drive).
+ * Where uploads live: resumes, application documents, organization
+ * verification documents and organization logos. All are served through
+ * controllers; only logos are open to everyone. The disk is chosen with
+ * UPLOADS_DISK: "local" (storage/app/private) or "google" (Google Drive).
  */
 class Uploads
 {
-    /** Top-level folders holding private uploads, used when moving them between disks. */
-    public const FOLDERS = ['resumes', 'applications', 'organization-documents'];
+    /** Top-level folders holding uploads, used when moving them between disks. */
+    public const FOLDERS = ['resumes', 'applications', 'organization-documents', 'organization-logos'];
 
     public static function name(): string
     {
@@ -23,7 +23,9 @@ class Uploads
 
     public static function disk(): FilesystemAdapter
     {
-        /** @var FilesystemAdapter */
-        return Storage::disk(self::name());
+        /** @var FilesystemAdapter $disk */
+        $disk = Storage::disk(self::name());
+
+        return $disk;
     }
 }

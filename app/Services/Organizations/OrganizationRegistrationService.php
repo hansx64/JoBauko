@@ -14,17 +14,11 @@ use App\Support\Uploads;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
 
 class OrganizationRegistrationService
 {
-    /**
-     * Logos are public. Verification documents are private uploads (see Uploads).
-     */
-    public const LOGO_DISK = 'public';
-
     public function __construct(
         private readonly ConsentRecorder $consents,
         private readonly AuditLogger $audit,
@@ -60,7 +54,7 @@ class OrganizationRegistrationService
                 $organization->verification_status = VerificationStatus::Pending;
 
                 if ($logo) {
-                    $organization->logo_path = $stored[] = $logo->store('organization-logos', self::LOGO_DISK);
+                    $organization->logo_path = $stored[] = $logo->store('organization-logos', Uploads::name());
                 }
 
                 $organization->save();
@@ -86,7 +80,6 @@ class OrganizationRegistrationService
             // Don't leave orphaned files when the database work fails.
             foreach ($stored as $path) {
                 Uploads::disk()->delete($path);
-                Storage::disk(self::LOGO_DISK)->delete($path);
             }
 
             throw $e;

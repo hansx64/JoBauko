@@ -49,7 +49,6 @@ class CheckProductionReadiness extends Command
             $this->check(false, 'Database is reachable', $e->getMessage());
         }
 
-        $this->check(File::exists(public_path('storage')), 'Public storage is linked', 'Run php artisan storage:link so organization logos display.');
         $this->checkUploads();
         $this->check(File::exists(public_path('build/manifest.json')), 'Frontend is built', 'Run npm ci && npm run build.');
         $this->warnUnless(! File::exists(public_path('hot')), 'Vite dev server is not in use', 'Delete public/hot; it makes pages load scripts from a development server.');

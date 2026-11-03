@@ -10,11 +10,11 @@ use App\Http\Requests\Organization\UpdateOrganizationRequest;
 use App\Models\Barangay;
 use App\Services\Audit\AuditLogger;
 use App\Services\Organizations\OrganizationRegistrationService;
+use App\Support\Uploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -67,8 +67,8 @@ class OrganizationProfileController extends Controller
 
             if ($request->hasFile('logo')) {
                 $old = $organization->logo_path;
-                $organization->logo_path = $request->file('logo')->store('organization-logos', OrganizationRegistrationService::LOGO_DISK);
-                DB::afterCommit(fn () => $old && Storage::disk(OrganizationRegistrationService::LOGO_DISK)->delete($old));
+                $organization->logo_path = $request->file('logo')->store('organization-logos', Uploads::name());
+                DB::afterCommit(fn () => $old && Uploads::disk()->delete($old));
             }
 
             $resubmitted = $organization->verification_status === VerificationStatus::Rejected;

@@ -7,6 +7,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\OpportunityController;
 use App\Http\Controllers\Public\OpportunityReportController;
+use App\Http\Controllers\Public\OrganizationLogoController;
+use App\Http\Middleware\ProtectPrivatePages;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,6 +19,10 @@ Route::get('opportunities/{opportunity:slug}', [OpportunityController::class, 's
 Route::post('opportunities/{opportunity:slug}/report', [OpportunityReportController::class, 'store'])
     ->middleware(['auth', 'verified', 'throttle:10,60'])
     ->name('opportunities.report');
+
+Route::get('organizations/{organization}/logo', OrganizationLogoController::class)
+    ->withoutMiddleware(ProtectPrivatePages::class)
+    ->name('organizations.logo');
 
 Route::get('privacy', function () {
     return Inertia::render('privacy', [
