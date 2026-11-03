@@ -96,23 +96,18 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
                         </Button>
                     </form>
 
-                    <div className="flex flex-wrap gap-3">
-                        <Button asChild size="lg" className="bg-white text-[#006b31] hover:bg-white/90">
-                            <Link href={route('opportunities.index')}>
-                                Explore Opportunities <ArrowRight className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                        <Button
-                            asChild
-                            size="lg"
-                            variant="outline"
-                            className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
-                        >
-                            <Link href={route('register')}>Create an Account</Link>
-                        </Button>
-                        <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
-                            <Link href={route('organizations.register')}>Post an Opportunity</Link>
-                        </Button>
+                    <div className="grid max-w-2xl gap-3 sm:grid-cols-3">
+                        {[
+                            { href: route('opportunities.index'), label: 'Explore Opportunities' },
+                            { href: route('register'), label: 'Create an Account' },
+                            { href: route('organizations.register'), label: 'Post an Opportunity' },
+                        ].map(({ href, label }) => (
+                            <Button key={label} asChild size="lg" className="bg-white text-[#006b31] hover:bg-white/90">
+                                <Link href={href}>
+                                    {label} <ArrowRight className="h-4 w-4" />
+                                </Link>
+                            </Button>
+                        ))}
                     </div>
 
                     <dl className="flex flex-wrap gap-8 text-sm">
