@@ -32,7 +32,7 @@ export function FlashMessage() {
                     'flex items-start gap-3 rounded-lg border px-4 py-3 text-sm',
                     isError
                         ? 'border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950/40 dark:text-red-100'
-                        : 'border-teal-200 bg-teal-50 text-teal-900 dark:border-teal-900 dark:bg-teal-950/40 dark:text-teal-100',
+                        : 'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100',
                 )}
             >
                 <Icon className="mt-0.5 h-4 w-4 shrink-0" />

@@ -12,7 +12,7 @@ export function CompletionMeter({ percent }: { percent: number }) {
             aria-valuemin={0}
             aria-valuemax={100}
         >
-            <div className="h-full rounded-full bg-teal-600 transition-all" style={{ width: `${percent}%` }} />
+            <div className="h-full rounded-full bg-emerald-600 transition-all" style={{ width: `${percent}%` }} />
         </div>
     );
 }
@@ -38,7 +38,7 @@ export function CompletionCard({ completion }: { completion: Completion }) {
                         <li key={section.key}>
                             <a href={`#${section.key}`} className="hover:bg-muted -mx-2 flex items-start gap-2 rounded-md px-2 py-1">
                                 {section.complete ? (
-                                    <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" />
+                                    <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                                 ) : (
                                     <CircleDashed className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
                                 )}

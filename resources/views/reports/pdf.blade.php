@@ -6,8 +6,8 @@
     <style>
         @page { margin: 28px 32px 40px; }
         body { font-family: "DejaVu Sans", sans-serif; font-size: 9.5px; color: #111827; }
-        header { border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 14px; }
-        .eyebrow { color: #1e3a8a; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; }
+        header { border-bottom: 2px solid #007a35; padding-bottom: 8px; margin-bottom: 14px; }
+        .eyebrow { color: #007a35; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; }
         h1 { font-size: 18px; margin: 2px 0 4px; }
         .meta { color: #4b5563; }
         .summary { width: 100%; border-collapse: separate; border-spacing: 6px 0; margin: 0 -6px 14px; }

@@ -269,7 +269,7 @@ function Verified({ ok, children }: { ok: boolean; children: ReactNode }) {
         <span className="inline-flex items-center gap-1.5">
             {children}
             {ok ? (
-                <BadgeCheck className="h-4 w-4 text-teal-600" aria-label="Verified" />
+                <BadgeCheck className="h-4 w-4 text-emerald-600" aria-label="Verified" />
             ) : (
                 <CircleAlert className="h-4 w-4 text-amber-600" aria-label="Not verified" />
             )}

@@ -37,12 +37,14 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     return (
         <div className="bg-background flex min-h-screen flex-col">
             <header className="bg-background/90 sticky top-0 z-40 border-b backdrop-blur">
-                <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-                    <Link href={route('home')} className="flex items-center gap-2 font-semibold">
-                        <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
-                            <AppLogoIcon className="size-5 fill-current" />
+                <div className="bauko-weave h-1" aria-hidden />
+                <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5">
+                    <Link href={route('home')} className="flex items-center gap-2.5">
+                        <AppLogoIcon className="size-10" alt="" />
+                        <span className="grid leading-tight">
+                            <span className="font-semibold">JoBauko</span>
+                            <span className="text-muted-foreground text-xs">Municipality of Bauko</span>
                         </span>
-                        JoBauko
                     </Link>
 
                     <nav className="hidden items-center gap-1 md:flex">
@@ -88,10 +90,11 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
             <main className="flex-1">{children}</main>
 
             <footer className="bg-muted/40 border-t">
+                <div className="bauko-weave h-1" aria-hidden />
                 <div className="text-muted-foreground mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm sm:grid-cols-3">
                     <div className="space-y-2">
                         <p className="text-foreground flex items-center gap-2 font-semibold">
-                            <AppLogoIcon className="size-5 fill-current" /> JoBauko
+                            <AppLogoIcon className="size-8" alt="" /> JoBauko
                         </p>
                         <p>Jobs, scholarships, livelihood programs and trainings for the people of Bauko, Mountain Province.</p>
                     </div>

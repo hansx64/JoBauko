@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ArrowRight, BellRing, Building2, FileCheck2, MapPinned, Search, ShieldCheck, Sparkles, UserRoundPlus } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
+import AppLogoIcon from '@/components/app-logo-icon';
 import { categoryIcons, categoryTones, OpportunityCard } from '@/components/opportunities/opportunity-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,18 +59,22 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
             <Head title="Discover Opportunities. Build Your Future." />
 
             {/* Hero */}
-            <section className="from-primary relative overflow-hidden bg-gradient-to-br via-[hsl(222,60%,22%)] to-[hsl(195,70%,22%)] text-white">
+            <section className="relative overflow-hidden bg-gradient-to-br from-[#006b31] via-[#00592a] to-[#0d2418] text-white">
                 <div
                     className="pointer-events-none absolute inset-0 opacity-[0.07]"
                     style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '22px 22px' }}
                 />
                 <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 md:py-24">
+                    <AppLogoIcon
+                        large
+                        className="pointer-events-none absolute top-16 right-4 hidden size-56 shadow-2xl ring-8 ring-white/15 lg:block xl:size-64"
+                    />
                     <div className="max-w-3xl space-y-6">
                         <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm ring-1 ring-white/20">
-                            <MapPinned className="h-4 w-4 text-teal-300" /> Bauko, Mountain Province
+                            <MapPinned className="h-4 w-4" /> Municipality of Bauko, Mountain Province
                         </p>
                         <h1 className="text-4xl font-bold tracking-tight text-balance md:text-6xl">Discover Opportunities. Build Your Future.</h1>
-                        <p className="max-w-2xl text-lg text-blue-100 md:text-xl">
+                        <p className="max-w-2xl text-lg text-white/85 md:text-xl">
                             Find jobs, scholarships, livelihood programs and trainings that match your skills, qualifications, and aspirations.
                         </p>
                     </div>
@@ -92,7 +97,7 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
                     </form>
 
                     <div className="flex flex-wrap gap-3">
-                        <Button asChild size="lg" className="bg-teal-500 text-white hover:bg-teal-400">
+                        <Button asChild size="lg" className="bg-white text-[#006b31] hover:bg-white/90">
                             <Link href={route('opportunities.index')}>
                                 Explore Opportunities <ArrowRight className="h-4 w-4" />
                             </Link>
@@ -112,11 +117,11 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
 
                     <dl className="flex flex-wrap gap-8 text-sm">
                         <div>
-                            <dt className="text-blue-200">Open opportunities</dt>
+                            <dt className="text-white/75">Open opportunities</dt>
                             <dd className="text-3xl font-semibold tabular-nums">{totals.open}</dd>
                         </div>
                         <div>
-                            <dt className="text-blue-200">Verified organizations</dt>
+                            <dt className="text-white/75">Verified organizations</dt>
                             <dd className="text-3xl font-semibold tabular-nums">{totals.organizations}</dd>
                         </div>
                     </dl>
@@ -125,7 +130,7 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
 
             {/* Categories */}
             <section className="mx-auto max-w-6xl px-4 py-16">
-                <SectionHeading title="What are you looking for?" subtitle="Three kinds of opportunities, one place to find them." />
+                <SectionHeading title="What are you looking for?" subtitle="Four kinds of opportunities, one place to find them." />
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {categories.map((category) => {
                         const Icon = categoryIcons[category.value];
@@ -247,13 +252,14 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
 
             {/* Call to action */}
             <section className="mx-auto max-w-6xl px-4 pb-16">
-                <div className="bg-primary text-primary-foreground grid gap-6 rounded-2xl p-8 md:grid-cols-[1fr_auto] md:items-center md:p-12">
+                {/* Fixed seal greens (not theme tokens) so the white text reads the same in light and dark mode. */}
+                <div className="grid gap-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#006b31] to-[#0d2418] p-8 text-white md:grid-cols-[1fr_auto] md:items-center md:p-12">
                     <div className="space-y-2">
                         <h2 className="text-2xl font-bold md:text-3xl">Your next opportunity could be posted today.</h2>
-                        <p className="text-primary-foreground/80">Create a free account to get recommendations and apply online.</p>
+                        <p className="text-white/80">Create a free account to get recommendations and apply online.</p>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                        <Button asChild size="lg" className="bg-teal-500 text-white hover:bg-teal-400">
+                        <Button asChild size="lg" className="bg-white text-[#006b31] hover:bg-white/90">
                             <Link href={route('register')}>Create an Account</Link>
                         </Button>
                         <Button

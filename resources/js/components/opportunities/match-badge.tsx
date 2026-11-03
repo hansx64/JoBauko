@@ -15,9 +15,9 @@ export function matchLabel(score: number) {
 export function MatchBadge({ score, className }: { score: number; className?: string }) {
     const tone =
         score >= 75
-            ? 'bg-teal-600 text-white'
+            ? 'bg-emerald-600 text-white'
             : score >= 50
-              ? 'bg-teal-100 text-teal-900 dark:bg-teal-900 dark:text-teal-100'
+              ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100'
               : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200';
 
     return (

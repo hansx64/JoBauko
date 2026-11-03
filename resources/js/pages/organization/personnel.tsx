@@ -87,7 +87,10 @@ export default function Personnel({ organization, members, roles }: { organizati
                                             ) : member.invitation_pending ? (
                                                 <Badge variant="secondary">Invitation sent</Badge>
                                             ) : (
-                                                <Badge variant="secondary" className="bg-teal-50 text-teal-800 dark:bg-teal-950 dark:text-teal-200">
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200"
+                                                >
                                                     Active
                                                 </Badge>
                                             )}
@@ -132,7 +135,7 @@ export default function Personnel({ organization, members, roles }: { organizati
                                     <ul className="grid gap-1.5 text-sm">
                                         {role.permissions.map((permission) => (
                                             <li key={permission} className="flex gap-2">
-                                                <Check className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" /> {permission}
+                                                <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> {permission}
                                             </li>
                                         ))}
                                     </ul>

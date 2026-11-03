@@ -89,7 +89,7 @@ export function OpportunityCard({ opportunity, showSave = false, showReasons = f
             {opportunity.summary && <p className="text-muted-foreground line-clamp-2 text-sm">{opportunity.summary}</p>}
 
             {showReasons && opportunity.match && opportunity.match.reasons.length > 0 && (
-                <ul className="space-y-0.5 text-xs text-teal-800 dark:text-teal-300">
+                <ul className="space-y-0.5 text-xs text-emerald-800 dark:text-emerald-300">
                     {opportunity.match.reasons.slice(0, 2).map((reason) => (
                         <li key={reason}>✓ {reason}</li>
                     ))}

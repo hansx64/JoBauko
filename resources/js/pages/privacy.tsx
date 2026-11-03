@@ -23,7 +23,7 @@ export default function Privacy({ version, contactEmail }: PrivacyProps) {
             <header className="border-b">
                 <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-4">
                     <Link href={route('home')} className="flex items-center gap-2 font-semibold">
-                        <AppLogoIcon className="size-6 fill-current" />
+                        <AppLogoIcon className="size-8" alt="" />
                         JoBauko
                     </Link>
                 </div>

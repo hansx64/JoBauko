@@ -77,78 +77,98 @@
 }
 
 :root {
-    /* JoBauko: deep navy primary, teal supporting colour, slate neutrals */
-    --background: hsl(0, 0%, 100%);
-    --foreground: hsl(222, 47%, 11%);
-    --card: hsl(0, 0%, 100%);
-    --card-foreground: hsl(222, 47%, 11%);
-    --popover: hsl(0, 0%, 100%);
-    --popover-foreground: hsl(222, 47%, 11%);
-    --primary: hsl(222, 66%, 30%);
-    --primary-foreground: hsl(210, 40%, 98%);
-    --secondary: hsl(210, 40%, 96%);
-    --secondary-foreground: hsl(222, 47%, 15%);
-    --muted: hsl(210, 40%, 96%);
-    --muted-foreground: hsl(215, 16%, 42%);
-    --accent: hsl(174, 60%, 94%);
-    --accent-foreground: hsl(175, 84%, 22%);
+    /*
+      JoBauko follows the official seal of the Municipality of Bauko: seal green
+      as the primary colour, the red and black woven band as an accent, on white.
+      The seal's own green (#00923f) is darkened for buttons and links so white
+      text on it meets WCAG AA (5.5:1).
+    */
+    --brand-green: #00923f;
+    --brand-red: #e30504;
+    --brand-black: #111111;
+
+    --background: #ffffff;
+    --foreground: #0f1a14;
+    --card: #ffffff;
+    --card-foreground: #0f1a14;
+    --popover: #ffffff;
+    --popover-foreground: #0f1a14;
+    --primary: #007a35;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f6f2;
+    --secondary-foreground: #13241a;
+    --muted: #f1f6f2;
+    --muted-foreground: #5a6b62;
+    --accent: #e3f4e9;
+    --accent-foreground: #005a27;
     --destructive: hsl(0, 72%, 51%);
     --destructive-foreground: hsl(0, 0%, 98%);
-    --border: hsl(214, 32%, 91%);
-    --input: hsl(214, 32%, 88%);
-    --ring: hsl(222, 66%, 30%);
-    --chart-1: hsl(222, 66%, 35%);
-    --chart-2: hsl(173, 70%, 36%);
-    --chart-3: hsl(199, 89%, 48%);
-    --chart-4: hsl(38, 92%, 50%);
-    --chart-5: hsl(262, 52%, 55%);
+    --border: #dfe8e2;
+    --input: #cfdcd4;
+    --ring: #007a35;
+    --chart-1: #00923f;
+    --chart-2: #e30504;
+    --chart-3: #2a8fd6;
+    --chart-4: #c9a227;
+    --chart-5: #3b3b3b;
     /* Single-series data colour, validated against --card in both modes. */
-    --viz-1: #2a78d6;
+    --viz-1: #00923f;
     --radius: 0.625rem;
-    --sidebar-background: hsl(210, 40%, 98%);
-    --sidebar-foreground: hsl(215, 25%, 27%);
-    --sidebar-primary: hsl(222, 66%, 30%);
-    --sidebar-primary-foreground: hsl(210, 40%, 98%);
-    --sidebar-accent: hsl(214, 40%, 93%);
-    --sidebar-accent-foreground: hsl(222, 66%, 25%);
-    --sidebar-border: hsl(214, 32%, 91%);
-    --sidebar-ring: hsl(222, 66%, 40%);
+    --sidebar-background: #f6faf7;
+    --sidebar-foreground: #2c3d33;
+    --sidebar-primary: #007a35;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #e3f4e9;
+    --sidebar-accent-foreground: #005a27;
+    --sidebar-border: #dfe8e2;
+    --sidebar-ring: #00923f;
 }
 
 .dark {
-    --background: hsl(222, 47%, 7%);
-    --foreground: hsl(210, 40%, 98%);
-    --card: hsl(222, 44%, 9%);
-    --card-foreground: hsl(210, 40%, 98%);
-    --popover: hsl(222, 44%, 9%);
-    --popover-foreground: hsl(210, 40%, 98%);
-    --primary: hsl(213, 90%, 68%);
-    --primary-foreground: hsl(222, 47%, 11%);
-    --secondary: hsl(217, 33%, 17%);
-    --secondary-foreground: hsl(210, 40%, 98%);
-    --muted: hsl(217, 33%, 14%);
-    --muted-foreground: hsl(215, 20%, 65%);
-    --accent: hsl(175, 60%, 15%);
-    --accent-foreground: hsl(172, 66%, 75%);
+    --background: #0b1310;
+    --foreground: #eef5f0;
+    --card: #101a16;
+    --card-foreground: #eef5f0;
+    --popover: #101a16;
+    --popover-foreground: #eef5f0;
+    --primary: #3ecf7a;
+    --primary-foreground: #0b1310;
+    --secondary: #18261f;
+    --secondary-foreground: #eef5f0;
+    --muted: #15211b;
+    --muted-foreground: #9aaca2;
+    --accent: #143323;
+    --accent-foreground: #9fe8bd;
     --destructive: hsl(0, 72%, 55%);
     --destructive-foreground: hsl(0, 0%, 98%);
-    --border: hsl(217, 33%, 18%);
-    --input: hsl(217, 33%, 22%);
-    --ring: hsl(213, 90%, 68%);
-    --chart-1: hsl(213, 90%, 65%);
-    --chart-2: hsl(172, 66%, 50%);
-    --chart-3: hsl(199, 89%, 60%);
-    --chart-4: hsl(38, 92%, 60%);
-    --chart-5: hsl(262, 70%, 70%);
-    --viz-1: #3987e5;
-    --sidebar-background: hsl(222, 47%, 9%);
-    --sidebar-foreground: hsl(215, 20%, 80%);
-    --sidebar-primary: hsl(213, 90%, 68%);
-    --sidebar-primary-foreground: hsl(222, 47%, 11%);
-    --sidebar-accent: hsl(217, 33%, 17%);
-    --sidebar-accent-foreground: hsl(210, 40%, 96%);
-    --sidebar-border: hsl(217, 33%, 18%);
-    --sidebar-ring: hsl(213, 90%, 68%);
+    --border: #1f2e26;
+    --input: #263a30;
+    --ring: #3ecf7a;
+    --chart-1: #22a356;
+    --chart-2: #f0453f;
+    --chart-3: #4ba3e3;
+    --chart-4: #d9b23a;
+    --chart-5: #b8c4bd;
+    --viz-1: #22a356;
+    --sidebar-background: #0e1813;
+    --sidebar-foreground: #c9d6ce;
+    --sidebar-primary: #3ecf7a;
+    --sidebar-primary-foreground: #0b1310;
+    --sidebar-accent: #18261f;
+    --sidebar-accent-foreground: #eef5f0;
+    --sidebar-border: #1f2e26;
+    --sidebar-ring: #3ecf7a;
+}
+
+/* The red-and-black woven band around the municipal seal, used as a thin trim. */
+@utility bauko-weave {
+    background-image: repeating-linear-gradient(
+        135deg,
+        var(--brand-red) 0 12px,
+        var(--brand-black) 12px 15px,
+        var(--brand-red) 15px 18px,
+        var(--brand-black) 18px 21px
+    );
 }
 
 @layer base {

@@ -270,7 +270,7 @@ export default function ReviewApplication({ application, opportunity, applicant,
                             <CardHeader>
                                 <CardTitle className="flex items-center justify-between gap-2 text-base">
                                     <span className="flex items-center gap-2">
-                                        <Sparkles className="h-4 w-4 text-teal-600" /> Match indicator
+                                        <Sparkles className="h-4 w-4 text-emerald-600" /> Match indicator
                                     </span>
                                     <span className="text-2xl font-semibold tabular-nums">{match.score}%</span>
                                 </CardTitle>
@@ -287,7 +287,7 @@ export default function ReviewApplication({ application, opportunity, applicant,
                                     <ul className="grid gap-1.5 text-sm">
                                         {match.reasons.map((reason) => (
                                             <li key={reason} className="flex gap-2">
-                                                <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" />
+                                                <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                                                 {reason}
                                             </li>
                                         ))}

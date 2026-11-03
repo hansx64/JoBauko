@@ -105,7 +105,7 @@ export default function Dashboard({
                 <div className="grid items-start gap-6 xl:grid-cols-[1fr_20rem]">
                     <div className="grid min-w-0 gap-6">
                         <DashboardSection
-                            icon={<Sparkles className="h-4 w-4 text-teal-600" />}
+                            icon={<Sparkles className="h-4 w-4 text-emerald-600" />}
                             title="Recommended for you"
                             description="Based on your skills, education, experience, location and interests."
                             action={
