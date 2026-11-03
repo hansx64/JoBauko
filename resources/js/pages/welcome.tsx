@@ -103,9 +103,7 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
                             { href: route('organizations.register'), label: 'Post an Opportunity' },
                         ].map(({ href, label }) => (
                             <Button key={label} asChild size="lg" className="bg-white text-[#006b31] hover:bg-white/90">
-                                <Link href={href}>
-                                    {label} <ArrowRight className="h-4 w-4" />
-                                </Link>
+                                <Link href={href}>{label}</Link>
                             </Button>
                         ))}
                     </div>
