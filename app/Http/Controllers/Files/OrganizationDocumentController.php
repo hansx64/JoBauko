@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Files;
 
 use App\Http\Controllers\Controller;
 use App\Models\OrganizationDocument;
-use App\Services\Organizations\OrganizationRegistrationService;
+use App\Support\Uploads;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class OrganizationDocumentController extends Controller
@@ -20,7 +19,7 @@ class OrganizationDocumentController extends Controller
     {
         Gate::authorize('viewDocuments', $document->organization);
 
-        return Storage::disk(OrganizationRegistrationService::DOCUMENT_DISK)->response(
+        return Uploads::disk()->response(
             $document->disk_path,
             $document->original_name,
             [

@@ -6,6 +6,7 @@ import { type ReactNode } from 'react';
 interface PrivacyProps {
     version: string;
     contactEmail: string;
+    uploadsInGoogleDrive: boolean;
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -17,7 +18,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
     );
 }
 
-export default function Privacy({ version, contactEmail }: PrivacyProps) {
+export default function Privacy({ version, contactEmail, uploadsInGoogleDrive }: PrivacyProps) {
     return (
         <div className="bg-background min-h-screen">
             <Head title="Privacy Notice" />
@@ -87,6 +88,12 @@ export default function Privacy({ version, contactEmail }: PrivacyProps) {
                         Resumes and documents are stored privately and are never publicly accessible. Access is restricted by role, and important
                         actions are recorded in a protected audit log.
                     </p>
+                    {uploadsInGoogleDrive && (
+                        <p>
+                            Uploaded resumes and documents are kept in a private Google Drive folder. Only JoBauko and the administrator of that
+                            Google account can open it. Google stores the files on its servers, which may be outside the Philippines.
+                        </p>
+                    )}
                 </Section>
 
                 <Section title="Retention">

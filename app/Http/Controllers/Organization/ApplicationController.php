@@ -16,12 +16,10 @@ use App\Models\Organization;
 use App\Services\Audit\AuditLogger;
 use App\Services\Recommendation\MatchScorer;
 use App\Services\Recommendation\SeekerSnapshot;
-use App\Services\Resumes\ResumeService;
+use App\Support\Uploads;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -256,10 +254,7 @@ class ApplicationController extends Controller
         $resume = $application->resume;
         abort_if($resume === null, 404);
 
-        /** @var FilesystemAdapter $disk */
-        $disk = Storage::disk(ResumeService::DISK);
-
-        return $disk->response(
+        return Uploads::disk()->response(
             $resume->disk_path,
             $resume->original_name,
             [

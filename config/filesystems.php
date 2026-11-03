@@ -45,6 +45,17 @@ return [
             'throw' => false,
         ],
 
+        // Private uploads in a Google Drive folder (UPLOADS_DISK=google).
+        // Set up with: php artisan jobauko:google-drive
+        'google' => [
+            'driver' => 'google',
+            'client_id' => env('GOOGLE_DRIVE_CLIENT_ID'),
+            'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+            'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+            'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID'),
+            'throw' => true,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

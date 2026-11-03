@@ -178,6 +178,49 @@ sudo nginx -t && sudo systemctl reload nginx
 
 Uploaded resumes and documents are stored in `storage/app/private`. That folder is outside `public/`, so the web server cannot serve those files directly. JoBauko only sends them after checking that the person may see them.
 
+### Storing uploads in Google Drive (optional)
+
+Instead of the server, resumes, application documents and organization verification documents can be kept in a folder in a Google account's Drive. People still open them only through JoBauko, after the same permission checks. Logos stay on the server.
+
+Before choosing this, know that:
+
+- The files belong to that Google account and count against its storage (15 GB on a free account). Whoever controls the account can open them in Drive.
+- If the account owner removes JoBauko's access (myaccount.google.com → Security → Third-party apps), changes the password with "sign out everywhere", or the account is closed, uploads and downloads stop until it is reconnected.
+- JoBauko only asks for the `drive.file` permission: it can see the files it created and nothing else in that Drive.
+- Google stores the files on its servers, which may be outside the Philippines. The privacy notice says so automatically when this is switched on. Have the Data Protection Officer approve it.
+
+**1. Create the Google credentials** at [console.cloud.google.com](https://console.cloud.google.com), signed in as the account that will hold the files:
+
+1. Create a project, for example `JoBauko`.
+2. **APIs & Services → Library**: enable **Google Drive API**.
+3. **Google Auth Platform** (OAuth consent screen): choose **External**, app name `JoBauko`, and your email as support and developer contact. Under **Data access**, add the scope `https://www.googleapis.com/auth/drive.file`.
+4. Under **Audience**, click **Publish app** so its status is **In production**. While it is in *Testing*, Google expires the connection after 7 days and uploads stop.
+5. Under **Clients**, create a client of type **Desktop app**. Copy its client ID and secret into `.env`:
+
+```env
+GOOGLE_DRIVE_CLIENT_ID=...apps.googleusercontent.com
+GOOGLE_DRIVE_CLIENT_SECRET=...
+```
+
+**2. Connect the account.** This needs a web browser on the same computer, so on a server without one, run it on your own computer and copy the two values it saves into the server's `.env`.
+
+```bash
+php artisan config:clear
+php artisan jobauko:google-drive
+```
+
+Open the link it prints and sign in. If Google says it hasn't verified the app, choose **Advanced → Go to JoBauko**; it is your own app. The command creates a **JoBauko uploads** folder and saves `GOOGLE_DRIVE_REFRESH_TOKEN` and `GOOGLE_DRIVE_FOLDER_ID` in `.env` without printing them.
+
+**3. Move existing files and switch:**
+
+```bash
+php artisan config:clear
+php artisan jobauko:move-uploads --to=google --dry-run   # count first
+php artisan jobauko:move-uploads --to=google
+```
+
+Then set `UPLOADS_DISK=google` in `.env`, run `php artisan config:clear`, and check with `php artisan jobauko:check` ("Uploads folder in Google Drive is reachable"). The copies on the server are left in place; delete `storage/app/private/resumes`, `applications` and `organization-documents` once you have opened a few files through the site.
+
 ## 6. HTTPS
 
 ```bash
@@ -261,7 +304,7 @@ Back up all three of these together. A database backup without the files, or the
 | What | Where | Why |
 |---|---|---|
 | Database | `opportunity_portal` | All accounts, profiles, opportunities, applications, consents and the audit log |
-| Uploaded files | `/var/www/jobauko/storage/app/private` and `storage/app/public` | Resumes, application documents, organization verification documents, logos |
+| Uploaded files | `/var/www/jobauko/storage/app/private` and `storage/app/public` | Resumes, application documents, organization verification documents, logos. With `UPLOADS_DISK=google`, the private files are in the Drive folder instead: back it up with Google Takeout or by downloading the folder. |
 | Settings | `/var/www/jobauko/.env` | Database and mail credentials, and `APP_KEY` |
 
 Example nightly script, `/usr/local/bin/jobauko-backup`:

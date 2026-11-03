@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Services\Sms\LogSmsGateway;
 use App\Services\Sms\SemaphoreSmsGateway;
 use App\Services\Sms\SmsGateway;
+use App\Services\Storage\GoogleDriveDisk;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -44,6 +46,9 @@ class AppServiceProvider extends ServiceProvider
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
+
+        // Google Drive as a storage disk for private uploads (UPLOADS_DISK=google).
+        Storage::extend('google', fn ($app, array $config) => GoogleDriveDisk::make($config));
 
         // An overall ceiling against scraping and runaway clients; individual
         // actions are throttled more tightly in the route files.

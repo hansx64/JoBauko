@@ -56,9 +56,13 @@ flowchart LR
   its opportunity) an `organization_id`. Organization controllers resolve the acting
   member's organization from the session and scope every query to it; policies
   re-check ownership on every record-level action.
-- **Private files.** Resumes and documents are stored on the private `local` disk
-  (`storage/app/private`) and streamed through controllers after a policy check.
-  Nothing personal is ever placed on the `public` disk (only organization logos).
+- **Private files.** Resumes and documents are stored on the disk named by
+  `UPLOADS_DISK` (`App\Support\Uploads`): the private `local` disk
+  (`storage/app/private`) by default, or `google`, a Google Drive folder reached
+  with an OAuth refresh token and only the `drive.file` scope
+  (`App\Services\Storage\GoogleDriveDisk`, set up with `jobauko:google-drive`).
+  Either way they are streamed through controllers after a policy check. Nothing
+  personal is ever placed on the `public` disk (only organization logos).
 
 ## 2. Users, roles and permissions
 

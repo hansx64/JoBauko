@@ -10,6 +10,7 @@ use App\Models\Organization;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Services\Privacy\ConsentRecorder;
+use App\Support\Uploads;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -20,10 +21,8 @@ use Throwable;
 class OrganizationRegistrationService
 {
     /**
-     * Verification documents are private; logos are public.
+     * Logos are public. Verification documents are private uploads (see Uploads).
      */
-    public const DOCUMENT_DISK = 'local';
-
     public const LOGO_DISK = 'public';
 
     public function __construct(
@@ -86,7 +85,7 @@ class OrganizationRegistrationService
         } catch (Throwable $e) {
             // Don't leave orphaned files when the database work fails.
             foreach ($stored as $path) {
-                Storage::disk(self::DOCUMENT_DISK)->delete($path);
+                Uploads::disk()->delete($path);
                 Storage::disk(self::LOGO_DISK)->delete($path);
             }
 
@@ -102,7 +101,7 @@ class OrganizationRegistrationService
         $path = $file->storeAs(
             "organization-documents/{$organization->id}",
             Str::uuid().'.'.$file->guessExtension(),
-            self::DOCUMENT_DISK,
+            Uploads::name(),
         );
         $stored[] = $path;
 

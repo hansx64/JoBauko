@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Files;
 
 use App\Http\Controllers\Controller;
 use App\Models\ApplicationDocument;
-use App\Services\Applications\ApplicationWorkflow;
+use App\Support\Uploads;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApplicationDocumentController extends Controller
@@ -20,7 +19,7 @@ class ApplicationDocumentController extends Controller
     {
         Gate::authorize('view', $document->application);
 
-        return Storage::disk(ApplicationWorkflow::DISK)->response(
+        return Uploads::disk()->response(
             $document->disk_path,
             $document->original_name,
             [

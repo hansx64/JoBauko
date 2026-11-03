@@ -22,6 +22,7 @@ Route::get('privacy', function () {
     return Inertia::render('privacy', [
         'version' => config('jobauko.privacy_notice_version'),
         'contactEmail' => config('jobauko.privacy_contact_email'),
+        'uploadsInGoogleDrive' => config('jobauko.uploads_disk') === 'google',
     ]);
 })->name('privacy');
 

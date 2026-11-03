@@ -30,6 +30,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Private uploads
+    |--------------------------------------------------------------------------
+    |
+    | Disk for resumes, application documents and organization verification
+    | documents: "local" (storage/app/private on this server) or "google"
+    | (a Google Drive folder; see config/filesystems.php).
+    |
+    */
+
+    'uploads_disk' => env('UPLOADS_DISK', 'local'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Mobile number verification
     |--------------------------------------------------------------------------
     */

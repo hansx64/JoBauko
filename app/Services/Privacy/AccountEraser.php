@@ -3,10 +3,8 @@
 namespace App\Services\Privacy;
 
 use App\Models\User;
-use App\Services\Applications\ApplicationWorkflow;
-use App\Services\Resumes\ResumeService;
+use App\Support\Uploads;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Permanently erases a person's account at their request (Data Privacy Act
@@ -25,11 +23,11 @@ class AccountEraser
 
         DB::transaction(fn () => $user->forceDelete());
 
-        Storage::disk(ResumeService::DISK)->delete($resumes->filter()->all());
-        Storage::disk(ApplicationWorkflow::DISK)->delete($documents->filter()->all());
+        Uploads::disk()->delete($resumes->filter()->all());
+        Uploads::disk()->delete($documents->filter()->all());
 
         foreach ($applicationIds as $id) {
-            Storage::disk(ApplicationWorkflow::DISK)->deleteDirectory("applications/{$id}");
+            Uploads::disk()->deleteDirectory("applications/{$id}");
         }
     }
 }

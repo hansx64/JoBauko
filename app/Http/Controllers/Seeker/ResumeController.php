@@ -7,10 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Seeker\UploadResumeRequest;
 use App\Models\Resume;
 use App\Services\Resumes\ResumeService;
+use App\Support\Uploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResumeController extends Controller
@@ -36,7 +36,7 @@ class ResumeController extends Controller
 
         $inline = $request->boolean('preview') && $resume->isPdf();
 
-        return Storage::disk(ResumeService::DISK)->response(
+        return Uploads::disk()->response(
             $resume->disk_path,
             $resume->original_name,
             [

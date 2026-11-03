@@ -17,12 +17,12 @@ use App\Notifications\ApplicationStatusUpdated;
 use App\Services\Audit\AuditLogger;
 use App\Services\Recommendation\MatchScorer;
 use App\Services\Recommendation\SeekerSnapshot;
+use App\Support\Uploads;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -34,12 +34,6 @@ use Throwable;
  */
 class ApplicationWorkflow
 {
-    /**
-     * Application files live on the private "local" disk and are served only
-     * through ApplicationDocumentController after a policy check.
-     */
-    public const DISK = 'local';
-
     public const MAX_DOCUMENTS = 20;
 
     public function __construct(
@@ -103,11 +97,11 @@ class ApplicationWorkflow
             });
         } catch (UniqueConstraintViolationException) {
             // A second submission raced past the check above.
-            Storage::disk(self::DISK)->delete($stored);
+            Uploads::disk()->delete($stored);
 
             throw ValidationException::withMessages(['application' => 'You have already applied to this opportunity.']);
         } catch (Throwable $e) {
-            Storage::disk(self::DISK)->delete($stored);
+            Uploads::disk()->delete($stored);
 
             throw $e;
         }
@@ -229,7 +223,7 @@ class ApplicationWorkflow
     private function storeDocument(Application $application, User $user, UploadedFile $file, string $label, ?int $requirementId = null): ApplicationDocument
     {
         $extension = $file->guessExtension() ?: Str::lower($file->getClientOriginalExtension());
-        $path = $file->storeAs("applications/{$application->id}", Str::uuid().'.'.$extension, self::DISK);
+        $path = $file->storeAs("applications/{$application->id}", Str::uuid().'.'.$extension, Uploads::name());
 
         try {
             return $application->documents()->create([
@@ -242,7 +236,7 @@ class ApplicationWorkflow
                 'uploaded_by' => $user->id,
             ]);
         } catch (Throwable $e) {
-            Storage::disk(self::DISK)->delete($path);
+            Uploads::disk()->delete($path);
 
             throw $e;
         }

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\AccountType;
 use App\Models\Barangay;
 use App\Models\User;
+use App\Support\Uploads;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -49,6 +50,7 @@ class CheckProductionReadiness extends Command
         }
 
         $this->check(File::exists(public_path('storage')), 'Public storage is linked', 'Run php artisan storage:link so organization logos display.');
+        $this->checkUploads();
         $this->check(File::exists(public_path('build/manifest.json')), 'Frontend is built', 'Run npm ci && npm run build.');
         $this->warnUnless(! File::exists(public_path('hot')), 'Vite dev server is not in use', 'Delete public/hot; it makes pages load scripts from a development server.');
 
@@ -66,6 +68,22 @@ class CheckProductionReadiness extends Command
         $this->info($warned > 0 ? "Ready, with {$warned} ".str('warning')->plural($warned).'.' : 'Ready for production.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Resumes and documents must be storable wherever UPLOADS_DISK points.
+     */
+    private function checkUploads(): void
+    {
+        $label = Uploads::name() === 'google' ? 'Uploads folder in Google Drive is reachable' : 'Private uploads folder is writable';
+
+        try {
+            Uploads::disk()->directoryExists('resumes');
+            $ok = Uploads::name() !== 'local' || is_writable(storage_path('app/private'));
+            $this->check($ok, $label, 'Make storage/app/private writable by the web server.');
+        } catch (Throwable $e) {
+            $this->check(false, $label, 'Run php artisan jobauko:google-drive to reconnect. ('.$e->getMessage().')');
+        }
     }
 
     private function check(bool $ok, string $label, string $fix): void
