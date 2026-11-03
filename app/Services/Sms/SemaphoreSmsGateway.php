@@ -26,7 +26,7 @@ class SemaphoreSmsGateway implements SmsGateway
                     'sendername' => $this->senderName,
                 ]));
         } catch (ConnectionException $e) {
-            return SmsResult::failed('Could not reach Semaphore: '.$e->getMessage());
+            return SmsResult::failed('Could not reach Semaphore: '.$this->withoutKey($e->getMessage()));
         }
 
         $first = $response->json('0');
@@ -37,7 +37,16 @@ class SemaphoreSmsGateway implements SmsGateway
 
         // Semaphore answers validation problems with a 200 and an object of
         // field errors, so the body is recorded either way.
-        return SmsResult::failed(substr("HTTP {$response->status()}: {$response->body()}", 0, 500));
+        return SmsResult::failed(substr($this->withoutKey("HTTP {$response->status()}: {$response->body()}"), 0, 500));
+    }
+
+    /**
+     * Errors are stored in the delivery log, which administrators can read,
+     * so the API key must never appear in them.
+     */
+    private function withoutKey(string $text): string
+    {
+        return $this->apiKey === '' ? $text : str_replace($this->apiKey, '[api key hidden]', $text);
     }
 
     public function name(): string

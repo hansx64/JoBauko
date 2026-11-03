@@ -4,6 +4,7 @@ namespace Tests\Feature\Notifications;
 
 use App\Services\Sms\SemaphoreSmsGateway;
 use App\Services\Sms\SmsGateway;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -32,6 +33,21 @@ class SemaphoreGatewayTest extends TestCase
 
         $this->assertFalse($result->successful);
         $this->assertStringContainsString('number format is invalid', $result->error);
+    }
+
+    public function test_the_api_key_never_appears_in_recorded_errors()
+    {
+        Http::fake(['api.semaphore.co/*' => Http::response(['apikey' => ['The key secret-key is not valid.']], 401)]);
+        $rejected = (new SemaphoreSmsGateway('secret-key'))->send('09171234567', 'Hello');
+
+        Http::fake(fn () => throw new ConnectionException('cURL error 60 for https://api.semaphore.co/api/v4/messages?apikey=secret-key'));
+        $unreachable = (new SemaphoreSmsGateway('secret-key'))->send('09171234567', 'Hello');
+
+        foreach ([$rejected, $unreachable] as $result) {
+            $this->assertFalse($result->successful);
+            $this->assertStringNotContainsString('secret-key', $result->error);
+            $this->assertStringContainsString('[api key hidden]', $result->error);
+        }
     }
 
     public function test_the_driver_is_selected_by_configuration()
