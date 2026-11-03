@@ -58,14 +58,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                    Forgot password?
-                                </TextLink>
-                            )}
-                        </div>
+                        <Label htmlFor="password">Password</Label>
                         <Input
                             id="password"
                             type="password"
@@ -77,6 +70,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             placeholder="Password"
                         />
                         <InputError message={errors.password} />
+                        {canResetPassword && (
+                            <TextLink href={route('password.request')} className="justify-self-end text-sm" tabIndex={5}>
+                                Forgot password?
+                            </TextLink>
+                        )}
                     </div>
 
                     <div className="flex items-center space-x-3">
