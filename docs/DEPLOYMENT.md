@@ -124,7 +124,6 @@ Set up the database, storage and caches:
 ```bash
 php artisan migrate --force
 php artisan db:seed --force          # 22 barangays, skills, first administrator
-php artisan storage:link
 php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan event:cache
 sudo chown -R www-data:www-data storage bootstrap/cache
 sudo chmod -R ug+rwX storage bootstrap/cache
@@ -180,7 +179,7 @@ Uploaded resumes and documents are stored in `storage/app/private`. That folder 
 
 ### Storing uploads in Google Drive (optional)
 
-Instead of the server, resumes, application documents and organization verification documents can be kept in a folder in a Google account's Drive. People still open them only through JoBauko, after the same permission checks. Logos stay on the server.
+Instead of the server, resumes, application documents, organization verification documents and organization logos can be kept in a folder in a Google account's Drive. People still open them only through JoBauko, after the same permission checks (logos are open to everyone).
 
 Before choosing this, know that:
 
@@ -304,7 +303,7 @@ Back up all three of these together. A database backup without the files, or the
 | What | Where | Why |
 |---|---|---|
 | Database | `opportunity_portal` | All accounts, profiles, opportunities, applications, consents and the audit log |
-| Uploaded files | `/var/www/jobauko/storage/app/private` and `storage/app/public` | Resumes, application documents, organization verification documents, logos. With `UPLOADS_DISK=google`, the private files are in the Drive folder instead: back it up with Google Takeout or by downloading the folder. |
+| Uploaded files | `/var/www/jobauko/storage/app/private` | Resumes, application documents, organization verification documents, logos. With `UPLOADS_DISK=google`, they are in the Drive folder instead: back it up with Google Takeout or by downloading the folder. |
 | Settings | `/var/www/jobauko/.env` | Database and mail credentials, and `APP_KEY` |
 
 Example nightly script, `/usr/local/bin/jobauko-backup`:
@@ -316,7 +315,7 @@ STAMP=$(date +%F)
 DEST=/var/backups/jobauko
 mkdir -p "$DEST"
 mysqldump --single-transaction --routines --triggers opportunity_portal | gzip > "$DEST/db-$STAMP.sql.gz"
-tar -czf "$DEST/files-$STAMP.tar.gz" -C /var/www/jobauko storage/app/private storage/app/public .env
+tar -czf "$DEST/files-$STAMP.tar.gz" -C /var/www/jobauko storage/app/private .env
 find "$DEST" -type f -mtime +30 -delete    # keep 30 days
 ```
 
@@ -367,7 +366,6 @@ Take a backup first. Then run `php artisan jobauko:check` again.
 | No deadline reminders | The scheduler cron line is missing (`sudo crontab -u www-data -l`) |
 | SMS show "failed" in Delivery logs | Semaphore credit, API key or sender name. The error from Semaphore is shown next to each message |
 | Emails do not arrive | SMTP settings; check `laravel.log` for mail errors |
-| Organization logos do not show | `php artisan storage:link` was not run |
 | "419 Page Expired" on forms | `APP_URL` does not match the address in the browser, or `SESSION_SECURE_COOKIE=true` without HTTPS |
 | Uploads rejected as too large | `upload_max_filesize` / `post_max_size` in php.ini, or `client_max_body_size` in Nginx |
 | Changes to `.env` have no effect | Run `php artisan config:cache` again |

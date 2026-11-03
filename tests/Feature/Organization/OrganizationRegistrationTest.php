@@ -97,7 +97,7 @@ class OrganizationRegistrationTest extends TestCase
         $seeker = User::factory()->create();
         $this->actingAs($seeker)->get($url)->assertOk()->assertHeaderMissing('Pragma');
 
-        $organization->update(['logo_path' => null]);
+        $organization->forceFill(['logo_path' => null])->save();
         $this->get("/organizations/{$organization->id}/logo")->assertNotFound();
     }
 

@@ -45,7 +45,6 @@ Then:
    ```bash
    php artisan migrate
    php artisan db:seed          # 22 barangays, skills, and the first administrator
-   php artisan storage:link
    ```
 
    `db:seed` prints a generated administrator password once, unless `ADMIN_PASSWORD` is set in `.env`.

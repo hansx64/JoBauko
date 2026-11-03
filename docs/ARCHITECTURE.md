@@ -61,8 +61,9 @@ flowchart LR
   (`storage/app/private`) by default, or `google`, a Google Drive folder reached
   with an OAuth refresh token and only the `drive.file` scope
   (`App\Services\Storage\GoogleDriveDisk`, set up with `jobauko:google-drive`).
-  Either way they are streamed through controllers after a policy check. Nothing
-  personal is ever placed on the `public` disk (only organization logos).
+  Either way they are streamed through controllers after a policy check.
+  Organization logos are on the same disk and are the only files served to
+  anyone (`organizations.logo`, cached by browsers through a versioned URL).
 
 ## 2. Users, roles and permissions
 

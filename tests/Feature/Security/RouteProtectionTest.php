@@ -21,6 +21,7 @@ class RouteProtectionTest extends TestCase
         'home',
         'opportunities.index',
         'opportunities.show',
+        'organizations.logo',
         'privacy',
     ];
 
