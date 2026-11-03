@@ -9,7 +9,7 @@ This guide runs JoBauko on a free Render web service with a free Aiven for MySQL
 | Render's disk is erased on every restart and deploy | Files saved on the server disappear | All uploads, including logos, go to Google Drive (`UPLOADS_DISK=google`) |
 | Render sleeps after 15 minutes without visitors | The next visit waits about a minute; the queue worker and scheduler stop while asleep | A free uptime monitor visits `/up` every 10 minutes to keep it awake |
 | Render has no shell, background workers or cron jobs on the free plan | Commands cannot be run on the server | `docker/start.sh` migrates, seeds and runs the queue worker and scheduler inside the web service |
-| Render blocks outgoing ports 25, 465 and 587 | Ordinary SMTP does not work | Mail goes through Brevo on port 2525 |
+| Render blocks outgoing ports 25, 465 and 587 | Ordinary SMTP does not work | Mail is sent with the Gmail API over HTTPS (`MAIL_MAILER=gmail`), as the same Google account that holds the uploads |
 | Render free instances have 512 MB of memory | Too many Apache workers would run out of memory | `docker/mpm.conf` limits Apache to 8 workers |
 | Aiven free MySQL has 1 GB of storage, one node and may be powered off when unused | Enough for a pilot; no failover | Keep the site awake; watch storage in the Aiven console |
 | Render gives 750 free hours a month per workspace | One always-awake service uses about 744 | Run only this one free service in the workspace |
@@ -20,13 +20,15 @@ This guide runs JoBauko on a free Render web service with a free Aiven for MySQL
 2. Wait until the service is **Running**. On its **Overview** page, note the **Host**, **Port**, **User** (`avnadmin`), **Password** and **Database name** (`defaultdb`).
 3. Click **Download** next to **CA certificate** and keep the `ca.pem` file.
 
-## 2. Mail (Brevo)
+## 2. Google account (uploads and mail)
 
-1. Sign up at https://www.brevo.com (free plan: 300 emails a day).
-2. Under **Senders, Domains & Dedicated IPs → Senders**, add and verify the address mail will come from.
-3. Under **SMTP & API → SMTP**, note the **Login** and create an **SMTP key**.
+Follow "Storing uploads in Google Drive" in `DEPLOYMENT.md`, with two additions so the same sign-in can also send email:
 
-Sending from a personal Gmail address through Brevo works, but some messages may land in spam. A municipal domain with Brevo's domain authentication is more reliable.
+1. In the Google Cloud project, also enable the **Gmail API** (*APIs & Services → Library*).
+2. Under *Google Auth Platform → Data Access*, add the `.../auth/gmail.send` scope next to `.../auth/drive.file`.
+3. Run `php artisan jobauko:google-drive` on your computer and tick every box Google shows. If the account was connected before Gmail was added, run it again; it keeps the same uploads folder and saves a new refresh token.
+
+Mail is sent as that Google account, so `MAIL_FROM_ADDRESS` must be its address. A personal Gmail account can send about 500 messages a day.
 
 ## 3. Values to prepare
 
@@ -47,8 +49,7 @@ Sending from a personal Gmail address through Brevo works, but some messages may
 | `DB_HOST`, `DB_PORT`, `DB_PASSWORD` | from Aiven |
 | `DB_CA_CERT` | the whole text of `ca.pem`, including the `BEGIN` and `END` lines |
 | `GOOGLE_DRIVE_CLIENT_ID`, `GOOGLE_DRIVE_CLIENT_SECRET`, `GOOGLE_DRIVE_REFRESH_TOKEN`, `GOOGLE_DRIVE_FOLDER_ID` | from your local `.env` |
-| `MAIL_USERNAME`, `MAIL_PASSWORD` | Brevo SMTP login and key |
-| `MAIL_FROM_ADDRESS` | the sender verified in Brevo |
+| `MAIL_FROM_ADDRESS` | the address of the connected Google account |
 | `SEMAPHORE_API_KEY`, `SEMAPHORE_SENDER_NAME` | from Semaphore; leave the sender empty until one is approved |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | from step 3 |
 | `PRIVACY_CONTACT_EMAIL` | the Data Protection Officer's address |
@@ -77,6 +78,6 @@ Push to the `main` branch. Render rebuilds and restarts automatically, and `dock
 | Deploy fails at `migrate` with an SSL or connection error | `DB_CA_CERT` incomplete, or `DB_HOST` / `DB_PORT` wrong |
 | Deploy fails creating the `audit_logs` triggers | The database user cannot create triggers while binary logging is on; ask Aiven support, or set `log_bin_trust_function_creators` if the plan allows it |
 | "419 Page Expired" on forms | `APP_URL` does not match the address in the browser |
-| Uploads fail | The Google Drive connection was removed or expired; run `php artisan jobauko:google-drive` locally and copy the new `GOOGLE_DRIVE_REFRESH_TOKEN` to Render |
-| Emails do not arrive | Brevo login or key, or the sender is not verified; the error is in the Logs |
+| Uploads or emails fail with `invalid_grant` | The Google connection was removed or expired; run `php artisan jobauko:google-drive` locally and copy the new `GOOGLE_DRIVE_REFRESH_TOKEN` to Render |
+| Emails do not arrive | The error is in the Logs. "insufficient authentication scopes": run `jobauko:google-drive` again and allow sending email, then copy the new refresh token to Render. Mail from another address than the Google account is rewritten or refused by Gmail |
 | Site takes a minute to open | It was asleep; set up the monitor in section 5 |

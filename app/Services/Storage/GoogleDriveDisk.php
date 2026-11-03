@@ -2,6 +2,7 @@
 
 namespace App\Services\Storage;
 
+use App\Services\Mail\GmailTransport;
 use Google\Client;
 use Google\Service\Drive;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -55,7 +56,8 @@ class GoogleDriveDisk
         $client->setApplicationName('JoBauko');
         $client->setClientId($clientId);
         $client->setClientSecret($clientSecret);
-        $client->setScopes([self::SCOPE]);
+        // Sending email (MAIL_MAILER=gmail) uses the same sign-in.
+        $client->setScopes([self::SCOPE, GmailTransport::SCOPE]);
         $client->setAccessType('offline');
 
         return $client;

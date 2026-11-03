@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Mail\GmailTransport;
 use App\Services\Sms\LogSmsGateway;
 use App\Services\Sms\SemaphoreSmsGateway;
 use App\Services\Sms\SmsGateway;
@@ -9,6 +10,7 @@ use App\Services\Storage\GoogleDriveDisk;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -49,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Google Drive as a storage disk for private uploads (UPLOADS_DISK=google).
         Storage::extend('google', fn ($app, array $config) => GoogleDriveDisk::make($config));
+        Mail::extend('gmail', fn (array $config) => GmailTransport::make($config));
 
         // An overall ceiling against scraping and runaway clients; individual
         // actions are throttled more tightly in the route files.

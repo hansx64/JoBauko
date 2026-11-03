@@ -64,18 +64,9 @@ services:
       - key: GOOGLE_DRIVE_FOLDER_ID
         sync: false
 
+      # Sent with the Gmail API as the Google account above (SMTP ports are blocked on the free plan).
       - key: MAIL_MAILER
-        value: smtp
-      - key: MAIL_HOST
-        value: smtp-relay.brevo.com
-      - key: MAIL_PORT
-        value: "2525"
-      - key: MAIL_ENCRYPTION
-        value: tls
-      - key: MAIL_USERNAME
-        sync: false
-      - key: MAIL_PASSWORD
-        sync: false
+        value: gmail
       - key: MAIL_FROM_ADDRESS
         sync: false
       - key: MAIL_FROM_NAME

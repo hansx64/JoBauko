@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Mail\GmailTransport;
 use App\Services\Storage\GoogleDriveDisk;
 use App\Support\EnvFile;
 use Google\Client;
@@ -12,9 +13,10 @@ use Illuminate\Support\Str;
 use Throwable;
 
 /**
- * One-time setup for storing uploads in Google Drive: signs in to the Google
- * account in the browser, then saves the refresh token and the uploads
- * folder in .env. Secrets are written to .env, never printed.
+ * One-time setup for storing uploads in Google Drive and sending email with
+ * Gmail: signs in to the Google account in the browser, then saves the
+ * refresh token and the uploads folder in .env. Secrets are written to .env,
+ * never printed.
  */
 class ConnectGoogleDrive extends Command
 {
@@ -22,7 +24,7 @@ class ConnectGoogleDrive extends Command
         {--folder=JoBauko uploads : Name of the Drive folder to create for uploads}
         {--timeout=300 : Seconds to wait for the browser sign-in}';
 
-    protected $description = 'Connect a Google account so private uploads can be stored in Google Drive';
+    protected $description = 'Connect a Google account to store uploads in Google Drive and send email with Gmail';
 
     public function handle(): int
     {
@@ -95,11 +97,18 @@ class ConnectGoogleDrive extends Command
         ]);
 
         $this->info('Connected. GOOGLE_DRIVE_REFRESH_TOKEN and GOOGLE_DRIVE_FOLDER_ID were saved in .env.');
+
+        // Google lets the account owner untick individual permissions.
+        $granted = explode(' ', (string) ($token['scope'] ?? ''));
+        if (! in_array(GmailTransport::SCOPE, $granted, true)) {
+            $this->warn('Sending email was not allowed, so MAIL_MAILER=gmail will not work. Run this command again and tick every box.');
+        }
         $this->newLine();
         $this->line('Next:');
         $this->line('  1. php artisan config:clear');
         $this->line('  2. php artisan jobauko:move-uploads --to=google   (copies existing files to Drive)');
         $this->line('  3. Set UPLOADS_DISK=google in .env, then php artisan config:clear again');
+        $this->line('  4. To send email from this Google account: set MAIL_MAILER=gmail and MAIL_FROM_ADDRESS to its address');
 
         return self::SUCCESS;
     }
