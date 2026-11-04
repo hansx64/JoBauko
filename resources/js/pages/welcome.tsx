@@ -65,10 +65,16 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
                     style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '22px 22px' }}
                 />
                 <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 md:py-24">
-                    <AppLogoIcon
-                        large
-                        className="pointer-events-none absolute top-16 right-4 hidden size-56 shadow-2xl ring-8 ring-white/15 lg:block xl:size-64"
-                    />
+                    <div className="pointer-events-none absolute top-16 right-4 hidden flex-col gap-5 lg:flex xl:flex-row">
+                        <AppLogoIcon large className="size-40 shadow-2xl ring-8 ring-white/15" />
+                        <img
+                            src="/images/montanosa-tech.png"
+                            width={256}
+                            height={256}
+                            alt="Montanosa Tech logo"
+                            className="size-40 shrink-0 rounded-full bg-white shadow-2xl ring-8 ring-white/15"
+                        />
+                    </div>
                     <div className="max-w-3xl space-y-6">
                         <h1 className="text-4xl font-bold tracking-tight text-balance md:text-6xl">Discover Opportunities. Build Your Future.</h1>
                         <p className="max-w-2xl text-lg text-white/85 md:text-xl">
