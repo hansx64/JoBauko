@@ -31,6 +31,19 @@ class UpdatePersonalInfoRequest extends FormRequest
     }
 
     /**
+     * College graduates and above have finished their studies, so the form
+     * does not ask; record it for them.
+     */
+    protected function prepareForValidation(): void
+    {
+        $level = EducationLevel::tryFrom((string) $this->input('highest_education'));
+
+        if ($level !== null && $level->rank() >= EducationLevel::CollegeGraduate->rank()) {
+            $this->merge(['current_education_status' => EducationStatus::Completed->value]);
+        }
+    }
+
+    /**
      * Get custom messages for validator errors.
      *
      * @return array<string, string>

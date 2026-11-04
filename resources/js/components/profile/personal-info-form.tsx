@@ -10,6 +10,8 @@ import { type PersonalInfo, type ProfileOptions } from '@/types/profile';
 
 type PersonalForm = Record<keyof PersonalInfo, string>;
 
+const FINISHED_LEVELS = ['college_graduate', 'masters', 'doctorate'];
+
 export function PersonalInfoForm({ personal, options }: { personal: PersonalInfo; options: ProfileOptions }) {
     const form = useForm<PersonalForm>({
         classification: personal.classification,
@@ -47,7 +49,17 @@ export function PersonalInfoForm({ personal, options }: { personal: PersonalInfo
             options: options.educationLevels,
             neededToApply: true,
         },
-        { name: 'current_education_status', label: 'Current educational status', type: 'select', options: options.educationStatuses },
+        // College graduates and above have finished their studies; the server records that for them.
+        ...(FINISHED_LEVELS.includes(form.data.highest_education)
+            ? []
+            : [
+                  {
+                      name: 'current_education_status',
+                      label: 'Current educational status',
+                      type: 'select',
+                      options: options.educationStatuses,
+                  } as FieldDef,
+              ]),
     ];
 
     const submit: FormEventHandler = (e) => {

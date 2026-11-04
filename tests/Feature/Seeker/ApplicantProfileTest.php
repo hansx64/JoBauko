@@ -4,6 +4,7 @@ namespace Tests\Feature\Seeker;
 
 use App\Enums\Classification;
 use App\Enums\EducationLevel;
+use App\Enums\EducationStatus;
 use App\Models\ApplicantEducation;
 use App\Models\Barangay;
 use App\Models\User;
@@ -56,6 +57,19 @@ class ApplicantProfileTest extends TestCase
         $this->assertSame(Classification::CareerShifter, $profile->classification);
         $this->assertSame('1998-04-12', $profile->date_of_birth->toDateString());
         $this->assertSame(EducationLevel::CollegeGraduate, $profile->highest_education);
+    }
+
+    public function test_college_graduates_and_above_are_recorded_as_finished_studying()
+    {
+        $user = $this->seeker();
+        $this->actingAs($user);
+
+        // The form hides the status for graduates, so none is sent.
+        $this->patch('/profile', ['classification' => 'unemployed', 'highest_education' => 'masters'])->assertSessionHasNoErrors();
+        $this->assertSame(EducationStatus::Completed, $user->applicantProfile->fresh()->current_education_status);
+
+        $this->patch('/profile', ['classification' => 'student', 'highest_education' => 'college_level', 'current_education_status' => 'studying']);
+        $this->assertSame(EducationStatus::Studying, $user->applicantProfile->fresh()->current_education_status);
     }
 
     public function test_changing_classification_does_not_change_notification_preferences()
