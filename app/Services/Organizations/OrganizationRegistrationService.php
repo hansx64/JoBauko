@@ -10,6 +10,7 @@ use App\Models\Organization;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Services\Privacy\ConsentRecorder;
+use App\Support\UploadPaths;
 use App\Support\Uploads;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -53,11 +54,13 @@ class OrganizationRegistrationService
                 $organization->slug = $this->uniqueSlug($data['name']);
                 $organization->verification_status = VerificationStatus::Pending;
 
-                if ($logo) {
-                    $organization->logo_path = $stored[] = $logo->store('organization-logos', Uploads::name());
-                }
-
                 $organization->save();
+
+                // After saving: the logo's folder is named with the organization's ID.
+                if ($logo) {
+                    $organization->logo_path = $stored[] = $this->storeLogo($organization, $logo);
+                    $organization->save();
+                }
 
                 $organization->members()->create([
                     'user_id' => $user->id,
@@ -92,8 +95,8 @@ class OrganizationRegistrationService
     public function storeDocument(Organization $organization, UploadedFile $file, string $type, array &$stored = []): void
     {
         $path = $file->storeAs(
-            "organization-documents/{$organization->id}",
-            Str::uuid().'.'.$file->guessExtension(),
+            UploadPaths::organizationDocuments($organization),
+            UploadPaths::fileName($file, $file->guessExtension() ?: $file->getClientOriginalExtension()),
             Uploads::name(),
         );
         $stored[] = $path;
@@ -105,6 +108,15 @@ class OrganizationRegistrationService
             'mime_type' => $file->getMimeType(),
             'size_bytes' => $file->getSize(),
         ]);
+    }
+
+    public function storeLogo(Organization $organization, UploadedFile $logo): string
+    {
+        return $logo->storeAs(
+            UploadPaths::organizationLogos($organization),
+            UploadPaths::fileName('Logo', $logo->guessExtension() ?: $logo->getClientOriginalExtension()),
+            Uploads::name(),
+        );
     }
 
     private function uniqueSlug(string $name): string

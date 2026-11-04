@@ -67,7 +67,7 @@ class OrganizationProfileController extends Controller
 
             if ($request->hasFile('logo')) {
                 $old = $organization->logo_path;
-                $organization->logo_path = $request->file('logo')->store('organization-logos', Uploads::name());
+                $organization->logo_path = $registration->storeLogo($organization, $request->file('logo'));
                 DB::afterCommit(fn () => $old && Uploads::disk()->delete($old));
             }
 

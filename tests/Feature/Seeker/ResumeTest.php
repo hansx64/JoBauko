@@ -74,7 +74,7 @@ class ResumeTest extends TestCase
         $response->assertRedirect("/resume/{$resume->id}/review");
 
         $this->disk->assertExists($resume->disk_path);
-        $this->assertStringStartsWith("resumes/{$user->id}/", $resume->disk_path);
+        $this->assertStringStartsWith("Resumes/{$user->id} - {$user->name}/maria-santos (", $resume->disk_path);
         $this->assertSame('application/pdf', $resume->mime_type);
         $this->assertSame(ResumeExtractionStatus::Extracted, $resume->extraction_status);
         $this->assertContains('Organic Farming', $resume->extracted_data['skills']);

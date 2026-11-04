@@ -181,6 +181,10 @@ Uploaded resumes and documents are stored in `storage/app/private`. That folder 
 
 Instead of the server, resumes, application documents, organization verification documents and organization logos can be kept in a folder in a Google account's Drive. People still open them only through JoBauko, after the same permission checks (logos are open to everyone).
 
+Inside that folder, each kind of upload has its own folder, with one folder per person, application or organization (`Resumes/12 - Juan Dela Cruz/`, `Application documents/48 - Juan Dela Cruz - Computer Technician/`, `Organization documents/4 - Bauko Farmers Cooperative/`, `Organization logos/4 - …/`). Do not rename or move files in Drive: JoBauko finds each file by its path. When a person deletes their account, their folders are deleted too.
+
+Give the live site and any test copy (such as a developer's computer) **separate** Drive folders, so test files never mix with residents' files.
+
 Before choosing this, know that:
 
 - The files belong to that Google account and count against its storage (15 GB on a free account). Whoever controls the account can open them in Drive.

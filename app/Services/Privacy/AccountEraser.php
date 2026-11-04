@@ -3,6 +3,7 @@
 namespace App\Services\Privacy;
 
 use App\Models\User;
+use App\Support\UploadPaths;
 use App\Support\Uploads;
 use Illuminate\Support\Facades\DB;
 
@@ -23,11 +24,13 @@ class AccountEraser
 
         DB::transaction(fn () => $user->forceDelete());
 
-        Uploads::disk()->delete($resumes->filter()->all());
-        Uploads::disk()->delete($documents->filter()->all());
+        $paths = $resumes->merge($documents)->filter();
+        Uploads::disk()->delete($paths->all());
 
-        foreach ($applicationIds as $id) {
-            Uploads::disk()->deleteDirectory("applications/{$id}");
+        // The person's own folders are named after them, so remove those too.
+        $folders = $paths->map(fn (string $path) => UploadPaths::ownFolder($path))->filter()->unique();
+        foreach ([...$folders, ...$applicationIds->map(fn ($id) => "applications/{$id}")] as $folder) {
+            Uploads::disk()->deleteDirectory($folder);
         }
     }
 }

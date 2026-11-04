@@ -17,6 +17,7 @@ use App\Notifications\ApplicationStatusUpdated;
 use App\Services\Audit\AuditLogger;
 use App\Services\Recommendation\MatchScorer;
 use App\Services\Recommendation\SeekerSnapshot;
+use App\Support\UploadPaths;
 use App\Support\Uploads;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
@@ -223,7 +224,7 @@ class ApplicationWorkflow
     private function storeDocument(Application $application, User $user, UploadedFile $file, string $label, ?int $requirementId = null): ApplicationDocument
     {
         $extension = $file->guessExtension() ?: Str::lower($file->getClientOriginalExtension());
-        $path = $file->storeAs("applications/{$application->id}", Str::uuid().'.'.$extension, Uploads::name());
+        $path = $file->storeAs(UploadPaths::application($application), UploadPaths::fileName($label, $extension), Uploads::name());
 
         try {
             return $application->documents()->create([

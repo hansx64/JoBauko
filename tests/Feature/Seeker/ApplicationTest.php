@@ -93,7 +93,7 @@ class ApplicationTest extends TestCase
         $document = $application->documents()->sole();
         $this->assertSame('Transcript of Records', $document->label);
         $this->disk->assertExists($document->disk_path);
-        $this->assertStringStartsWith("applications/{$application->id}/", $document->disk_path);
+        $this->assertStringStartsWith("Application documents/{$application->id} - {$seeker->name} - {$job->title}/Transcript of Records (", $document->disk_path);
 
         $this->assertDatabaseHas('application_status_histories', ['application_id' => $application->id, 'from_status' => null, 'to_status' => 'submitted', 'changed_by' => $seeker->id]);
         $this->assertDatabaseHas('audit_logs', ['action' => 'application.submitted', 'auditable_id' => $application->id, 'organization_id' => $job->organization_id]);

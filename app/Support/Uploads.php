@@ -13,8 +13,20 @@ use Illuminate\Support\Facades\Storage;
  */
 class Uploads
 {
-    /** Top-level folders holding uploads, used when moving them between disks. */
-    public const FOLDERS = ['resumes', 'applications', 'organization-documents', 'organization-logos'];
+    /**
+     * Top-level folders holding uploads, used when moving them between disks:
+     * the current ones (see UploadPaths) and the ones used before.
+     */
+    public const FOLDERS = [
+        UploadPaths::RESUMES,
+        UploadPaths::APPLICATIONS,
+        UploadPaths::ORGANIZATION_DOCUMENTS,
+        UploadPaths::ORGANIZATION_LOGOS,
+        'resumes',
+        'applications',
+        'organization-documents',
+        'organization-logos',
+    ];
 
     public static function name(): string
     {

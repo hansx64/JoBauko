@@ -92,5 +92,11 @@ export interface OpportunityFormOptions {
 }
 
 export function formatDate(date: string | null, options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' }) {
-    return date ? new Date(date.length === 10 ? `${date}T00:00:00` : date).toLocaleDateString(undefined, options) : '—';
+    if (!date) return '—';
+
+    const value = new Date(date.length === 10 ? `${date}T00:00:00` : date);
+    // toLocaleDateString refuses time options (it throws on timeStyle), so use the full formatter when a time is asked for.
+    const withTime = options.timeStyle !== undefined || options.hour !== undefined || options.minute !== undefined;
+
+    return withTime ? value.toLocaleString(undefined, options) : value.toLocaleDateString(undefined, options);
 }

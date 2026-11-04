@@ -5,6 +5,7 @@ namespace App\Services\Resumes;
 use App\Enums\ResumeExtractionStatus;
 use App\Models\Resume;
 use App\Models\User;
+use App\Support\UploadPaths;
 use App\Support\Uploads;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,7 @@ class ResumeService
     public function upload(User $user, UploadedFile $file): Resume
     {
         $extension = $file->getMimeType() === ResumeTextExtractor::PDF ? 'pdf' : 'docx';
-        $path = $file->storeAs("resumes/{$user->id}", Str::uuid().'.'.$extension, Uploads::name());
+        $path = $file->storeAs(UploadPaths::resumes($user), UploadPaths::fileName($file, $extension), Uploads::name());
 
         $resume = $this->makeCurrent($user, [
             'disk_path' => $path,
@@ -47,7 +48,7 @@ class ResumeService
      */
     public function storeGenerated(User $user, string $pdf, string $fileName): Resume
     {
-        $path = "resumes/{$user->id}/".Str::uuid().'.pdf';
+        $path = UploadPaths::resumes($user).'/'.UploadPaths::fileName(pathinfo($fileName, PATHINFO_FILENAME), 'pdf');
         Uploads::disk()->put($path, $pdf);
 
         return $this->makeCurrent($user, [

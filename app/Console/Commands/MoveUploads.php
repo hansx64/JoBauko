@@ -36,23 +36,26 @@ class MoveUploads extends Command
         $target = Storage::disk($to);
         $copied = $skipped = $failed = 0;
 
-        foreach (Uploads::FOLDERS as $folder) {
-            foreach ($source->allFiles($folder) as $path) {
-                try {
-                    if ($target->fileExists($path)) {
-                        $skipped++;
+        // On Windows, "Resumes" and the older "resumes" are the same folder; count each file once.
+        $paths = collect(Uploads::FOLDERS)
+            ->flatMap(fn (string $folder) => $source->allFiles($folder))
+            ->unique(fn (string $path) => mb_strtolower($path));
 
-                        continue;
-                    }
+        foreach ($paths as $path) {
+            try {
+                if ($target->fileExists($path)) {
+                    $skipped++;
 
-                    if (! $this->option('dry-run')) {
-                        $target->writeStream($path, $source->readStream($path));
-                    }
-                    $copied++;
-                } catch (Throwable $e) {
-                    $failed++;
-                    $this->warn("Could not copy {$path}: {$e->getMessage()}");
+                    continue;
                 }
+
+                if (! $this->option('dry-run')) {
+                    $target->writeStream($path, $source->readStream($path));
+                }
+                $copied++;
+            } catch (Throwable $e) {
+                $failed++;
+                $this->warn("Could not copy {$path}: {$e->getMessage()}");
             }
         }
 

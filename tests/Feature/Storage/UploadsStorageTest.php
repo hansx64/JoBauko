@@ -3,8 +3,10 @@
 namespace Tests\Feature\Storage;
 
 use App\Enums\ResumeExtractionStatus;
+use App\Models\Organization;
 use App\Models\User;
 use App\Support\EnvFile;
+use App\Support\UploadPaths;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -82,22 +84,37 @@ class UploadsStorageTest extends TestCase
         $local->put('resumes/1/a.pdf', 'resume');
         $local->put('applications/2/b.pdf', 'document');
         $local->put('organization-documents/3/c.pdf', 'permit');
+        $local->put('Organization logos/3 - Bauko Cooperative/Logo (a1b2c3d4).png', 'logo');
         $local->put('other/not-an-upload.txt', 'ignored');
         $google->put('resumes/1/a.pdf', 'resume');
 
         $this->artisan('jobauko:move-uploads', ['--to' => 'google', '--dry-run' => true])
-            ->expectsOutputToContain('Would copy 2 file(s)')
+            ->expectsOutputToContain('Would copy 3 file(s)')
             ->assertSuccessful();
         $google->assertMissing('applications/2/b.pdf');
 
         $this->artisan('jobauko:move-uploads', ['--to' => 'google'])
-            ->expectsOutputToContain('Copied 2 file(s) from "local" to "google"; 1 already there; 0 failed.')
+            ->expectsOutputToContain('Copied 3 file(s) from "local" to "google"; 1 already there; 0 failed.')
             ->assertSuccessful();
 
         $google->assertExists('applications/2/b.pdf');
+        $google->assertExists('Organization logos/3 - Bauko Cooperative/Logo (a1b2c3d4).png');
         $this->assertSame('permit', $google->get('organization-documents/3/c.pdf'));
         $google->assertMissing('other/not-an-upload.txt');
         $local->assertExists('applications/2/b.pdf');
+    }
+
+    public function test_upload_folders_and_files_have_readable_safe_names()
+    {
+        $organization = Organization::factory()->create(['name' => "St. Mary's Weavers: Bauko/Abatan"]);
+
+        $this->assertSame("Organization documents/{$organization->id} - St. Marys Weavers Bauko Abatan", UploadPaths::organizationDocuments($organization));
+        $this->assertSame("Organization logos/{$organization->id} - St. Marys Weavers Bauko Abatan", UploadPaths::organizationLogos($organization));
+        $this->assertMatchesRegularExpression('/^Mayors Permit 2026 \([a-z0-9]{8}\)\.pdf$/', UploadPaths::fileName("Mayor's Permit 2026", 'PDF'));
+        $this->assertMatchesRegularExpression('/^file \([a-z0-9]{8}\)\.png$/', UploadPaths::fileName('???', 'png'));
+
+        $this->assertSame("Organization documents/{$organization->id} - St. Marys Weavers Bauko Abatan", UploadPaths::ownFolder(UploadPaths::organizationDocuments($organization).'/a.pdf'));
+        $this->assertNull(UploadPaths::ownFolder('organization-logos/a.png'));
     }
 
     public function test_moving_needs_a_different_target_disk()
