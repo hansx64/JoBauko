@@ -38,6 +38,7 @@ export default function AcceptInvitation({ name, email, organization, role, acti
                 <div className="grid gap-2">
                     <Label htmlFor="password">Password</Label>
                     <PasswordInput
+                        strength
                         id="password"
                         autoComplete="new-password"
                         autoFocus
@@ -51,6 +52,7 @@ export default function AcceptInvitation({ name, email, organization, role, acti
                 <div className="grid gap-2">
                     <Label htmlFor="password_confirmation">Confirm password</Label>
                     <PasswordInput
+                        mustMatch={data.password}
                         id="password_confirmation"
                         autoComplete="new-password"
                         required

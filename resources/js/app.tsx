@@ -4,6 +4,7 @@ import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { route as routeFn } from 'ziggy-js';
+import { FormValidationBubble } from './components/form-validation-bubble';
 import { initializeTheme } from './hooks/use-appearance';
 import { type SharedData } from './types';
 
@@ -19,7 +20,12 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<App {...props} />);
+        root.render(
+            <>
+                <App {...props} />
+                <FormValidationBubble />
+            </>,
+        );
     },
     progress: {
         color: '#4B5563',

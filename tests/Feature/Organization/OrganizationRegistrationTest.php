@@ -45,8 +45,8 @@ class OrganizationRegistrationTest extends TestCase
             'representative_name' => 'Pedro Bayang',
             'representative_position' => 'Chairperson',
             'email' => 'pedro@bhfc.example',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'password' => 'Highland-Harvest-2026',
+            'password_confirmation' => 'Highland-Harvest-2026',
             'privacy_consent' => true,
             ...$overrides,
         ];

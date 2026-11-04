@@ -74,12 +74,12 @@ class PersonnelTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page->component('auth/accept-invitation')->where('email', 'maria@coop.test'));
 
-        $this->post($url, ['password' => 'a-strong-passphrase', 'password_confirmation' => 'a-strong-passphrase'])
+        $this->post($url, ['password' => 'a-strong-passphrase-26', 'password_confirmation' => 'a-strong-passphrase-26'])
             ->assertRedirect(route('org.dashboard'));
 
         $user = $member->user->refresh();
         $this->assertAuthenticatedAs($user);
-        $this->assertTrue(Hash::check('a-strong-passphrase', $user->password));
+        $this->assertTrue(Hash::check('a-strong-passphrase-26', $user->password));
         $this->assertNotNull($user->email_verified_at);
 
         // The link works only once.

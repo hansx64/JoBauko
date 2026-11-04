@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Rules\NotCommonPassword;
 use App\Services\Mail\GmailTransport;
 use App\Services\Sms\LogSmsGateway;
 use App\Services\Sms\SemaphoreSmsGateway;
@@ -58,10 +59,13 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('web', fn (Request $request) => Limit::perMinute(config('jobauko.requests_per_minute'))
             ->by($request->user()?->id ? 'user:'.$request->user()->id : 'ip:'.$request->ip()));
 
-        // Stricter passwords in production, including a check against known
-        // breached passwords (k-anonymity lookup; the password never leaves the server).
-        Password::defaults(fn () => $this->app->environment('production')
-            ? Password::min(10)->letters()->numbers()->uncompromised()
-            : Password::min(8));
+        // The same rules the strength meter shows (resources/js/lib/password-strength.ts).
+        // Production also rejects known breached passwords (k-anonymity lookup;
+        // the password never leaves the server).
+        Password::defaults(function () {
+            $rule = Password::min(10)->letters()->numbers()->rules([new NotCommonPassword]);
+
+            return $this->app->environment('production') ? $rule->uncompromised() : $rule;
+        });
     }
 }

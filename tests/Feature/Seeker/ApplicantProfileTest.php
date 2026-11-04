@@ -67,8 +67,8 @@ class ApplicantProfileTest extends TestCase
             'mobile_number' => '09181234567',
             'barangay_id' => Barangay::value('id'),
             'classification' => 'student',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'password' => 'Highland-Harvest-2026',
+            'password_confirmation' => 'Highland-Harvest-2026',
             'privacy_consent' => true,
         ]);
         $user = User::where('email', 'ana@example.com')->firstOrFail();

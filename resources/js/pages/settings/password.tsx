@@ -77,6 +77,7 @@ export default function Password() {
                             <Label htmlFor="password">New password</Label>
 
                             <PasswordInput
+                                strength
                                 id="password"
                                 ref={passwordInput}
                                 value={data.password}
@@ -93,6 +94,7 @@ export default function Password() {
                             <Label htmlFor="password_confirmation">Confirm password</Label>
 
                             <PasswordInput
+                                mustMatch={data.password}
                                 id="password_confirmation"
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}

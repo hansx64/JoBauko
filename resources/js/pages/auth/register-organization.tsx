@@ -203,6 +203,7 @@ export default function RegisterOrganization({ organizationTypes, barangays }: {
                             </Field>
                             <Field label="Password" error={errors.password}>
                                 <PasswordInput
+                                    strength
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     autoComplete="new-password"
@@ -211,6 +212,7 @@ export default function RegisterOrganization({ organizationTypes, barangays }: {
                             </Field>
                             <Field label="Confirm password" error={errors.password_confirmation}>
                                 <PasswordInput
+                                    mustMatch={data.password}
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
                                     autoComplete="new-password"

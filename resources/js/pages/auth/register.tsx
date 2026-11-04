@@ -147,6 +147,7 @@ export default function Register({ barangays, classifications, classificationTop
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
                         <PasswordInput
+                            strength
                             id="password"
                             required
                             autoComplete="new-password"
@@ -161,6 +162,7 @@ export default function Register({ barangays, classifications, classificationTop
                     <div className="grid gap-2">
                         <Label htmlFor="password_confirmation">Confirm password</Label>
                         <PasswordInput
+                            mustMatch={data.password}
                             id="password_confirmation"
                             required
                             autoComplete="new-password"

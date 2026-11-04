@@ -27,9 +27,15 @@ class PasswordPolicyTest extends TestCase
         $this->assertTrue($this->passes('rice-terraces-2026'));
     }
 
-    public function test_other_environments_keep_the_basic_minimum()
+    public function test_weak_passwords_are_refused_in_every_environment()
     {
-        $this->assertFalse($this->passes('short'));
-        $this->assertTrue($this->passes('password'));
+        $this->assertFalse($this->passes('password'));
+        $this->assertFalse($this->passes('password12'));
+        $this->assertFalse($this->passes('1234567890'));
+        $this->assertFalse($this->passes('Bauko@12345'));
+        $this->assertFalse($this->passes('aaaa1111aaaa'));
+        $this->assertFalse($this->passes('abcdefgh12'));
+        $this->assertTrue($this->passes('rice-terraces-2026'));
+        $this->assertTrue($this->passes('Kabayan7market'));
     }
 }
