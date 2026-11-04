@@ -3,6 +3,7 @@ import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 import InputError from '@/components/input-error';
+import { PasswordInput } from '@/components/password-input';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -145,9 +146,8 @@ export default function Register({ barangays, classifications, classificationTop
 
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
-                        <Input
+                        <PasswordInput
                             id="password"
-                            type="password"
                             required
                             autoComplete="new-password"
                             value={data.password}
@@ -160,9 +160,8 @@ export default function Register({ barangays, classifications, classificationTop
 
                     <div className="grid gap-2">
                         <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input
+                        <PasswordInput
                             id="password_confirmation"
-                            type="password"
                             required
                             autoComplete="new-password"
                             value={data.password_confirmation}

@@ -3,6 +3,7 @@ import { Building2, FileCheck2, LoaderCircle, UserRoundCheck } from 'lucide-reac
 import { FormEventHandler, ReactNode } from 'react';
 
 import InputError from '@/components/input-error';
+import { PasswordInput } from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -201,8 +202,7 @@ export default function RegisterOrganization({ organizationTypes, barangays }: {
                                 />
                             </Field>
                             <Field label="Password" error={errors.password}>
-                                <Input
-                                    type="password"
+                                <PasswordInput
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     autoComplete="new-password"
@@ -210,8 +210,7 @@ export default function RegisterOrganization({ organizationTypes, barangays }: {
                                 />
                             </Field>
                             <Field label="Confirm password" error={errors.password_confirmation}>
-                                <Input
-                                    type="password"
+                                <PasswordInput
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
                                     autoComplete="new-password"
