@@ -36,7 +36,7 @@ It has three kinds of users:
 
 It is built by Montanosa Tech for the Municipality of Bauko.
 
-Live site: https://jobauko.onrender.com
+Live site: https://jobauko-9xll.onrender.com
 The site runs on a free host that sleeps when idle. The first page load can take up to a minute. Wait for it and reload; it is not broken.
 
 ## Visit the site first
@@ -62,8 +62,8 @@ Do not log in, create accounts or submit any form on the live site. It is a real
 - Primary green: #007a35. Hero gradient: #006b31 → #00592a → #0d2418. Bright green in dark areas: #3ecf7a. Text on green: white.
 - Font: Instrument Sans (weights 400, 500, 600), from fonts.bunny.net or Google Fonts.
 - Logos are both shown as circles with a white background:
-  - The seal of the Municipality of Bauko: https://jobauko.onrender.com/images/bauko-seal.png
-  - The Montanosa Tech logo: https://jobauko.onrender.com/images/montanosa-tech.png
+  - The seal of the Municipality of Bauko: https://jobauko-9xll.onrender.com/images/bauko-seal.png
+  - The Montanosa Tech logo: https://jobauko-9xll.onrender.com/images/montanosa-tech.png
   Download them into the Remotion project's public/ folder. Never redraw, recolor or crop either logo, especially the seal.
 - Tagline from the site: "Discover Opportunities. Build Your Future."
 
@@ -214,7 +214,7 @@ Icons with short labels appearing one by one:
 Words: "Your data, your choice."
 
 **Scene 17 · 2:52–3:00 · Closing**
-Both logos, "JoBauko", the tagline and "jobauko.onrender.com". Hold the final frame for at least the last 3 seconds.
+Both logos, "JoBauko", the tagline and "jobauko-9xll.onrender.com". Hold the final frame for at least the last 3 seconds.
 
 ## Accuracy rules: do not break these
 
@@ -292,6 +292,6 @@ About 430 words, which takes about 3 minutes at a calm presenting pace. Each lin
 
 ### Before you present
 
-- Open https://jobauko.onrender.com a few minutes before you start, so the free server is awake if someone tries it.
+- Open https://jobauko-9xll.onrender.com a few minutes before you start, so the free server is awake if someone tries it.
 - Play the video full screen with sound off. It has no audio.
 - Practise once with a timer. If a line runs long, shorten it rather than speaking faster.
