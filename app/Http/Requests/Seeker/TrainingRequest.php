@@ -16,9 +16,23 @@ class TrainingRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'provider' => ['nullable', 'string', 'max:255'],
-            'completed_at' => ['nullable', 'date', 'before_or_equal:today'],
-            'hours' => ['nullable', 'integer', 'min:1', 'max:10000'],
+            // Shown on the resume, so employers can judge the training.
+            'provider' => ['required', 'string', 'max:255'],
+            'completed_at' => ['required', 'date', 'before_or_equal:today'],
+            'hours' => ['required', 'integer', 'min:1', 'max:10000'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'provider.required' => 'Enter who conducted the training.',
+            'completed_at.required' => 'Enter the date you completed the training.',
+            'completed_at.before_or_equal' => 'The completion date cannot be in the future.',
+            'hours.required' => 'Enter the number of hours.',
         ];
     }
 }

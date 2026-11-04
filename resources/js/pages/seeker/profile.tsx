@@ -69,9 +69,9 @@ export default function Profile(props: ProfilePageProps) {
 
     const trainingFields: FieldDef[] = [
         { name: 'title', label: 'Training or seminar', type: 'text', required: true },
-        { name: 'provider', label: 'Conducted by', type: 'text', placeholder: 'e.g. DTI, ATI, TESDA' },
-        { name: 'completed_at', label: 'Date completed', type: 'date' },
-        { name: 'hours', label: 'Number of hours', type: 'number' },
+        { name: 'provider', label: 'Conducted by', type: 'text', required: true, placeholder: 'e.g. DTI, ATI, TESDA' },
+        { name: 'completed_at', label: 'Date completed', type: 'date', required: true },
+        { name: 'hours', label: 'Number of hours', type: 'number', required: true },
     ];
 
     return (

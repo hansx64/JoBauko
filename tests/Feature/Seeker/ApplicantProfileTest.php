@@ -139,10 +139,20 @@ class ApplicantProfileTest extends TestCase
         $this->actingAs($user);
 
         $this->post('/profile/certifications', ['name' => 'Bread and Pastry Production NC II', 'issuer' => 'TESDA'])->assertSessionHasNoErrors();
-        $this->post('/profile/trainings', ['title' => 'Organic Farming Training', 'provider' => 'ATI', 'hours' => 24])->assertSessionHasNoErrors();
+        $this->post('/profile/trainings', ['title' => 'Organic Farming Training', 'provider' => 'ATI', 'completed_at' => '2025-06-20', 'hours' => 24])->assertSessionHasNoErrors();
 
         $this->assertSame(1, $user->applicantProfile->certifications()->count());
         $this->assertSame(24, $user->applicantProfile->trainings()->sole()->hours);
+    }
+
+    public function test_a_training_needs_who_conducted_it_when_and_for_how_long()
+    {
+        $this->actingAs($this->seeker())
+            ->post('/profile/trainings', ['title' => 'Organic Farming Training'])
+            ->assertSessionHasErrors(['provider', 'completed_at', 'hours']);
+
+        $this->post('/profile/trainings', ['title' => 'Organic Farming Training', 'provider' => 'ATI', 'completed_at' => now()->addDay()->toDateString(), 'hours' => 24])
+            ->assertSessionHasErrors(['completed_at' => 'The completion date cannot be in the future.']);
     }
 
     public function test_skills_are_synced_against_the_dictionary_without_duplicates()
