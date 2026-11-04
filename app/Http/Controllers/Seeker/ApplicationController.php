@@ -104,7 +104,7 @@ class ApplicationController extends Controller
             'resumeRequired' => $opportunity->category === OpportunityCategory::Job,
             'completion' => $completion->for($user)['percent'],
             // Required profile sections still to do; the form is replaced by a checklist until they are done.
-            'missing' => array_map(fn (array $s) => ['key' => $s['key'], 'label' => $s['label'], 'hint' => $s['hint']], $completion->missingToApply($user)),
+            'missing' => array_map(fn (array $s) => ['key' => $s['key'], 'label' => $s['label'], 'hint' => $s['hint']], $completion->missingToApply($user, $opportunity)),
         ]);
     }
 

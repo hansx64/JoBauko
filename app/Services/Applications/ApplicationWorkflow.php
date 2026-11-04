@@ -56,7 +56,7 @@ class ApplicationWorkflow
             throw ValidationException::withMessages(['application' => 'You have already applied to this opportunity.']);
         }
 
-        if ($missing = $this->completion->missingToApply($user)) {
+        if ($missing = $this->completion->missingToApply($user, $opportunity)) {
             $labels = array_map(fn (array $section) => Str::lower($section['label']), $missing);
 
             throw ValidationException::withMessages(['application' => 'Finish your profile before applying. Still missing: '.implode(', ', $labels).'.']);

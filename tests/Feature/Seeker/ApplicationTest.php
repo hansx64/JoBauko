@@ -10,7 +10,6 @@ use App\Models\Application;
 use App\Models\Opportunity;
 use App\Models\OpportunityDocument;
 use App\Models\Organization;
-use App\Models\Resume;
 use App\Models\User;
 use App\Notifications\ApplicationActivity;
 use App\Services\Applications\ApplicationWorkflow;
@@ -205,6 +204,22 @@ class ApplicationTest extends TestCase
         $this->post("/opportunities/{$job->slug}/apply", ['consent' => '1'])
             ->assertSessionHasErrors(['application' => 'Finish your profile before applying. Still missing: personal information, educational background, skills, resume.']);
         $this->assertDatabaseCount('applications', 0);
+
+        // Scholarships, livelihood programs and trainings need the profile but not a resume.
+        $complete = User::factory()->readyToApply()->create();
+        $complete->resumes()->delete();
+        $scholarship = Opportunity::factory()->published()->create(['category' => OpportunityCategory::Scholarship]);
+
+        $this->actingAs($complete)
+            ->get("/opportunities/{$job->slug}/apply")
+            ->assertInertia(fn ($page) => $page->where('missing', fn ($missing) => collect($missing)->pluck('key')->all() === ['resume']));
+        $this->get("/opportunities/{$scholarship->slug}/apply")
+            ->assertInertia(fn ($page) => $page->where('missing', []));
+        $this->post("/opportunities/{$scholarship->slug}/apply", ['consent' => '1'])->assertSessionHasNoErrors();
+        $this->post("/opportunities/{$job->slug}/apply", ['consent' => '1'])
+            ->assertSessionHasErrors(['application' => 'Finish your profile before applying. Still missing: resume.']);
+        $this->assertSame([$scholarship->id], Application::pluck('opportunity_id')->all());
+        Application::query()->forceDelete();
 
         // Work experience, certifications and interests are optional.
         $ready = User::factory()->readyToApply()->create();

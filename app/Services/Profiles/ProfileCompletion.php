@@ -2,6 +2,8 @@
 
 namespace App\Services\Profiles;
 
+use App\Enums\OpportunityCategory;
+use App\Models\Opportunity;
 use App\Models\User;
 
 /**
@@ -9,33 +11,43 @@ use App\Models\User;
  * stored, so it can never drift from the underlying data.
  *
  * Sections marked required must be complete before the seeker can apply:
- * organizations need to see who they are, their education, their skills and
- * a resume. The others improve recommendations but many residents (students,
- * first-time job seekers) have nothing to put there yet.
+ * organizations need to see who they are, their education and their skills.
+ * A resume is also required for jobs; scholarships, livelihood programs and
+ * trainings only need the profile. The other sections improve
+ * recommendations but many residents (students, first-time job seekers) have
+ * nothing to put there yet.
  */
 class ProfileCompletion
 {
     public const REQUIRED_TO_APPLY = ['personal', 'education', 'skills', 'resume'];
 
+    /** Required only when applying to these categories. */
+    public const REQUIRED_FOR_JOBS_ONLY = ['resume'];
+
     /**
-     * The required sections the seeker still has to complete before applying.
+     * The required sections the seeker still has to complete before applying
+     * to this opportunity (or to a job, when none is given).
      *
-     * @return list<array{key: string, label: string, weight: int, complete: bool, required: bool, hint: string}>
+     * @return list<array{key: string, label: string, weight: int, complete: bool, required: bool, jobs_only: bool, hint: string}>
      */
-    public function missingToApply(User $user): array
+    public function missingToApply(User $user, ?Opportunity $opportunity = null): array
     {
+        $needed = $opportunity === null || $opportunity->category === OpportunityCategory::Job
+            ? self::REQUIRED_TO_APPLY
+            : array_values(array_diff(self::REQUIRED_TO_APPLY, self::REQUIRED_FOR_JOBS_ONLY));
+
         $sections = $this->for($user)['sections'];
 
         if ($sections === []) {
             // No applicant profile at all: everything required is missing.
-            return array_map(fn (string $key) => ['key' => $key, 'label' => ucfirst($key), 'weight' => 0, 'complete' => false, 'required' => true, 'hint' => ''], self::REQUIRED_TO_APPLY);
+            return array_map(fn (string $key) => ['key' => $key, 'label' => ucfirst($key), 'weight' => 0, 'complete' => false, 'required' => true, 'hint' => ''], $needed);
         }
 
-        return array_values(array_filter($sections, fn (array $s) => $s['required'] && ! $s['complete']));
+        return array_values(array_filter($sections, fn (array $s) => in_array($s['key'], $needed, true) && ! $s['complete']));
     }
 
     /**
-     * @return array{percent: int, sections: list<array{key: string, label: string, weight: int, complete: bool, required: bool, hint: string}>}
+     * @return array{percent: int, sections: list<array{key: string, label: string, weight: int, complete: bool, required: bool, jobs_only: bool, hint: string}>}
      */
     public function for(User $user): array
     {
@@ -100,7 +112,11 @@ class ProfileCompletion
             ],
         ];
 
-        $sections = array_map(fn (array $s) => [...$s, 'required' => in_array($s['key'], self::REQUIRED_TO_APPLY, true)], $sections);
+        $sections = array_map(fn (array $s) => [
+            ...$s,
+            'required' => in_array($s['key'], self::REQUIRED_TO_APPLY, true),
+            'jobs_only' => in_array($s['key'], self::REQUIRED_FOR_JOBS_ONLY, true),
+        ], $sections);
 
         $percent = array_sum(array_map(fn (array $s) => $s['complete'] ? $s['weight'] : 0, $sections));
 

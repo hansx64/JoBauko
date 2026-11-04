@@ -70,6 +70,8 @@ export interface CompletionSection {
     complete: boolean;
     /** Must be complete before the seeker can apply to opportunities. */
     required: boolean;
+    /** Required only when applying to jobs (the resume). */
+    jobs_only: boolean;
     hint: string;
 }
 

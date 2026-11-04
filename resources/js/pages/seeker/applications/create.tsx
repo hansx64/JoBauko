@@ -332,8 +332,8 @@ function FinishProfileFirst({ missing }: { missing: ApplyProps['missing'] }) {
                     <ClipboardList className="h-4 w-4" /> Finish your profile to apply
                 </CardTitle>
                 <CardDescription>
-                    Organizations review your applicant profile and resume, so these parts must be filled in before you can apply. It only needs to be
-                    done once; after that you can apply to any opportunity.
+                    Organizations review your applicant profile, so these parts must be filled in before you can apply. Jobs also need a resume. It
+                    only needs to be done once.
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
