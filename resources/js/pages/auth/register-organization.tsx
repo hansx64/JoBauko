@@ -278,7 +278,8 @@ function Section({ icon, title, description, children }: { icon: ReactNode; titl
 
 function Field({ label, error, className, children }: { label: string; error?: string; className?: string; children: ReactNode }) {
     return (
-        <div className={`grid gap-2 ${className ?? ''}`}>
+        // content-start: in a row with a taller neighbour (the password strength meter), keep the label and input at the top.
+        <div className={`grid content-start gap-2 ${className ?? ''}`}>
             <Label>{label}</Label>
             {children}
             <InputError message={error} />
