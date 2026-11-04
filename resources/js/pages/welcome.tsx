@@ -70,9 +70,6 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
                         className="pointer-events-none absolute top-16 right-4 hidden size-56 shadow-2xl ring-8 ring-white/15 lg:block xl:size-64"
                     />
                     <div className="max-w-3xl space-y-6">
-                        <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm ring-1 ring-white/20">
-                            <MapPinned className="h-4 w-4" /> Municipality of Bauko, Mountain Province
-                        </p>
                         <h1 className="text-4xl font-bold tracking-tight text-balance md:text-6xl">Discover Opportunities. Build Your Future.</h1>
                         <p className="max-w-2xl text-lg text-white/85 md:text-xl">
                             Find jobs, scholarships, livelihood programs and trainings that match your skills, qualifications, and aspirations.
