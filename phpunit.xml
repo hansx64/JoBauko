@@ -24,6 +24,12 @@
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="mysql"/>
         <env name="DB_DATABASE" value="opportunity_portal_test"/>
+        <!-- Always the local server, even when .env points at the live database. -->
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="3306"/>
+        <env name="DB_USERNAME" value="root"/>
+        <env name="DB_PASSWORD" value=""/>
+        <env name="MYSQL_ATTR_SSL_CA" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="UPLOADS_DISK" value="local"/>
         <env name="PULSE_ENABLED" value="false"/>
