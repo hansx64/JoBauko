@@ -25,3 +25,31 @@ export default function AppLogoIcon({ large = false, className, alt = 'Seal of t
         />
     );
 }
+
+/** The logo of Montanosa Tech, who built JoBauko. */
+export function MontanosaLogoIcon({ className, alt = 'Montanosa Tech logo', ...props }: ImgHTMLAttributes<HTMLImageElement>) {
+    return (
+        <img
+            src="/images/montanosa-tech.png"
+            width={256}
+            height={256}
+            alt={alt}
+            className={cn('shrink-0 rounded-full bg-white', className)}
+            {...props}
+        />
+    );
+}
+
+/**
+ * The municipal seal with the Montanosa Tech logo beside it. `className`
+ * sizes each logo; `secondClassName` is added to the second one only (for
+ * example to hide it where there is room for one logo).
+ */
+export function LogoPair({ large = false, className, secondClassName }: { large?: boolean; className?: string; secondClassName?: string }) {
+    return (
+        <span className="flex shrink-0 items-center gap-1.5">
+            <AppLogoIcon large={large} className={className} alt="" />
+            <MontanosaLogoIcon className={cn(className, secondClassName)} alt="" />
+        </span>
+    );
+}

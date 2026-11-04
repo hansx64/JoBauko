@@ -1,4 +1,4 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+import { LogoPair } from '@/components/app-logo-icon';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Head, Link } from '@inertiajs/react';
 import { type ReactNode } from 'react';
@@ -25,7 +25,7 @@ export default function Privacy({ version, contactEmail, uploadsInGoogleDrive }:
             <header className="border-b">
                 <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-4">
                     <Link href={route('home')} className="flex items-center gap-2 font-semibold">
-                        <AppLogoIcon className="size-8" alt="" />
+                        <LogoPair className="size-8" />
                         JoBauko
                     </Link>
                     <AppearanceToggleDropdown />

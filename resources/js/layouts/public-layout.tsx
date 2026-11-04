@@ -1,4 +1,4 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+import { LogoPair } from '@/components/app-logo-icon';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -41,7 +41,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                 <div className="bauko-weave h-1" aria-hidden />
                 <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5">
                     <Link href={route('home')} className="flex items-center gap-2.5">
-                        <AppLogoIcon className="size-10" alt="" />
+                        <LogoPair className="size-10" />
                         <span className="grid leading-tight">
                             <span className="font-semibold">JoBauko</span>
                             <span className="text-muted-foreground text-xs">Municipality of Bauko</span>
@@ -101,7 +101,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                 <div className="text-muted-foreground mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm sm:grid-cols-3">
                     <div className="space-y-2">
                         <p className="text-foreground flex items-center gap-2 font-semibold">
-                            <AppLogoIcon className="size-8" alt="" /> JoBauko
+                            <LogoPair className="size-8" /> JoBauko
                         </p>
                         <p>Jobs, scholarships, livelihood programs and trainings for the people of Bauko, Mountain Province.</p>
                     </div>

@@ -1,4 +1,4 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+import { LogoPair } from '@/components/app-logo-icon';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Link } from '@inertiajs/react';
 
@@ -17,7 +17,9 @@ export default function AuthSimpleLayout({ children, title, description }: AuthL
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col items-center gap-4">
                         <Link href={route('home')} className="flex flex-col items-center gap-2 font-medium">
-                            <AppLogoIcon large className="mb-1 size-20" />
+                            <span className="mb-1">
+                                <LogoPair large className="size-20" />
+                            </span>
                             <span className="sr-only">{title}</span>
                         </Link>
 

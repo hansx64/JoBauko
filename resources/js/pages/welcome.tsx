@@ -2,7 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ArrowRight, BellRing, Building2, FileCheck2, MapPinned, Search, ShieldCheck, Sparkles, UserRoundPlus } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
-import AppLogoIcon from '@/components/app-logo-icon';
+import AppLogoIcon, { MontanosaLogoIcon } from '@/components/app-logo-icon';
 import { categoryIcons, categoryTones, OpportunityCard } from '@/components/opportunities/opportunity-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,13 +67,7 @@ export default function Welcome({ categories, latest, featuredOrganizations, tot
                 <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 md:py-24">
                     <div className="pointer-events-none absolute top-16 right-4 hidden flex-col gap-5 lg:flex xl:flex-row">
                         <AppLogoIcon large className="size-40 shadow-2xl ring-8 ring-white/15" />
-                        <img
-                            src="/images/montanosa-tech.png"
-                            width={256}
-                            height={256}
-                            alt="Montanosa Tech logo"
-                            className="size-40 shrink-0 rounded-full bg-white shadow-2xl ring-8 ring-white/15"
-                        />
+                        <MontanosaLogoIcon className="size-40 shadow-2xl ring-8 ring-white/15" />
                     </div>
                     <div className="max-w-3xl space-y-6">
                         <h1 className="text-4xl font-bold tracking-tight text-balance md:text-6xl">Discover Opportunities. Build Your Future.</h1>

@@ -1,4 +1,4 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+import { LogoPair } from '@/components/app-logo-icon';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 
@@ -16,7 +16,9 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
             <div className="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#006b31] to-[#0d2418]" />
                 <Link href={route('home')} className="relative z-20 flex items-center text-lg font-medium">
-                    <AppLogoIcon className="mr-3 size-10" alt="" />
+                    <span className="mr-3">
+                        <LogoPair className="size-10" />
+                    </span>
                     {name}
                 </Link>
                 {quote && (
@@ -31,7 +33,7 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
             <div className="w-full lg:p-8">
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                     <Link href={route('home')} className="relative z-20 flex items-center justify-center lg:hidden">
-                        <AppLogoIcon large className="size-16 sm:size-20" />
+                        <LogoPair large className="size-16 sm:size-20" />
                     </Link>
                     <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center">
                         <h1 className="text-xl font-medium">{title}</h1>
