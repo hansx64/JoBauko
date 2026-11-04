@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AccountType;
 use App\Enums\AssistanceType;
 use App\Enums\Classification;
 use App\Enums\EducationLevel;
 use App\Enums\EmploymentType;
 use App\Enums\OpportunityCategory;
 use App\Enums\OpportunityStatus;
+use App\Enums\OrganizationRole;
 use App\Enums\OrganizationType;
 use App\Enums\TrainingType;
 use App\Enums\VerificationStatus;
@@ -16,6 +18,7 @@ use App\Models\Barangay;
 use App\Models\Opportunity;
 use App\Models\Organization;
 use App\Models\Skill;
+use App\Models\User;
 use App\Services\Recommendation\MatchRefresher;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -219,9 +222,36 @@ class SampleDataSeeder extends Seeder
             'target_classifications' => [Classification::Student->value, Classification::FreshGraduate->value],
         ], ['Communication Skills'], []);
 
+        // .test addresses so notifications never reach a real inbox.
+        $this->member($agriculture, 'agriculture@jobauko.test', 'Evelyn Lagman');
+        $this->member($coop, 'abatanvalley@jobauko.test', 'Rodel Kitongan');
+        $this->member($inn, 'pinewoodridge@jobauko.test', 'Marites Daoas');
+        $this->member($foundation, 'highlandsfoundation@jobauko.test', 'Nestor Bilagot');
+
         MatchRefresher::invalidateAll();
 
         $this->command?->info('Sample organizations and opportunities are ready.');
+    }
+
+    /**
+     * An administrator login for the organization. The password is random and
+     * shown once, so it is never stored in the code.
+     */
+    private function member(Organization $organization, string $email, string $name): void
+    {
+        $user = User::firstOrNew(['email' => $email]);
+
+        if (! $user->exists) {
+            $password = Str::password(14, symbols: false);
+            $user->fill(['name' => $name, 'password' => $password]);
+            $user->account_type = AccountType::Organization;
+            $user->email_verified_at = now();
+            $user->save();
+
+            $this->command?->line("  {$organization->name}: {$email} / {$password}");
+        }
+
+        $organization->members()->updateOrCreate(['user_id' => $user->id], ['role' => OrganizationRole::Admin, 'is_active' => true]);
     }
 
     private function barangay(string $name): ?int
