@@ -20,6 +20,8 @@ export interface FieldDef {
     label: string;
     type: 'text' | 'textarea' | 'date' | 'number' | 'select' | 'checkbox';
     required?: boolean;
+    /** Can be left empty when saving, but must be filled in before applying to opportunities. */
+    neededToApply?: boolean;
     options?: Option[];
     placeholder?: string;
     hint?: string;
@@ -182,7 +184,11 @@ export function FieldInput({ idPrefix, field, value, error, onChange, disabled }
         <div className="grid gap-2">
             <Label htmlFor={inputId}>
                 {field.label}
-                {!field.required && <span className="text-muted-foreground font-normal"> (optional)</span>}
+                {field.neededToApply ? (
+                    <span className="font-normal text-amber-700 dark:text-amber-400"> (needed to apply)</span>
+                ) : (
+                    !field.required && <span className="text-muted-foreground font-normal"> (optional)</span>
+                )}
             </Label>
             {field.type === 'select' ? (
                 <Select value={String(value ?? '')} onValueChange={onChange} disabled={disabled}>

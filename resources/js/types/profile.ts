@@ -68,6 +68,8 @@ export interface CompletionSection {
     label: string;
     weight: number;
     complete: boolean;
+    /** Must be complete before the seeker can apply to opportunities. */
+    required: boolean;
     hint: string;
 }
 

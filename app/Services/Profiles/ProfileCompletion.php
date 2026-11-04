@@ -7,11 +7,35 @@ use App\Models\User;
 /**
  * Computes how complete a seeker's profile is. Derived on demand rather than
  * stored, so it can never drift from the underlying data.
+ *
+ * Sections marked required must be complete before the seeker can apply:
+ * organizations need to see who they are, their education, their skills and
+ * a resume. The others improve recommendations but many residents (students,
+ * first-time job seekers) have nothing to put there yet.
  */
 class ProfileCompletion
 {
+    public const REQUIRED_TO_APPLY = ['personal', 'education', 'skills', 'resume'];
+
     /**
-     * @return array{percent: int, sections: list<array{key: string, label: string, weight: int, complete: bool, hint: string}>}
+     * The required sections the seeker still has to complete before applying.
+     *
+     * @return list<array{key: string, label: string, weight: int, complete: bool, required: bool, hint: string}>
+     */
+    public function missingToApply(User $user): array
+    {
+        $sections = $this->for($user)['sections'];
+
+        if ($sections === []) {
+            // No applicant profile at all: everything required is missing.
+            return array_map(fn (string $key) => ['key' => $key, 'label' => ucfirst($key), 'weight' => 0, 'complete' => false, 'required' => true, 'hint' => ''], self::REQUIRED_TO_APPLY);
+        }
+
+        return array_values(array_filter($sections, fn (array $s) => $s['required'] && ! $s['complete']));
+    }
+
+    /**
+     * @return array{percent: int, sections: list<array{key: string, label: string, weight: int, complete: bool, required: bool, hint: string}>}
      */
     public function for(User $user): array
     {
@@ -75,6 +99,8 @@ class ProfileCompletion
                 'hint' => 'Upload your resume as a PDF or Word (DOCX) file, or create one with the resume builder.',
             ],
         ];
+
+        $sections = array_map(fn (array $s) => [...$s, 'required' => in_array($s['key'], self::REQUIRED_TO_APPLY, true)], $sections);
 
         $percent = array_sum(array_map(fn (array $s) => $s['complete'] ? $s['weight'] : 0, $sections));
 

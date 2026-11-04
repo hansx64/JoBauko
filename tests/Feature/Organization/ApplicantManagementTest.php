@@ -96,9 +96,8 @@ class ApplicantManagementTest extends TestCase
         $this->seed(SkillSeeder::class);
         ['job' => $job] = $this->organizationWithJob();
         $job->skills()->attach(Skill::where('name', 'Organic Farming')->value('id'));
-        $seeker = User::factory()->seeker()->create();
+        $seeker = User::factory()->readyToApply()->create();
         $seeker->applicantProfile->skills()->attach(Skill::where('name', 'Organic Farming')->value('id'));
-        Resume::factory()->for($seeker)->create();
 
         $this->actingAs($seeker)->post("/opportunities/{$job->slug}/apply", ['consent' => '1'])->assertSessionHasNoErrors();
 

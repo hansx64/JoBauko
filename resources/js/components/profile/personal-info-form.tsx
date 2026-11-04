@@ -30,16 +30,23 @@ export function PersonalInfoForm({ personal, options }: { personal: PersonalInfo
             options: options.classifications,
             hint: 'Update this whenever your situation changes. It helps us suggest the right opportunities.',
         },
-        { name: 'date_of_birth', label: 'Date of birth', type: 'date' },
-        { name: 'gender', label: 'Gender', type: 'select', options: options.genders },
+        { name: 'date_of_birth', label: 'Date of birth', type: 'date', neededToApply: true },
+        { name: 'gender', label: 'Gender', type: 'select', options: options.genders, neededToApply: true },
         {
             name: 'address_line',
             label: 'Street / sitio',
             type: 'text',
             placeholder: 'e.g. Sitio Lamagan',
             hint: 'Your barangay is set in account settings.',
+            neededToApply: true,
         },
-        { name: 'highest_education', label: 'Highest educational attainment', type: 'select', options: options.educationLevels },
+        {
+            name: 'highest_education',
+            label: 'Highest educational attainment',
+            type: 'select',
+            options: options.educationLevels,
+            neededToApply: true,
+        },
         { name: 'current_education_status', label: 'Current educational status', type: 'select', options: options.educationStatuses },
     ];
 

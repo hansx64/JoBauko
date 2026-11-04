@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Notifications\ApplicationActivity;
 use App\Notifications\ApplicationStatusUpdated;
 use App\Services\Audit\AuditLogger;
+use App\Services\Profiles\ProfileCompletion;
 use App\Services\Recommendation\MatchScorer;
 use App\Services\Recommendation\SeekerSnapshot;
 use App\Support\UploadPaths;
@@ -40,6 +41,7 @@ class ApplicationWorkflow
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly MatchScorer $scorer,
+        private readonly ProfileCompletion $completion,
     ) {}
 
     /**
@@ -52,6 +54,12 @@ class ApplicationWorkflow
 
         if (Application::withTrashed()->where('opportunity_id', $opportunity->id)->where('user_id', $user->id)->exists()) {
             throw ValidationException::withMessages(['application' => 'You have already applied to this opportunity.']);
+        }
+
+        if ($missing = $this->completion->missingToApply($user)) {
+            $labels = array_map(fn (array $section) => Str::lower($section['label']), $missing);
+
+            throw ValidationException::withMessages(['application' => 'Finish your profile before applying. Still missing: '.implode(', ', $labels).'.']);
         }
 
         $resume = ($data['include_resume'] ?? true) ? $user->currentResume : null;

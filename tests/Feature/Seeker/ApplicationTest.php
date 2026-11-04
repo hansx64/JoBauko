@@ -36,10 +36,7 @@ class ApplicationTest extends TestCase
 
     private function seekerWithResume(): User
     {
-        $seeker = User::factory()->seeker()->create();
-        Resume::factory()->for($seeker)->create();
-
-        return $seeker;
+        return User::factory()->readyToApply()->create();
     }
 
     /**
@@ -155,10 +152,6 @@ class ApplicationTest extends TestCase
         $scholarship = Opportunity::factory()->published()->create(['category' => OpportunityCategory::Scholarship]);
         $resumeDocument = $scholarship->requiredDocuments()->create(['name' => 'Updated résumé', 'is_required' => true]);
 
-        $this->actingAs(User::factory()->seeker()->create())
-            ->post("/opportunities/{$scholarship->slug}/apply", ['consent' => '1'])
-            ->assertSessionHasErrors("documents.{$resumeDocument->id}");
-
         $this->actingAs($this->seekerWithResume())
             ->post("/opportunities/{$scholarship->slug}/apply", ['consent' => '1', 'include_resume' => '0'])
             ->assertSessionHasErrors("documents.{$resumeDocument->id}");
@@ -178,21 +171,48 @@ class ApplicationTest extends TestCase
         }
     }
 
-    public function test_a_job_application_needs_a_resume_but_a_scholarship_does_not()
+    public function test_a_job_application_must_include_the_resume_but_a_scholarship_may_leave_it_out()
     {
-        $seeker = User::factory()->seeker()->create();
+        $seeker = User::factory()->readyToApply()->create();
         $job = Opportunity::factory()->job()->published()->create();
         $scholarship = Opportunity::factory()->published()->create(['category' => OpportunityCategory::Scholarship]);
 
         $this->actingAs($seeker)
-            ->post("/opportunities/{$job->slug}/apply", ['consent' => '1'])
+            ->post("/opportunities/{$job->slug}/apply", ['consent' => '1', 'include_resume' => '0'])
             ->assertSessionHasErrors('resume');
 
-        $this->post("/opportunities/{$scholarship->slug}/apply", ['consent' => '1'])
+        $this->post("/opportunities/{$scholarship->slug}/apply", ['consent' => '1', 'include_resume' => '0'])
             ->assertSessionHasNoErrors();
 
         $this->assertSame([$scholarship->id], Application::pluck('opportunity_id')->all());
         $this->assertNull(Application::sole()->resume_id);
+    }
+
+    public function test_the_profile_and_a_resume_must_be_finished_before_applying()
+    {
+        $seeker = User::factory()->seeker()->create();
+        $seeker->applicantProfile->update(['address_line' => null]);
+        $job = Opportunity::factory()->job()->published()->create();
+
+        $this->actingAs($seeker)
+            ->get("/opportunities/{$job->slug}/apply")
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('seeker/applications/create')
+                ->where('missing.0.key', 'personal')
+                ->where('missing', fn ($missing) => collect($missing)->pluck('key')->all() === ['personal', 'education', 'skills', 'resume']));
+
+        $this->post("/opportunities/{$job->slug}/apply", ['consent' => '1'])
+            ->assertSessionHasErrors(['application' => 'Finish your profile before applying. Still missing: personal information, educational background, skills, resume.']);
+        $this->assertDatabaseCount('applications', 0);
+
+        // Work experience, certifications and interests are optional.
+        $ready = User::factory()->readyToApply()->create();
+        $this->actingAs($ready)
+            ->get("/opportunities/{$job->slug}/apply")
+            ->assertInertia(fn ($page) => $page->where('missing', []));
+        $this->post("/opportunities/{$job->slug}/apply", ['consent' => '1'])->assertSessionHasNoErrors();
+        $this->assertDatabaseCount('applications', 1);
     }
 
     public function test_a_seeker_cannot_apply_twice()
@@ -267,7 +287,7 @@ class ApplicationTest extends TestCase
 
     public function test_seekers_see_their_own_applications_with_history()
     {
-        $seeker = User::factory()->seeker()->create();
+        $seeker = User::factory()->readyToApply()->create();
         $mine = Application::factory()->for($seeker)->create();
         $approved = Application::factory()->for($seeker)->status(ApplicationStatus::Approved)->create();
         Application::factory()->create();
@@ -298,7 +318,7 @@ class ApplicationTest extends TestCase
         $document = $application->documents()->create([
             'label' => 'Transcript', 'disk_path' => 'applications/x/file.pdf', 'original_name' => 'file.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 10,
         ]);
-        $other = User::factory()->seeker()->create();
+        $other = User::factory()->readyToApply()->create();
 
         $this->actingAs($other)->get("/applications/{$application->id}")->assertNotFound();
         $this->post("/applications/{$application->id}/withdraw")->assertNotFound();
@@ -330,7 +350,7 @@ class ApplicationTest extends TestCase
     {
         Notification::fake();
         [$job, $staff] = $this->jobWithDocuments();
-        $seeker = User::factory()->seeker()->create();
+        $seeker = User::factory()->readyToApply()->create();
         $application = Application::factory()->for($seeker)->for($job)->status(ApplicationStatus::UnderReview)->create();
 
         $this->actingAs($seeker)
@@ -354,7 +374,7 @@ class ApplicationTest extends TestCase
 
     public function test_decided_applications_cannot_be_withdrawn()
     {
-        $seeker = User::factory()->seeker()->create();
+        $seeker = User::factory()->readyToApply()->create();
         $application = Application::factory()->for($seeker)->status(ApplicationStatus::Approved)->create();
 
         $this->actingAs($seeker)->post("/applications/{$application->id}/withdraw")->assertForbidden();
@@ -365,7 +385,7 @@ class ApplicationTest extends TestCase
     {
         Notification::fake();
         [$job, $staff] = $this->jobWithDocuments();
-        $seeker = User::factory()->seeker()->create();
+        $seeker = User::factory()->readyToApply()->create();
         $application = Application::factory()->for($seeker)->for($job)->create();
         $this->actingAs($seeker);
 
@@ -392,7 +412,7 @@ class ApplicationTest extends TestCase
 
     public function test_the_dashboard_summarizes_applications()
     {
-        $seeker = User::factory()->seeker()->create();
+        $seeker = User::factory()->readyToApply()->create();
         Application::factory()->for($seeker)->create();
         Application::factory()->for($seeker)->status(ApplicationStatus::Approved)->create();
         Application::factory()->for($seeker)->status(ApplicationStatus::Withdrawn)->create();

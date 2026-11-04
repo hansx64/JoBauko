@@ -19,6 +19,7 @@ export function CompletionMeter({ percent }: { percent: number }) {
 
 export function CompletionCard({ completion }: { completion: Completion }) {
     const missing = completion.sections.filter((s) => !s.complete);
+    const missingRequired = missing.filter((s) => s.required);
 
     return (
         <Card>
@@ -28,7 +29,11 @@ export function CompletionCard({ completion }: { completion: Completion }) {
                     <span className="text-2xl font-semibold tabular-nums">{completion.percent}%</span>
                 </CardTitle>
                 <CardDescription>
-                    {missing.length === 0 ? 'Your profile is complete.' : 'A more complete profile gives you better recommendations.'}
+                    {missing.length === 0
+                        ? 'Your profile is complete.'
+                        : missingRequired.length > 0
+                          ? 'Complete the parts marked "Required to apply" before you can apply to opportunities.'
+                          : 'You can apply to opportunities. A more complete profile gives you better recommendations.'}
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
@@ -44,6 +49,11 @@ export function CompletionCard({ completion }: { completion: Completion }) {
                                 )}
                                 <span>
                                     <span className={section.complete ? '' : 'font-medium'}>{section.label}</span>
+                                    {section.required && !section.complete && (
+                                        <span className="ml-2 rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
+                                            Required to apply
+                                        </span>
+                                    )}
                                     {!section.complete && <span className="text-muted-foreground block text-xs">{section.hint}</span>}
                                 </span>
                             </a>
