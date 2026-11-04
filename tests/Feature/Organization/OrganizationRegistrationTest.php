@@ -101,6 +101,24 @@ class OrganizationRegistrationTest extends TestCase
         $this->get("/organizations/{$organization->id}/logo")->assertNotFound();
     }
 
+    public function test_a_job_seekers_mobile_number_can_be_used_for_their_organization()
+    {
+        User::factory()->seeker()->create(['mobile_number' => '09171234567']);
+
+        $this->post('/organizations/register', $this->validData(['mobile_number' => '0917 123 4567']))
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(2, User::where('mobile_number', '09171234567')->count());
+    }
+
+    public function test_two_organization_accounts_cannot_share_a_mobile_number()
+    {
+        User::factory()->organization()->create(['mobile_number' => '09171234567']);
+
+        $this->post('/organizations/register', $this->validData(['mobile_number' => '09171234567']))
+            ->assertSessionHasErrors(['mobile_number' => 'This mobile number is already used by another organization account.']);
+    }
+
     public function test_at_least_one_verification_document_is_required()
     {
         $this->post('/organizations/register', $this->validData(['documents' => []]))

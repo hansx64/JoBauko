@@ -118,6 +118,15 @@ class RegistrationTest extends TestCase
             ->assertSessionHasErrors('mobile_number');
     }
 
+    public function test_a_number_on_an_organization_account_can_still_register_as_a_job_seeker()
+    {
+        User::factory()->organization()->create(['mobile_number' => '09171234567']);
+
+        $this->post('/register', $this->validData())->assertSessionHasNoErrors();
+
+        $this->assertSame(AccountType::Seeker, User::where('email', 'maria@example.com')->sole()->account_type);
+    }
+
     public function test_mobile_number_formats_are_normalized_before_the_uniqueness_check()
     {
         User::factory()->create(['mobile_number' => '09171234567']);

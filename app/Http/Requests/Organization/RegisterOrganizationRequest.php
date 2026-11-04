@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Organization;
 
+use App\Enums\AccountType;
 use App\Enums\OrganizationType;
 use App\Models\Barangay;
 use App\Models\User;
@@ -47,7 +48,7 @@ class RegisterOrganizationRequest extends FormRequest
             'representative_name' => ['required', 'string', 'max:255'],
             'representative_position' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)],
-            'mobile_number' => ['nullable', 'string', 'regex:/^09\d{9}$/', Rule::unique(User::class)],
+            'mobile_number' => ['nullable', 'string', 'regex:/^09\d{9}$/', MobileNumber::uniqueFor(AccountType::Organization)],
             'password' => ['required', 'confirmed', Password::defaults()],
             'privacy_consent' => ['accepted'],
         ];
@@ -63,6 +64,7 @@ class RegisterOrganizationRequest extends FormRequest
         return [
             'contact_number.regex' => 'Enter a valid phone number.',
             'mobile_number.regex' => 'Enter a valid Philippine mobile number, e.g. 0917 123 4567.',
+            'mobile_number.unique' => 'This mobile number is already used by another organization account.',
             'documents.required' => 'Upload at least one verification document, such as a business permit or SEC/DTI registration.',
             'documents.*.mimes' => 'Documents must be PDF, JPG or PNG files.',
             'documents.*.extensions' => 'Documents must be PDF, JPG or PNG files.',

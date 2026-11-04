@@ -52,7 +52,7 @@ class ProfileUpdateRequest extends FormRequest
                 'nullable',
                 'string',
                 'regex:/^09\d{9}$/',
-                Rule::unique(User::class)->ignore($this->user()->id),
+                MobileNumber::uniqueFor($this->user()->account_type)->ignore($this->user()->id),
             ],
 
             'barangay_id' => [
