@@ -146,10 +146,10 @@ class ResumeBuilderTest extends TestCase
 
         $text = $this->pdfText($response->getContent());
         foreach ([
-            'MARIA SANTOS',
+            'Maria Santos',
+            'Office Clerk',
             'Sitio Lamagan, Abatan, Bauko, Mountain Province',
-            '09171234567',
-            'Applying for: Office Clerk',
+            '0917 123 4567',
             'To work as an office clerk',
             'Records Assistant',
             'Jul 2022 – Present',
@@ -166,6 +166,8 @@ class ResumeBuilderTest extends TestCase
             $this->assertStringContainsString($expected, $text);
         }
         $this->assertStringNotContainsString('- Encoded', $text);
+        // The signature line under the name was removed; the name appears only in the header.
+        $this->assertSame(1, substr_count($text, 'Maria Santos'));
         // Work experience comes before education when there is any.
         $this->assertLessThan(strpos($text, 'EDUCATION'), strpos($text, 'WORK EXPERIENCE'));
         // Age and sex are left out unless the seeker opts in.

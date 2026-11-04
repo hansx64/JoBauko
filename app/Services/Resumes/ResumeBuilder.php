@@ -53,7 +53,8 @@ class ResumeBuilder
         return [
             'name' => $user->name,
             'address' => $this->address($user, $profile),
-            'mobile' => $user->mobile_number,
+            // 0917 123 4567 reads more easily than 09171234567.
+            'mobile' => $user->mobile_number ? preg_replace('/^(\d{4})(\d{3})(\d{4})$/', '$1 $2 $3', $user->mobile_number) : null,
             'email' => $user->email,
             'desired_position' => $details->desired_position,
             'objective' => $details->objective ?? $profile->summary,

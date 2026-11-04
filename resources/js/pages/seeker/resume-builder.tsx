@@ -389,7 +389,7 @@ export default function ResumeBuilder({ details, contents, gaps, currentResume, 
                                     idPrefix="resume"
                                     field={{
                                         name: 'include_certification',
-                                        label: 'End with "I hereby certify that the above information is true and correct" and a signature line',
+                                        label: 'End with "I hereby certify that the above information is true and correct"',
                                         type: 'checkbox',
                                     }}
                                     value={form.data.include_certification}
